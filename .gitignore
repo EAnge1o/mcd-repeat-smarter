@@ -1,0 +1,32 @@
+# 依赖
+node_modules/
+dist/
+dist-server/
+
+# 环境变量与凭据（不要提交真实 Token）
+.env
+.env.local
+.env.*.local
+
+# 运行期数据（用户自己保存的常用方案）
+data/*
+!data/.gitkeep
+
+# 本地 MCP 探测产物（可能含真实订单/门店信息）
+probe/
+scripts/out/
+
+# 日志
+*.log
+npm-debug.log*
+
+# 编辑器 / 系统
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# 测试/构建临时产物
+coverage/
+test-results/
+.tmp/
