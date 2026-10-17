@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { HistoryOrder, Plan } from '../../server/domain/types';
 import { cx } from './ui';
-import { IconBell, IconClose, IconMenu, IconSearch, IconStore } from './Icons';
+import { IconArches, IconBell, IconClose, IconMenu, IconSearch, IconStore } from './Icons';
 import type { ViewKey } from './Sidebar';
 import { fmtDateTime, paidCents, yuan } from '../lib/metrics';
 
@@ -259,9 +259,9 @@ export function Topbar({
           type="button"
           onClick={() => onNavigate('about')}
           aria-label="关于本项目"
-          className="ml-0.5 grid h-10 w-10 place-items-center rounded-full bg-brand-500 text-[13px] font-black text-white shadow-brand-press transition-colors duration-100 hover:bg-brand-600 active:translate-y-[3px] active:shadow-none"
+          className="ml-0.5 grid h-10 w-10 place-items-center rounded-full bg-brand-500 text-gold-400 shadow-brand-press transition-colors duration-100 hover:bg-brand-600 active:translate-y-[3px] active:shadow-none"
         >
-          我
+          <IconArches size={18} />
         </button>
       </div>
 
