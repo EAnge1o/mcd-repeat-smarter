@@ -1,0 +1,68 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    scrollbar-gutter: stable;
+  }
+
+  body {
+    @apply bg-canvas text-[#111827] antialiased;
+    /* 中文正文默认 14px，dashboard 的信息密度靠字号分级，不靠放大留白 */
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  /* 统一焦点环：键盘可见，鼠标点击不出现。a11y 基线，不允许各组件自己发挥 */
+  :where(a, button, input, textarea, select, [tabindex]):focus-visible {
+    @apply outline-none ring-2 ring-brand-500/40 ring-offset-1 ring-offset-white;
+  }
+
+  /* 数字一律等宽，KPI 与表格列才对得齐 */
+  .tnum {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: 'tnum' 1;
+  }
+
+  /* 细滚动条：表格横向滚动时不抢视觉 */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #d8d4cd transparent;
+  }
+  *::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  *::-webkit-scrollbar-thumb {
+    @apply rounded-full bg-[#d8d4cd];
+  }
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  /* 动效降级：不做位移，只保留透明度变化 */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  /* 骨架屏：一条扫光，不用脉冲，脉冲在数据面板里会显得页面在抖 */
+  .skeleton {
+    @apply relative overflow-hidden rounded-md bg-[#eeece8];
+  }
+  .skeleton::after {
+    content: '';
+    @apply absolute inset-0 -translate-x-full animate-shimmer;
+    background-image: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.65), transparent);
+  }
+}

@@ -1,34 +1,32 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { BeType, HistoryOrder, Plan, PlanItem } from '../server/domain/types';
-import { buildHabitProfile } from '../server/domain/habits';
 import { api, ApiRequestError, type AdjustResult, type ConfirmResult, type HealthInfo } from './api';
-import { Composer } from './components/Composer';
-import { HabitBar } from './components/HabitBar';
-import { PlanCard } from './components/PlanCard';
-import { OrderHistory } from './components/OrderHistory';
-import { AdjustResultView } from './components/AdjustResultView';
+import { computeKpis, hourBuckets, spendSeries, topItems } from './lib/metrics';
+import { Sidebar, type ViewKey } from './components/Sidebar';
+import { Topbar } from './components/Topbar';
 import { ConfirmSheet } from './components/ConfirmSheet';
 import { StorePicker } from './components/StorePicker';
-import { Thinking } from './components/Thinking';
-import { Alert, SectionHead, SourceBadge, Toasts, type ToastItem } from './components/Common';
-import { IconArches, IconBack, IconClose, IconPlus, IconStore } from './components/Icons';
-
-const QUICK_PROMPTS = ['还是老样子', '不要薯条，换个别的', '饮料换成无糖的', '不超过 20 元'];
+import { Alert, Button, Toasts, type ToastItem } from './components/ui';
+import { IconClose } from './components/Icons';
+import { Overview } from './views/Overview';
+import { OrderView } from './views/OrderView';
+import { PlansView } from './views/PlansView';
+import { OrdersView } from './views/OrdersView';
+import { StoresView } from './views/StoresView';
+import { AboutView } from './views/AboutView';
 
 const TAGS = ['上班早餐', '日常午餐', '周末套餐', '加班夜宵'];
-
-const HERO_IMAGE = '/media/meal-hero.jpg';
 
 interface CurrentStore {
   storeCode: string;
   storeName: string;
 }
 
-/** 抬头上的日期：真实当天，不是编的期号。
- *  zh-CN 默认输出「10月17日星期六」，中间不加空格会读成「十七日星期六」。 */
+/** zh-CN 默认输出「10月17日星期六」，不加空格会读成「十七日星期六」 */
 function todayLabel(): string {
-  const d = new Date();
-  return d.toLocaleDateString('zh-CN', { month: 'long', day: 'numeric', weekday: 'long' }).replace('星期', ' 星期');
+  return new Date()
+    .toLocaleDateString('zh-CN', { month: 'long', day: 'numeric', weekday: 'long' })
+    .replace('星期', ' 星期');
 }
 
 export default function App() {
@@ -39,6 +37,10 @@ export default function App() {
   const [ordersLoading, setOrdersLoading] = useState(true);
   const [plans, setPlans] = useState<Plan[]>([]);
   const [plansLoading, setPlansLoading] = useState(true);
+  const [lastSync, setLastSync] = useState<string | null>(null);
+
+  const [view, setView] = useState<ViewKey>('overview');
+  const [mobileNav, setMobileNav] = useState(false);
 
   const [adjusting, setAdjusting] = useState(false);
   const [result, setResult] = useState<AdjustResult | null>(null);
@@ -82,34 +84,36 @@ export default function App() {
     };
   }, []);
 
-  useEffect(() => {
-    let alive = true;
-    (async () => {
-      setOrdersLoading(true);
-      try {
-        const r = await api.history();
-        if (alive) setOrders(r.orders);
-      } catch {
-        if (alive) setOrders([]);
-      } finally {
-        if (alive) setOrdersLoading(false);
-      }
-    })();
-    (async () => {
-      setPlansLoading(true);
-      try {
-        const r = await api.plans();
-        if (alive) setPlans(r.plans);
-      } catch {
-        if (alive) setPlans([]);
-      } finally {
-        if (alive) setPlansLoading(false);
-      }
-    })();
-    return () => {
-      alive = false;
-    };
+  const loadOrders = useCallback(async () => {
+    setOrdersLoading(true);
+    try {
+      const r = await api.history();
+      // 服务端不保证顺序，这里统一按时间倒序，KPI 和表格都依赖「第一行是最新」
+      setOrders([...r.orders].sort((a, b) => b.createTime.localeCompare(a.createTime)));
+      setLastSync(new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' }));
+    } catch {
+      setOrders([]);
+    } finally {
+      setOrdersLoading(false);
+    }
   }, []);
+
+  const loadPlans = useCallback(async () => {
+    setPlansLoading(true);
+    try {
+      const r = await api.plans();
+      setPlans(r.plans);
+    } catch {
+      setPlans([]);
+    } finally {
+      setPlansLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    void loadOrders();
+    void loadPlans();
+  }, [loadOrders, loadPlans]);
 
   // 门店名回填：默认门店编码来自 .env，从历史订单里补全展示名
   useEffect(() => {
@@ -118,22 +122,18 @@ export default function App() {
     if (hit) setStore({ storeCode: hit.storeCode, storeName: hit.storeName });
   }, [orders, store]);
 
-  const habit = useMemo(() => buildHabitProfile(orders), [orders]);
-
-  const refreshPlans = useCallback(async () => {
-    try {
-      const r = await api.plans();
-      setPlans(r.plans);
-    } catch {
-      /* 忽略：不影响主流程 */
-    }
-  }, []);
+  // ---------- 派生数据 ----------
+  const kpis = useMemo(() => computeKpis(orders, plans), [orders, plans]);
+  const series = useMemo(() => spendSeries(orders, 10), [orders]);
+  const buckets = useMemo(() => hourBuckets(orders), [orders]);
+  const tops = useMemo(() => topItems(orders, 5), [orders]);
 
   // ---------- 核心：调整 ----------
   const runAdjust = useCallback(
     async (payload: { message: string; basePlanId?: string }) => {
       setAdjusting(true);
       setAdjustError(null);
+      setView('order');
       try {
         const r = await api.adjust({
           message: payload.message,
@@ -157,22 +157,18 @@ export default function App() {
     [store, beType],
   );
 
-  const handleSubmit = (text: string) => {
-    void runAdjust({ message: text });
-  };
+  const handleSubmit = (text: string) => void runAdjust({ message: text });
 
   const handleUsePlan = (plan: Plan) => {
     setStore({ storeCode: plan.storeCode, storeName: plan.storeName });
     void runAdjust({ message: '还是老样子', basePlanId: plan.id });
   };
 
-  const handleUseLatest = () => {
-    void runAdjust({ message: '还是老样子' });
-  };
+  const handleUseLatest = () => void runAdjust({ message: '还是老样子' });
 
-  const backToJournal = () => {
-    setResult(null);
-    setAdjustError(null);
+  const handleUseOrder = (order: HistoryOrder) => {
+    setStore({ storeCode: order.storeCode, storeName: order.storeName });
+    void runAdjust({ message: '还是老样子' });
   };
 
   // ---------- 方案管理 ----------
@@ -180,7 +176,7 @@ export default function App() {
     if (!window.confirm(`删除「${plan.name}」？这个操作不可撤销。`)) return;
     try {
       await api.deletePlan(plan.id);
-      await refreshPlans();
+      await loadPlans();
       toast('已删除');
     } catch (err) {
       const e = err as ApiRequestError;
@@ -191,7 +187,7 @@ export default function App() {
   const handleDuplicatePlan = async (plan: Plan) => {
     try {
       await api.duplicatePlan(plan.id);
-      await refreshPlans();
+      await loadPlans();
       toast('已复制一份');
     } catch (err) {
       const e = err as ApiRequestError;
@@ -204,17 +200,12 @@ export default function App() {
     if (!name || name.trim() === plan.name) return;
     try {
       await api.updatePlan(plan.id, { name: name.trim() });
-      await refreshPlans();
+      await loadPlans();
       toast('已重命名');
     } catch (err) {
       const e = err as ApiRequestError;
       toast(e.detail?.message ?? '重命名失败', 'error');
     }
-  };
-
-  const openSaveDialog = () => {
-    setSaveName(`我的${saveTag}`);
-    setSaveOpen(true);
   };
 
   const handleSavePlan = async () => {
@@ -230,7 +221,7 @@ export default function App() {
         beType: result.beType,
         tag: saveTag,
       });
-      await refreshPlans();
+      await loadPlans();
       setSaveOpen(false);
       toast('已存为常用方案');
     } catch (err) {
@@ -247,258 +238,166 @@ export default function App() {
 
   const handleOrdered = (r: ConfirmResult) => {
     toast(r.mode === 'demo' ? '演示下单完成，未产生真实订单' : `订单已提交${r.orderId ? ` · ${r.orderId.slice(-6)}` : ''}`);
-    if (r.mode === 'live') {
-      void api.history().then((x) => setOrders(x.orders)).catch(() => undefined);
-    }
+    if (r.mode === 'live') void loadOrders();
   };
 
   // ---------- 渲染 ----------
   if (healthError) {
     return (
-      <div className="app">
-        <main className="main">
-          <div className="shell" style={{ maxWidth: 620, paddingTop: 72 }}>
-            <Alert kind="error" title="连不上本地服务" hint="请确认已执行 npm run dev，并且前端与 API 两个进程都正常启动。">
-              {healthError}
-            </Alert>
-          </div>
-        </main>
+      <div className="grid min-h-screen place-items-center bg-canvas px-4">
+        <div className="w-full max-w-md">
+          <Alert kind="error" title="连不上本地服务" hint="请确认已执行 npm run dev，并且前端与 API 两个进程都正常启动。">
+            {healthError}
+          </Alert>
+        </div>
       </div>
     );
   }
 
-  const hasActionbar = Boolean(result && selectedCandidate);
-
   return (
-    <div className={hasActionbar ? 'app app--has-actionbar' : 'app'}>
-      {/* ================= 顶栏 ================= */}
-      <header className="topbar">
-        <div className="shell topbar__inner">
-          <div className="brand">
-            <span className="brand__mark" aria-hidden="true">
-              <IconArches />
-            </span>
-            <span className="brand__text">
-              <span className="brand__name">麦麦老样子</span>
-              <span className="brand__sub">Repeat Smarter</span>
-            </span>
+    <div className="min-h-screen bg-canvas">
+      <Sidebar
+        view={view}
+        onNavigate={setView}
+        plansCount={plans.length}
+        ordersCount={orders.length}
+        storeName={store?.storeName || (store ? `门店 ${store.storeCode}` : '')}
+        mode={mode}
+        mobileOpen={mobileNav}
+        onCloseMobile={() => setMobileNav(false)}
+        onPickStore={() => setStorePickerOpen(true)}
+      />
+
+      <div className="lg:pl-64">
+        <Topbar
+          plans={plans}
+          orders={orders}
+          storeName={store?.storeName || (store ? `门店 ${store.storeCode}` : '')}
+          mode={mode}
+          lastSync={lastSync}
+          onNavigate={setView}
+          onOpenMobile={() => setMobileNav(true)}
+          onPickStore={() => setStorePickerOpen(true)}
+        />
+
+        <main className="px-4 py-4 pb-24 md:px-6 md:py-6 md:pb-24">
+          <div className="mx-auto max-w-[1400px]">
+            {view === 'overview' ? (
+              <Overview
+                dateLabel={todayLabel()}
+                mode={mode}
+                demoReason={health?.demoReason}
+                storeName={store?.storeName || (store ? `门店 ${store.storeCode}` : '')}
+                kpis={kpis}
+                series={series}
+                buckets={buckets}
+                tops={tops}
+                orders={orders}
+                ordersLoading={ordersLoading}
+                plans={plans}
+                plansLoading={plansLoading}
+                onNavigate={setView}
+                onUsePlan={handleUsePlan}
+                onUseOrder={handleUseOrder}
+                onDeletePlan={(p) => void handleDeletePlan(p)}
+                onDuplicatePlan={(p) => void handleDuplicatePlan(p)}
+                onRenamePlan={(p) => void handleRenamePlan(p)}
+                onUseLatest={handleUseLatest}
+              />
+            ) : null}
+
+            {view === 'order' ? (
+              <OrderView
+                adjusting={adjusting}
+                result={result}
+                selectedId={selectedId}
+                error={adjustError}
+                mode={mode}
+                storeName={store?.storeName || (store ? `门店 ${store.storeCode}` : '')}
+                plans={plans}
+                onSubmit={handleSubmit}
+                onSelect={setSelectedId}
+                onSave={() => {
+                  setSaveName(`我的${saveTag}`);
+                  setSaveOpen(true);
+                }}
+                onReset={() => {
+                  setResult(null);
+                  setAdjustError(null);
+                }}
+                onUsePlan={handleUsePlan}
+                onPickStore={() => setStorePickerOpen(true)}
+                onNavigate={setView}
+              />
+            ) : null}
+
+            {view === 'plans' ? (
+              <PlansView
+                plans={plans}
+                loading={plansLoading}
+                mode={mode}
+                onUse={handleUsePlan}
+                onDelete={(p) => void handleDeletePlan(p)}
+                onDuplicate={(p) => void handleDuplicatePlan(p)}
+                onRename={(p) => void handleRenamePlan(p)}
+                onNavigate={setView}
+              />
+            ) : null}
+
+            {view === 'orders' ? (
+              <OrdersView
+                orders={orders}
+                loading={ordersLoading}
+                mode={mode}
+                onUse={handleUseOrder}
+                onUseLatest={handleUseLatest}
+                onRefresh={() => void loadOrders()}
+              />
+            ) : null}
+
+            {view === 'stores' ? (
+              <StoresView
+                defaultCity={health?.city ?? '上海市'}
+                beType={beType}
+                currentStoreCode={store?.storeCode}
+                currentStoreName={store?.storeName || ''}
+                onPick={(s) => {
+                  setStore({ storeCode: s.storeCode, storeName: s.storeName });
+                  setResult(null);
+                  toast(`已切到 ${s.storeName}`);
+                }}
+              />
+            ) : null}
+
+            {view === 'about' ? <AboutView mode={mode} demoReason={health?.demoReason} onNavigate={setView} /> : null}
           </div>
+        </main>
+      </div>
 
-          <span className="topbar__spacer" />
-
-          <div className="topbar__tools">
-            <SourceBadge mode={mode} />
-            <button type="button" className="store-btn" onClick={() => setStorePickerOpen(true)}>
-              <IconStore size={13} />
-              <span className="store-btn__label">
-                {store?.storeName || (store ? `门店 ${store.storeCode}` : '选择门店')}
-              </span>
-            </button>
-          </div>
-        </div>
-      </header>
-
-      <main className="main">
-        {/* ================= 首页 ================= */}
-        {!result && (
-          <div className="shell">
-            <section className="hero">
-              <div className="hero__copy">
-                <div className="hero__eyebrow">
-                  <span className="bar" />
-                  <span className="label-cn">{todayLabel()}</span>
-                </div>
-
-                <h1 className="hero__title">
-                  <span className="hero__line">
-                    今天<span className="punct">，</span>还是
-                  </span>
-                  <span className="hero__line">
-                    <em>老样子</em>吗？
-                  </span>
-                </h1>
-
-                <p className="hero__lead">记得你的习惯，也听得懂你今天的小变化。</p>
-
-                {health && mode === 'demo' && (
-                  <div style={{ marginTop: 20 }}>
-                    <Alert kind="warn" title="当前是演示数据">
-                      {health.demoReason ?? '未连接真实 MCP'}。页面上的门店、餐品、价格均为内置示例，用于体验完整流程，不代表真实供应情况。
-                    </Alert>
-                  </div>
-                )}
-
-                {ordersLoading ? (
-                  <div className="facts">
-                    <div className="skeleton" style={{ height: 12, width: 220 }} />
-                  </div>
-                ) : (
-                  <HabitBar habit={habit} />
-                )}
-              </div>
-
-              <div className="hero__action">
-                <Composer onSubmit={handleSubmit} loading={adjusting} quickPrompts={QUICK_PROMPTS} />
-
-                {adjustError && (
-                  <div style={{ marginTop: 14 }}>
-                    <Alert kind="error" title="没能完成调整" hint={adjustError.hint}>
-                      {adjustError.message}
-                    </Alert>
-                  </div>
-                )}
-
-                {adjusting && (
-                  <div style={{ marginTop: 14 }}>
-                    <Thinking title="正在解析你的说法，并查询门店真实菜单…" />
-                  </div>
-                )}
-              </div>
-
-              <figure className="hero__media">
-                <img src={HERO_IMAGE} alt="汉堡、薯条与饮料的组合示意图" loading="eager" />
-                <figcaption>示意图 · 非门店实际餐品</figcaption>
-              </figure>
-            </section>
-
-            <div className="shelf">
-              <section className="shelf__col">
-                <SectionHead
-                  title="常用方案"
-                  desc="整单复用，也可以当作下一次修改的起点"
-                  meta={plansLoading ? '' : plans.length > 0 ? `${plans.length} 个` : '还没有'}
-                />
-
-                {plansLoading ? (
-                  <div className="plans">
-                    <div className="skeleton" style={{ height: 172, borderRadius: 16 }} />
-                    <div className="skeleton" style={{ height: 172, borderRadius: 16 }} />
-                  </div>
-                ) : plans.length === 0 ? (
-                  <div className="plans">
-                    <div className="plan plan--ghost">
-                      <div className="plan__ghost-title">还没有保存的常用方案</div>
-                      <div className="plan__ghost-desc">
-                        调好一单后点「存成常用方案」，它会出现在这里。下次说一句「还是老样子」，就能把它整单调出来。
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="plans">
-                    {plans.map((p) => (
-                      <PlanCard
-                        key={p.id}
-                        plan={p}
-                        onUse={() => handleUsePlan(p)}
-                        onDuplicate={() => void handleDuplicatePlan(p)}
-                        onDelete={() => void handleDeletePlan(p)}
-                        onRename={() => void handleRenamePlan(p)}
-                      />
-                    ))}
-
-                    {/* 空位卡：告诉用户这里还能再放一个，比留一个空洞更清楚 */}
-                    {plans.length % 2 === 1 && (
-                      <div className="plan plan--ghost">
-                        <div className="plan__ghost-title">
-                          <IconPlus size={12} /> 还能再存一个
-                        </div>
-                        <div className="plan__ghost-desc">下次调好之后点「存成常用方案」，就会放到这个位置。</div>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </section>
-
-              <section className="shelf__col">
-                <SectionHead
-                  title="最近订单"
-                  desc={mode === 'live' ? '读取自你的麦当劳账号' : '内置示例，非真实账号'}
-                  meta={mode === 'live' ? 'MCP' : '演示'}
-                />
-                <OrderHistory
-                  orders={orders}
-                  loading={ordersLoading}
-                  mode={mode}
-                  onUseLatest={orders.length > 0 ? handleUseLatest : undefined}
-                />
-              </section>
-            </div>
-          </div>
-        )}
-
-        {/* ================= 结果页 ================= */}
-        {result && (
-          <div className="shell">
-            <div className="result rise">
-              <div className="result__bar">
-                <button type="button" className="btn btn--quiet" onClick={backToJournal}>
-                  <IconBack size={14} />
-                  返回
-                </button>
-                <span className="result__context">
-                  {result.store.storeName || result.store.storeCode} · 基于
-                  {result.baseFrom.kind === 'plan' ? '常用方案' : '最近一单'}
-                </span>
-              </div>
-
-              {!adjusting && (
-                <>
-                  {adjustError && (
-                    <Alert kind="error" title="这次的修改没成功" hint={adjustError.hint}>
-                      {adjustError.message}
-                    </Alert>
-                  )}
-                  <AdjustResultView result={result} selectedId={selectedId} onSelect={setSelectedId} onSave={openSaveDialog} />
-                </>
-              )}
-
-              {/* 接着说：补充指令放在结论之后，不打断阅读顺序 */}
-              <Composer onSubmit={handleSubmit} loading={adjusting} compact placeholder="还想改？接着说，比如「饮料换成无糖的」" />
-
-              {adjusting && <Thinking title="正在按新的说法重新核价…" />}
-            </div>
-          </div>
-        )}
-      </main>
-
-      {/* ================= 页脚 ================= */}
-      <footer className="foot">
-        <div className="shell foot__inner">
-          <div className="foot__brand">记住你常点的，听懂你这次改的。</div>
-          <div className="foot__meta">
-            餐品、价格与优惠以麦当劳官方渠道实时结果为准
-            <br />
-            非官方参赛作品 · McD Repeat Smarter
-          </div>
-        </div>
-      </footer>
-
-      {/* ---------- 吸底操作栏 ---------- */}
-      {result && selectedCandidate && (
-        <div className="actionbar">
-          <div className="actionbar__inner">
-            <div className="actionbar__info">
-              <div className="actionbar__name">
+      {/* 吸底操作栏：只在结果页出现，落到内容区右侧，不盖住侧边栏 */}
+      {view === 'order' && result && selectedCandidate ? (
+        <div data-region="actionbar" className="fixed bottom-0 left-0 right-0 z-30 border-t border-line bg-white/95 backdrop-blur lg:left-64">
+          <div className="mx-auto flex max-w-[1400px] items-center justify-between gap-3 px-4 py-2.5 md:px-6">
+            <div className="min-w-0">
+              <p className="truncate text-[12px] font-medium text-[#111827]">
                 {selectedCandidate.label}
-                {selectedCandidate.price
-                  ? ` · 共 ${selectedCandidate.price.lines.reduce((n, l) => n + l.quantity, 0)} 件`
-                  : ''}
-              </div>
-              <div className="actionbar__amount">
+                {selectedCandidate.price ? ` · 共 ${selectedCandidate.price.lines.reduce((n, l) => n + l.quantity, 0)} 件` : ''}
+              </p>
+              <p className="tnum text-[16px] font-semibold leading-tight text-[#111827]">
                 {selectedCandidate.price ? `¥${(selectedCandidate.price.priceCents / 100).toFixed(2)}` : '核价失败'}
-              </div>
+              </p>
             </div>
-            <button
-              type="button"
-              className="btn btn--primary btn--lg"
+            <Button
+              variant="primary"
+              size="lg"
               onClick={() => setSheetOpen(true)}
               disabled={!selectedCandidate.price || selectedCandidate.price.priceCents === 0}
             >
               去确认下单
-            </button>
+            </Button>
           </div>
         </div>
-      )}
+      ) : null}
 
       {/* ---------- 弹层 ---------- */}
       <StorePicker
@@ -514,7 +413,7 @@ export default function App() {
         beType={beType}
       />
 
-      {result && selectedCandidate && (
+      {result && selectedCandidate ? (
         <ConfirmSheet
           open={sheetOpen}
           onClose={() => setSheetOpen(false)}
@@ -526,43 +425,61 @@ export default function App() {
           mode={mode}
           onOrdered={handleOrdered}
         />
-      )}
+      ) : null}
 
       {/* 存成常用方案 */}
-      {saveOpen && result && selectedCandidate && (
-        <div className="modal" onClick={() => setSaveOpen(false)} role="presentation">
-          <div className="modal__box" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true">
-            <div className="modal__head">
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div className="modal__title">存成常用方案</div>
-                <div className="tiny">下次说「还是老样子」就能整单调出来</div>
+      {saveOpen && result && selectedCandidate ? (
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/45 p-0 backdrop-blur-[2px] sm:items-center sm:p-6" onClick={() => setSaveOpen(false)} role="presentation">
+          <div
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-label="存成常用方案"
+            className="w-full max-w-md overflow-hidden rounded-t-2xl bg-white shadow-lift sm:rounded-2xl"
+          >
+            <div className="flex items-start gap-3 border-b border-line px-4 py-3 md:px-5">
+              <div className="min-w-0 flex-1">
+                <h2 className="text-sm font-semibold tracking-tight text-[#111827]">存成常用方案</h2>
+                <p className="text-[11px] text-[#8a877f]">下次说「还是老样子」就能整单调出来</p>
               </div>
-              <button type="button" className="icon-btn" onClick={() => setSaveOpen(false)} aria-label="关闭">
-                <IconClose />
+              <button
+                type="button"
+                onClick={() => setSaveOpen(false)}
+                aria-label="关闭"
+                className="grid h-8 w-8 place-items-center rounded-lg text-[#8a877f] transition-colors duration-150 hover:bg-[#f2f0ec]"
+              >
+                <IconClose size={16} />
               </button>
             </div>
 
-            <div className="modal__body">
-              <div className="field">
-                <label htmlFor="pname">方案名称</label>
+            <div className="space-y-3 px-4 py-4 md:px-5">
+              <div>
+                <label htmlFor="pname" className="mb-1 block text-[11px] text-[#6b6862]">
+                  方案名称
+                </label>
                 <input
                   id="pname"
-                  className="input"
                   value={saveName}
                   onChange={(e) => setSaveName(e.target.value)}
                   placeholder="例如 我的日常午餐"
+                  className="h-9 w-full rounded-lg border border-line bg-[#faf9f7] px-2.5 text-sm text-[#111827] transition-all duration-150 placeholder:text-[#a8a49c] focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
                 />
               </div>
 
-              <div className="field">
-                <label>分类</label>
-                <div className="tag-picker">
+              <div>
+                <p className="mb-1.5 text-[11px] text-[#6b6862]">分类</p>
+                <div className="flex flex-wrap gap-1.5">
                   {TAGS.map((t) => (
                     <button
                       key={t}
                       type="button"
-                      className={`chip${saveTag === t ? ' chip--active' : ''}`}
                       onClick={() => setSaveTag(t)}
+                      aria-pressed={saveTag === t}
+                      className={
+                        saveTag === t
+                          ? 'rounded-md bg-brand-500 px-2.5 py-1 text-[11px] font-medium text-white transition-colors duration-150'
+                          : 'rounded-md bg-[#f2f0ec] px-2.5 py-1 text-[11px] text-[#5c5850] transition-colors duration-150 hover:bg-[#e8e5df]'
+                      }
                     >
                       {t}
                     </button>
@@ -571,31 +488,31 @@ export default function App() {
               </div>
 
               <div>
-                <div className="tiny" style={{ marginBottom: 6 }}>
+                <p className="mb-1.5 text-[11px] text-[#6b6862]">
                   将保存以下 {selectedCandidate.items.length} 项（结构化编码，不是一句话）
-                </div>
-                <div className="items">
+                </p>
+                <ul className="divide-y divide-line rounded-lg border border-line">
                   {selectedCandidate.items.map((it, i) => (
-                    <div key={i} className="item-row">
-                      <span className="item-row__qty">{it.quantity}×</span>
-                      <span className="item-row__nm">{it.name}</span>
-                      {it.children.length > 0 && (
-                        <span className="item-row__kids">{it.children.map((c) => c.name).join(' / ')}</span>
-                      )}
-                    </div>
+                    <li key={i} className="flex items-baseline gap-2 px-2.5 py-1.5">
+                      <span className="tnum shrink-0 text-[11px] text-[#8a877f]">{it.quantity}×</span>
+                      <span className="min-w-0 flex-1 truncate text-[12px] text-[#111827]">{it.name}</span>
+                      {it.children.length > 0 ? (
+                        <span className="shrink-0 truncate text-[10px] text-[#a8a49c]">{it.children.map((c) => c.name).join(' / ')}</span>
+                      ) : null}
+                    </li>
                   ))}
-                </div>
+                </ul>
               </div>
             </div>
 
-            <div className="modal__foot">
-              <button type="button" className="btn btn--primary btn--block" onClick={() => void handleSavePlan()} disabled={saving}>
-                {saving ? <div className="spinner" /> : '保存'}
-              </button>
+            <div className="border-t border-line px-4 py-3 md:px-5">
+              <Button variant="primary" size="lg" className="w-full" onClick={() => void handleSavePlan()} disabled={saving}>
+                {saving ? <span className="h-3.5 w-3.5 animate-spin-slow rounded-full border-2 border-white/35 border-t-white" /> : '保存'}
+              </Button>
             </div>
           </div>
         </div>
-      )}
+      ) : null}
 
       <Toasts items={toasts} />
     </div>

@@ -30,3 +30,5 @@ Thumbs.db
 coverage/
 test-results/
 .tmp/
+.tmp-*
+.tmp*.png

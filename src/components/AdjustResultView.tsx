@@ -1,9 +1,24 @@
 import type { CandidatePlan, PlanItem } from '../../server/domain/types';
 import type { AdjustResult, MatchedView } from '../api';
-import { SectionHead, StatusBadge } from './Common';
+import { Alert, Badge, cx } from './ui';
 import { IconAlert, IconArrow, IconCheck, IconReceipt } from './Icons';
 
 const yuan = (cents?: number) => (cents === undefined ? '—' : (cents / 100).toFixed(2));
+
+function StatusBadge({ status }: { status: string }) {
+  switch (status) {
+    case 'exact':
+      return <Badge tone="ok">仍可点</Badge>;
+    case 'renamed':
+      return <Badge tone="warn">编码已更新</Badge>;
+    case 'substituted':
+      return <Badge tone="warn">已替换</Badge>;
+    case 'unavailable':
+      return <Badge tone="danger">已下架</Badge>;
+    default:
+      return <Badge tone="neutral">{status}</Badge>;
+  }
+}
 
 /** 把解析出的意图渲染成可复核的标签 —— 让「AI 理解了什么」看得见、可纠正。 */
 function ChangeTags({ result }: { result: AdjustResult }) {
@@ -29,12 +44,15 @@ function ChangeTags({ result }: { result: AdjustResult }) {
 
   if (tags.length === 0) tags.push({ kind: 'keep', text: '按原方案' });
 
+  const toneOf = (k: string) =>
+    k === 'remove' || k === 'budget' ? 'danger' : k === 'add' ? 'ok' : k === 'replace' ? 'warn' : 'neutral';
+
   return (
-    <div className="said__chips">
+    <div className="mt-2.5 flex flex-wrap gap-1.5">
       {tags.map((t, i) => (
-        <span key={i} className={`tag tag--${t.kind}`}>
+        <Badge key={i} tone={toneOf(t.kind) as 'neutral' | 'ok' | 'warn' | 'danger'}>
           {t.text}
-        </span>
+        </Badge>
       ))}
     </div>
   );
@@ -44,48 +62,42 @@ function ChangeTags({ result }: { result: AdjustResult }) {
 function MatchNotice({ matched, summary }: { matched: MatchedView[]; summary: AdjustResult['matchSummary'] }) {
   if (!summary.hasRisk) {
     return (
-      <div className="tiny" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+      <p className="flex items-center gap-1.5 text-xs text-[#1d7a45]">
         <IconCheck size={13} />
         原方案里的商品当前都还能点到
-      </div>
+      </p>
     );
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+    <div className="space-y-2">
       {matched.map((m, i) => {
         const risky = m.status !== 'exact' || m.children.some((c) => c.status !== 'exact');
         if (!risky) return null;
         return (
-          <div key={i} className="alert alert--warn">
-            <IconAlert />
-            <div className="alert__body">
-              <div style={{ display: 'flex', alignItems: 'center', gap: 7, flexWrap: 'wrap' }}>
-                <span style={{ fontWeight: 600, color: 'var(--ink)' }}>{m.name}</span>
-                <StatusBadge status={m.status} />
-                {m.currentName && m.currentName !== m.name && <span className="tiny">→ 现已对应「{m.currentName}」</span>}
-              </div>
+          <Alert key={i} kind="warn" title={m.name}>
+            <div className="flex flex-wrap items-center gap-1.5">
+              <StatusBadge status={m.status} />
+              {m.currentName && m.currentName !== m.name ? <span>现已对应「{m.currentName}」</span> : null}
+            </div>
 
-              {m.children
-                .filter((c) => c.status !== 'exact')
-                .map((c, j) => (
-                  <div key={j} className="tiny" style={{ marginTop: 4 }}>
-                    子项「{c.name}」{c.status === 'substituted' ? '已下架，替换为' : '编码变更，对应'}「{c.currentName}」
-                    {c.alternatives.length > 0 && (
-                      <span style={{ opacity: 0.75 }}>
-                        （也可选：{c.alternatives.map((a) => `${a.name} ${a.diffPrice ?? ''}`).join('、')}）
-                      </span>
-                    )}
-                  </div>
-                ))}
-
-              {m.notes.map((n, k) => (
-                <div key={k} className="tiny" style={{ marginTop: 3, opacity: 0.85 }}>
-                  {n}
+            {m.children
+              .filter((c) => c.status !== 'exact')
+              .map((c, j) => (
+                <div key={j} className="mt-1">
+                  子项「{c.name}」{c.status === 'substituted' ? '已下架，替换为' : '编码变更，对应'}「{c.currentName}」
+                  {c.alternatives.length > 0 ? (
+                    <span className="opacity-75">（也可选：{c.alternatives.map((a) => `${a.name} ${a.diffPrice ?? ''}`).join('、')}）</span>
+                  ) : null}
                 </div>
               ))}
-            </div>
-          </div>
+
+            {m.notes.map((n, k) => (
+              <div key={k} className="mt-1 opacity-85">
+                {n}
+              </div>
+            ))}
+          </Alert>
         );
       })}
     </div>
@@ -95,9 +107,9 @@ function MatchNotice({ matched, summary }: { matched: MatchedView[]; summary: Ad
 function ChildTags({ tags }: { tags: { name: string; changed?: boolean }[] }) {
   if (tags.length === 0) return null;
   return (
-    <div className="cmp__kids">
+    <div className="mt-0.5 flex flex-wrap gap-1 pl-7">
       {tags.map((t, i) => (
-        <span key={i} className={t.changed ? 'cmp__kid--changed' : undefined}>
+        <span key={i} className={cx('text-[10px]', t.changed ? 'text-[#8a5a00]' : 'text-[#a8a49c]')}>
           {t.name}
         </span>
       ))}
@@ -112,20 +124,20 @@ function Compare({ matched, candidate }: { matched: MatchedView[]; candidate: Ca
   const count = (items: PlanItem[]) => items.reduce((n, i) => n + i.quantity, 0);
 
   return (
-    <div className="cmp">
-      <div className="cmp__col">
-        <div className="cmp__head">
-          <span className="cmp__title">原方案</span>
-          <span className="cmp__count">共 {matched.reduce((n, m) => n + m.quantity, 0)} 件</span>
+    <div className="grid grid-cols-1 gap-2 sm:grid-cols-[1fr_auto_1fr] sm:items-center">
+      <div className="rounded-lg border border-line bg-[#faf9f7] p-3">
+        <div className="flex items-baseline justify-between">
+          <span className="text-[11px] font-medium text-[#6b6862]">原方案</span>
+          <span className="tnum text-[10px] text-[#a8a49c]">共 {matched.reduce((n, m) => n + m.quantity, 0)} 件</span>
         </div>
-        <div className="cmp__rows">
+        <div className="mt-2 space-y-1">
           {matched.map((m, i) => {
             const gone = m.status === 'unavailable' || removed.has(m.name);
             return (
               <div key={i}>
-                <div className={`cmp__row${gone ? ' cmp__row--removed' : ''}`}>
-                  <span className="cmp__qty">{m.quantity}×</span>
-                  <span className="cmp__nm" title={m.name}>
+                <div className="flex items-baseline gap-1.5">
+                  <span className="tnum w-5 shrink-0 text-right text-[10px] text-[#a8a49c]">{m.quantity}×</span>
+                  <span className={cx('truncate text-[12px]', gone ? 'text-[#a8a49c] line-through' : 'text-[#4b4945]')} title={m.name}>
                     {m.name}
                   </span>
                 </div>
@@ -136,26 +148,29 @@ function Compare({ matched, candidate }: { matched: MatchedView[]; candidate: Ca
         </div>
       </div>
 
-      <div className="cmp__mid" aria-hidden="true">
-        <span>
-          <IconArrow size={14} />
+      <div className="hidden justify-center sm:flex" aria-hidden="true">
+        <span className="grid h-6 w-6 place-items-center rounded-full border border-line bg-white text-[#a8a49c]">
+          <IconArrow size={12} />
         </span>
       </div>
 
-      <div className="cmp__col cmp__col--after">
-        <div className="cmp__head">
-          <span className="cmp__title">调整后</span>
-          <span className="cmp__count">共 {count(candidate.items)} 件</span>
+      <div className="rounded-lg border border-brand-100 bg-brand-50/40 p-3">
+        <div className="flex items-baseline justify-between">
+          <span className="text-[11px] font-medium text-brand-700">调整后</span>
+          <span className="tnum text-[10px] text-[#a8a49c]">共 {count(candidate.items)} 件</span>
         </div>
-        <div className="cmp__rows">
+        <div className="mt-2 space-y-1">
           {candidate.items.length === 0 ? (
-            <div className="tiny muted">这一版没有任何餐品</div>
+            <p className="text-[11px] text-[#a8a49c]">这一版没有任何餐品</p>
           ) : (
             candidate.items.map((item, i) => (
               <div key={`${item.productCode}-${i}`}>
-                <div className={`cmp__row${added.has(item.name) ? ' cmp__row--added' : ''}`}>
-                  <span className="cmp__qty">{item.quantity}×</span>
-                  <span className="cmp__nm" title={item.name}>
+                <div className="flex items-baseline gap-1.5">
+                  <span className="tnum w-5 shrink-0 text-right text-[10px] text-[#a8a49c]">{item.quantity}×</span>
+                  <span
+                    className={cx('truncate text-[12px]', added.has(item.name) ? 'font-medium text-brand-700' : 'text-[#3d3a35]')}
+                    title={item.name}
+                  >
                     {item.name}
                   </span>
                 </div>
@@ -171,21 +186,13 @@ function Compare({ matched, candidate }: { matched: MatchedView[]; candidate: Ca
   );
 }
 
-function CandidateCard({
-  candidate,
-  active,
-  onSelect,
-}: {
-  candidate: CandidatePlan;
-  active: boolean;
-  onSelect: () => void;
-}) {
+function CandidateCard({ candidate, active, onSelect }: { candidate: CandidatePlan; active: boolean; onSelect: () => void }) {
   const price = candidate.price;
   const changedNames = new Set(candidate.changes.filter((c) => c.type === 'replaced').map((c) => c.after ?? ''));
+  const notes = candidate.explain.slice(0, 3);
 
   return (
     <div
-      className={`cand${active ? ' cand--active' : ''}`}
       role="radio"
       aria-checked={active}
       tabIndex={0}
@@ -196,109 +203,108 @@ function CandidateCard({
           onSelect();
         }
       }}
+      className={cx(
+        'cursor-pointer rounded-lg border p-3 transition-all duration-150 ease-out',
+        active
+          ? 'border-brand-500 bg-white shadow-[inset_0_0_0_1px_#da291c]'
+          : 'border-line bg-white hover:border-[#d8d4cd] hover:shadow-card',
+      )}
     >
-      <div className="cand__head">
-        <span className="radio" aria-hidden="true" />
-        <div className="cand__main">
-          <div className="cand__label">{candidate.label}</div>
-          <div className="cand__badges">
-            {candidate.withinBudget === true && (
-              <span className="badge badge--ok">
-                <IconCheck size={11} />
-                在预算内
-              </span>
-            )}
-            {candidate.withinBudget === false && (
-              <span className="badge badge--red">
-                <IconAlert size={11} />
-                超预算
-              </span>
-            )}
-            {candidate.price && candidate.price.discountCents > 0 && (
-              <span className="badge badge--warn">已省 ¥{yuan(candidate.price.discountCents)}</span>
-            )}
+      <div className="flex items-start gap-2">
+        <span
+          className={cx(
+            'mt-0.5 grid h-4 w-4 shrink-0 place-items-center rounded-full border transition-colors duration-150',
+            active ? 'border-brand-500 bg-brand-500' : 'border-[#d8d4cd] bg-white',
+          )}
+          aria-hidden="true"
+        >
+          {active ? <span className="h-1.5 w-1.5 rounded-full bg-white" /> : null}
+        </span>
+
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-[13px] font-medium text-[#111827]">{candidate.label}</p>
+          <div className="mt-1 flex flex-wrap items-center gap-1">
+            {candidate.withinBudget === true ? <Badge tone="ok">在预算内</Badge> : null}
+            {candidate.withinBudget === false ? <Badge tone="danger">超预算</Badge> : null}
+            {price && price.discountCents > 0 ? <Badge tone="warn">已省 ¥{yuan(price.discountCents)}</Badge> : null}
           </div>
         </div>
 
-        <div className="cand__price">
+        <div className="shrink-0 text-right">
           {price ? (
             <>
-              <div className="cand__amount num">
-                <small>¥</small>
+              <div className="tnum text-[16px] font-semibold leading-none text-[#111827]">
+                <span className="mr-0.5 text-[11px] font-normal text-[#8a877f]">¥</span>
                 {yuan(price.priceCents)}
               </div>
-              {price.originalPriceCents > price.priceCents && (
-                <div className="cand__strike">¥{yuan(price.originalPriceCents)}</div>
-              )}
+              {price.originalPriceCents > price.priceCents ? (
+                <div className="tnum mt-0.5 text-[10px] text-[#a8a49c] line-through">¥{yuan(price.originalPriceCents)}</div>
+              ) : null}
             </>
           ) : (
-            <div className="cand__amount num" style={{ fontSize: 14, color: 'var(--red)' }}>
-              核价失败
-            </div>
+            <div className="text-[11px] font-medium text-[#b3261e]">核价失败</div>
           )}
         </div>
       </div>
 
-      <div className="cand__items">
+      <div className="mt-2.5 space-y-0.5 border-t border-line pt-2">
         {candidate.items.map((item, i) => (
           <div key={`${item.productCode}-${i}`}>
-            <div className="cand__line">
-              <span className="cand__qty">{item.quantity}</span>
-              <span className="cand__nm">{item.name}</span>
+            <div className="flex items-baseline gap-1.5">
+              <span className="tnum w-4 shrink-0 text-right text-[10px] text-[#a8a49c]">{item.quantity}</span>
+              <span className="truncate text-[12px] text-[#4b4945]">{item.name}</span>
             </div>
-            {item.children.length > 0 && (
-              <div className="cand__kids">
+            {item.children.length > 0 ? (
+              <div className="flex flex-wrap gap-1 pl-[22px]">
                 {item.children.map((c, j) => (
                   <span
                     key={j}
-                    className={
-                      changedNames.has(c.name) || (c.aliasNames && c.aliasNames.length > 0)
-                        ? 'cand__kid--changed'
-                        : undefined
-                    }
+                    className={cx(
+                      'text-[10px]',
+                      changedNames.has(c.name) || (c.aliasNames && c.aliasNames.length > 0) ? 'text-[#8a5a00]' : 'text-[#a8a49c]',
+                    )}
                   >
                     {c.roundName ? `${c.roundName}·` : ''}
                     {c.name}
                   </span>
                 ))}
               </div>
-            )}
+            ) : null}
           </div>
         ))}
       </div>
 
-      {(candidate.budgetNote || (candidate.priceChecks && candidate.priceChecks.length > 0) || candidate.explain.length > 0) && (
-        <div className="cand__notes">
-          {candidate.budgetNote && (
-            <div className="cand__note cand__note--warn">
-              <IconAlert size={12} />
+      {candidate.budgetNote || (candidate.priceChecks && candidate.priceChecks.length > 0) || notes.length > 0 ? (
+        <div className="mt-2 space-y-1 border-t border-line pt-2">
+          {candidate.budgetNote ? (
+            <p className="flex items-start gap-1 text-[11px] leading-relaxed text-[#8a5a00]">
+              <IconAlert size={11} className="mt-0.5 shrink-0" />
               <span>{candidate.budgetNote}。系统不会为了凑预算偷偷换掉你要的东西。</span>
-            </div>
-          )}
-          {candidate.priceChecks &&
-            candidate.priceChecks.map((n, i) => (
-              <div key={i} className="cand__note cand__note--warn">
-                <IconAlert size={12} />
-                <span>{n}</span>
-              </div>
-            ))}
-          {candidate.explain.slice(0, 4).map((e, i) => (
-            <div key={i} className="cand__note cand__note--plain">
-              {e}
-            </div>
+            </p>
+          ) : null}
+          {(candidate.priceChecks ?? []).map((n, i) => (
+            <p key={i} className="flex items-start gap-1 text-[11px] leading-relaxed text-[#8a5a00]">
+              <IconAlert size={11} className="mt-0.5 shrink-0" />
+              <span>{n}</span>
+            </p>
+          ))}
+          {notes.map((e, i) => (
+            <p key={i} className="text-[11px] leading-relaxed text-[#8a877f]">
+              · {e}
+            </p>
           ))}
         </div>
-      )}
+      ) : null}
 
-      {price && (
-        <div className="cand__foot">
-          <span className="cand__foot-left">
-            <IconReceipt size={12} />
+      {price ? (
+        <div className="mt-2 flex items-center justify-between gap-2 text-[10px] text-[#a8a49c]">
+          <span className="flex items-center gap-1">
+            <IconReceipt size={11} />
             官方核价 · 共 {price.lines.reduce((n, l) => n + l.quantity, 0)} 件
           </span>
-          {price.traceId && <span>trace {price.traceId.slice(0, 8)}</span>}
+          {price.traceId ? <span className="tnum">trace {price.traceId.slice(0, 8)}</span> : null}
         </div>
-      )}
+      ) : null}
     </div>
   );
 }
@@ -322,62 +328,59 @@ export function AdjustResultView({
     result.candidates.every((c) => c.withinBudget === false);
 
   return (
-    <div className="result">
+    <div className="space-y-3">
       {/* 用户原话 + 解析出的修改点：先让用户确认「我理解对了没有」 */}
-      <div className="said">
-        <div className="said__label">你刚才说</div>
-        <div className="said__text">「{result.intent.raw}」</div>
+      <div className="rounded-lg border border-line bg-white p-3.5">
+        <p className="text-[11px] text-[#8a877f]">你刚才说</p>
+        <p className="mt-1 text-[13px] leading-relaxed text-[#111827]">「{result.intent.raw}」</p>
         <ChangeTags result={result} />
       </div>
 
-      {result.intent.unrecognized.length > 0 && (
-        <div className="alert alert--warn">
-          <IconAlert />
-          <div className="alert__body">
-            <div className="alert__title">有一部分没听懂</div>
-            <div>
-              「{result.intent.unrecognized.join('、')}」这部分没能转成具体修改。你可以换个说法，例如「不要薯条」「薯条换成玉米杯」「不超过 20 元」。
-            </div>
-          </div>
-        </div>
-      )}
+      {result.intent.unrecognized.length > 0 ? (
+        <Alert kind="warn" title="有一部分没听懂">
+          「{result.intent.unrecognized.join('、')}」这部分没能转成具体修改。可以换个说法，例如「不要薯条」「薯条换成玉米杯」「不超过 20 元」。
+        </Alert>
+      ) : null}
 
       <MatchNotice matched={result.matched} summary={result.matchSummary} />
 
-      {allOverBudget && (
-        <div className="alert alert--error">
-          <IconAlert />
-          <div className="alert__body">
-            <div className="alert__title">没有方案能压到 ¥{(result.intent.budgetCents! / 100).toFixed(0)} 以内</div>
-            <div>下面列出的是最接近的选项。你可以放宽预算，或告诉我可以减少哪一项。</div>
-          </div>
-        </div>
-      )}
+      {allOverBudget ? (
+        <Alert kind="error" title={`没有方案能压到 ¥${(result.intent.budgetCents! / 100).toFixed(0)} 以内`}>
+          下面列出的是最接近的选项。你可以放宽预算，或告诉我可以减少哪一项。
+        </Alert>
+      ) : null}
 
-      <section className="section section--flush">
-        <SectionHead title="改了什么" desc="左边是你原来的，右边是这一次要下的" meta="前后对照" />
+      <section>
+        <div className="mb-2 flex items-baseline justify-between">
+          <h2 className="text-[13px] font-semibold tracking-tight text-[#111827]">改了什么</h2>
+          <span className="text-[11px] text-[#a8a49c]">前后对照</span>
+        </div>
         <Compare matched={result.matched} candidate={selected} />
       </section>
 
-      <section className="section section--flush">
-        <SectionHead
-          title="候选方案"
-          desc="选一个再往下走，金额以官方接口为准"
-          meta={`${result.candidates.length} 个`}
-        />
-        <div className="cands" role="radiogroup" aria-label="候选方案">
+      <section>
+        <div className="mb-2 flex items-baseline justify-between">
+          <h2 className="text-[13px] font-semibold tracking-tight text-[#111827]">候选方案</h2>
+          <span className="tnum text-[11px] text-[#a8a49c]">{result.candidates.length} 个</span>
+        </div>
+        <div className="space-y-2" role="radiogroup" aria-label="候选方案">
           {result.candidates.map((c) => (
             <CandidateCard key={c.id} candidate={c} active={c.id === selected.id} onSelect={() => onSelect(c.id)} />
           ))}
         </div>
       </section>
 
-      <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'center' }}>
-        <button type="button" className="btn btn--ghost btn--sm" onClick={onSave} disabled={!selected.price}>
+      <div className="flex flex-wrap items-center gap-2">
+        <button
+          type="button"
+          onClick={onSave}
+          disabled={!selected.price}
+          className="inline-flex h-8 items-center gap-1 rounded-lg border border-line bg-white px-3 text-xs font-medium text-[#3d3a35] transition-colors duration-150 hover:bg-[#faf9f7] active:scale-[0.97] disabled:opacity-40"
+        >
           存成常用方案
-          <IconArrow size={12} />
+          <IconArrow size={11} />
         </button>
-        <span className="tiny">下次说「还是老样子」就能调出来</span>
+        <span className="text-[11px] text-[#a8a49c]">下次说「还是老样子」就能调出来</span>
       </div>
     </div>
   );

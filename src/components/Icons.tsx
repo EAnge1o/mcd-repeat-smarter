@@ -167,3 +167,51 @@ export const IconArches = ({ size = 19, className }: IconProps) => (
     />
   </svg>
 );
+
+export const IconGrid = ({ size = 16, className }: IconProps) => (
+  <svg {...base(size)} className={className}>
+    <rect x="3.5" y="3.5" width="7" height="7" rx="1.6" />
+    <rect x="13.5" y="3.5" width="7" height="7" rx="1.6" />
+    <rect x="3.5" y="13.5" width="7" height="7" rx="1.6" />
+    <rect x="13.5" y="13.5" width="7" height="7" rx="1.6" />
+  </svg>
+);
+
+export const IconBookmark = ({ size = 16, className }: IconProps) => (
+  <svg {...base(size)} className={className}>
+    <path d="M6.5 3.5h11a1 1 0 0 1 1 1v16l-6.5-4-6.5 4v-16a1 1 0 0 1 1-1z" />
+  </svg>
+);
+
+export const IconSearch = ({ size = 16, className }: IconProps) => (
+  <svg {...base(size)} className={className}>
+    <circle cx="11" cy="11" r="6.5" />
+    <path d="m16 16 4.5 4.5" />
+  </svg>
+);
+
+export const IconBell = ({ size = 16, className }: IconProps) => (
+  <svg {...base(size)} className={className}>
+    <path d="M6 10a6 6 0 0 1 12 0c0 4 1.5 5.5 1.5 5.5h-15S6 14 6 10z" />
+    <path d="M10.2 19a2 2 0 0 0 3.6 0" />
+  </svg>
+);
+
+export const IconMenu = ({ size = 18, className }: IconProps) => (
+  <svg {...base(size)} className={className}>
+    <path d="M4 7h16M4 12h16M4 17h16" />
+  </svg>
+);
+
+export const IconChevronRight = ({ size = 14, className }: IconProps) => (
+  <svg {...base(size)} className={className}>
+    <path d="m9.5 6 6 6-6 6" />
+  </svg>
+);
+
+export const IconWallet = ({ size = 16, className }: IconProps) => (
+  <svg {...base(size)} className={className}>
+    <path d="M3.5 8.5A2.5 2.5 0 0 1 6 6h12.5A2 2 0 0 1 20.5 8v9a2 2 0 0 1-2 2H6a2.5 2.5 0 0 1-2.5-2.5z" />
+    <path d="M16 12.5h4.5" />
+  </svg>
+);
