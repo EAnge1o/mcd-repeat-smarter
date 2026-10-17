@@ -147,8 +147,8 @@ export function SpendTrend({ points, skipped, selectedId, onPick, height = 176 }
             >
               <defs>
                 <linearGradient id="spendBand" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#da291c" stopOpacity="0.1" />
-                  <stop offset="100%" stopColor="#da291c" stopOpacity="0" />
+                  <stop offset="0%" stopColor="#d62315" stopOpacity="0.18" />
+                  <stop offset="100%" stopColor="#d62315" stopOpacity="0" />
                 </linearGradient>
               </defs>
 
@@ -159,7 +159,7 @@ export function SpendTrend({ points, skipped, selectedId, onPick, height = 176 }
                     y1={t.y}
                     x2={w - PAD.r}
                     y2={t.y}
-                    stroke={i === 0 ? 'rgba(40,32,28,.16)' : 'rgba(40,32,28,.07)'}
+                    stroke={i === 0 ? 'rgba(13,13,13,.18)' : 'rgba(13,13,13,.08)'}
                     strokeWidth="1"
                     strokeDasharray={i === 0 ? undefined : '1 5'}
                   />
@@ -167,9 +167,9 @@ export function SpendTrend({ points, skipped, selectedId, onPick, height = 176 }
                     x={PAD.l - 12}
                     y={t.y + 3.5}
                     textAnchor="end"
-                    fontSize="9.5"
-                    fill="#736a61"
-                    style={{ fontFamily: '"DM Mono", monospace', letterSpacing: '0.04em' }}
+                    fontSize="11"
+                    fill="#6e6e6e"
+                    style={{ fontFamily: '"DM Mono", monospace', letterSpacing: '0.02em', fontWeight: 500 }}
                   >
                     {axisLabel(t.v)}
                   </text>
@@ -177,7 +177,7 @@ export function SpendTrend({ points, skipped, selectedId, onPick, height = 176 }
               ))}
 
               <path d={area} fill="url(#spendBand)" />
-              <path d={line} fill="none" stroke="#da291c" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              <path d={line} fill="none" stroke="#d62315" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" />
 
               {nodes.map((p, i) => {
                 const show = nodes.length <= maxLabels || i === 0 || i === nodes.length - 1 || i === Math.floor((nodes.length - 1) / 2);
@@ -191,9 +191,9 @@ export function SpendTrend({ points, skipped, selectedId, onPick, height = 176 }
                     x={first ? PAD.l : last ? w - PAD.r : p.x}
                     y={H - 7}
                     textAnchor={first ? 'start' : last ? 'end' : 'middle'}
-                    fontSize="9.5"
-                    fill="#736a61"
-                    style={{ fontFamily: '"DM Mono", monospace', letterSpacing: '0.04em' }}
+                    fontSize="11"
+                    fill="#6e6e6e"
+                    style={{ fontFamily: '"DM Mono", monospace', letterSpacing: '0.02em', fontWeight: 500 }}
                   >
                     {p.label}
                   </text>
@@ -201,7 +201,7 @@ export function SpendTrend({ points, skipped, selectedId, onPick, height = 176 }
               })}
 
               {hot ? (
-                <line x1={hot.x} y1={PAD.t - 4} x2={hot.x} y2={PAD.t + PH} stroke="#da291c" strokeWidth="1" strokeDasharray="2 4" opacity="0.32" />
+                <line x1={hot.x} y1={PAD.t - 4} x2={hot.x} y2={PAD.t + PH} stroke="#d62315" strokeWidth="1.6" strokeDasharray="3 4" opacity="0.4" />
               ) : null}
 
               {nodes.map((p, i) => {
@@ -211,11 +211,11 @@ export function SpendTrend({ points, skipped, selectedId, onPick, height = 176 }
                     key={`c-${i}`}
                     cx={p.x}
                     cy={p.y}
-                    r={on ? 4.4 : 2.6}
-                    fill={on ? '#da291c' : '#faf8f6'}
-                    stroke="#da291c"
-                    strokeWidth={on ? 2 : 1.5}
-                    className="transition-all duration-200"
+                    r={on ? 6 : 3.6}
+                    fill={on ? '#d62315' : '#ffffff'}
+                    stroke="#d62315"
+                    strokeWidth={on ? 3 : 2.2}
+                    className="transition-all duration-150"
                   />
                 );
               })}
@@ -255,17 +255,17 @@ export function SpendTrend({ points, skipped, selectedId, onPick, height = 176 }
 
             {hot ? (
               <div
-                className="float pointer-events-none absolute z-10 -translate-x-1/2 rounded-xl px-3 py-2"
+                className="float pointer-events-none absolute z-10 -translate-x-1/2 rounded-2xl px-3 py-2"
                 style={{ left: `${(hot.x / w) * 100}%`, top: `${(hot.y / H) * 100}%`, marginTop: -56 }}
               >
                 <p className="tnum display text-[14px] leading-none text-ink">¥{yuan(hot.cents)}</p>
-                <p className="mt-1 whitespace-nowrap text-[9px] tracking-[0.04em] text-ink-faint">{fmtDateTime(hot.time)}</p>
+                <p className="mt-1 whitespace-nowrap text-[11.5px] tracking-[0.04em] text-ink-faint">{fmtDateTime(hot.time)}</p>
               </div>
             ) : null}
           </div>
 
           {skipped > 0 || zeroCount > 0 ? (
-            <p className="mt-2 text-[10px] leading-relaxed text-ink-faint">
+            <p className="mt-2 text-[11.5px] leading-relaxed text-ink-faint">
               {skipped > 0 ? `另有 ${skipped} 笔订单接口未返回金额，未计入趋势线。` : ''}
               {zeroCount > 0 ? `${skipped > 0 ? ' ' : ''}其中 ${zeroCount} 笔为券/积分全额抵扣，实付 ¥0。` : ''}
             </p>

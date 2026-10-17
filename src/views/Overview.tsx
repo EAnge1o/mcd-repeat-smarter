@@ -151,7 +151,7 @@ export function Overview(props: OverviewProps) {
         不做四个等宽格子 —— 同样大小等于宣称同样重要，结果是谁都不重要。
         累计实付放大成唯一主角，其余退成一行次级数字。
       */}
-      <section aria-label="消费概况" className="mt-14 md:mt-16">
+      <section aria-label="消费概况" className="mt-12 md:mt-14">
         <div className="flex flex-wrap items-end justify-between gap-x-12 gap-y-7">
           <MetricLead
             label="累计实付"
@@ -175,13 +175,18 @@ export function Overview(props: OverviewProps) {
           />
         </div>
 
-        <div className="hair mt-8" aria-hidden="true" />
+        {/* 麦当劳的分区不是一条灰线，而是一道红黄撞色条 —— 这是它的招牌分隔语言 */}
+        <div className="mt-8 flex h-2 overflow-hidden rounded-full" aria-hidden="true">
+          <span className="w-1/2 bg-brand-500" />
+          <span className="w-1/4 bg-gold-400" />
+          <span className="w-1/4 bg-ink" />
+        </div>
       </section>
 
       {/* 趋势 + 记忆 */}
       <div className="mt-12 grid grid-cols-1 items-start gap-5 md:mt-14 md:gap-6 xl:grid-cols-12">
         {ordersLoading || series.points.length > 0 ? (
-          <Panel className="min-w-0 px-5 py-6 md:px-8 md:py-8 xl:col-span-8">
+          <Panel className="min-w-0 px-5 py-6 shadow-panel md:px-8 md:py-8 xl:col-span-8">
             <SectionHead title="钱花在哪几单上" desc={trendNote} size="sm" />
             <div className="mt-5">
               {ordersLoading ? (
@@ -193,8 +198,12 @@ export function Overview(props: OverviewProps) {
           </Panel>
         ) : null}
 
-        <Panel className="min-w-0 px-5 py-6 md:px-7 md:py-8 xl:col-span-4">
-          <SectionHead title="我记住的" desc="全部由你的真实订单统计得出" size="sm" />
+        <Panel layer="panel" className="min-w-0 border-0 bg-ink px-5 py-6 text-white md:px-7 md:py-8 xl:col-span-4">
+          {/* 深色区块里的栏目头：标签换成红底，标题改反白 */}
+          <div>
+            <span className="eyebrow mb-2.5 bg-brand-500 text-white">我记住的</span>
+            <h2 className="display text-[25px] text-white">全部来自你的真实订单</h2>
+          </div>
           <div className="mt-5">
             <MemoryRail
               top={top ? { name: top.name, count: top.count, share: topShare } : null}
@@ -210,7 +219,7 @@ export function Overview(props: OverviewProps) {
       </div>
 
       {/* 常用方案 */}
-      <Panel className="mt-5 px-5 py-6 md:mt-6 md:px-8 md:py-8">
+      <Panel className="mt-5 px-5 py-6 shadow-panel md:mt-6 md:px-8 md:py-8">
         <SectionHead
           title="常用方案"
           desc="方案存的是商品编码，不是一句话。价格每次下单前都会按门店重新核。"
@@ -238,7 +247,7 @@ export function Overview(props: OverviewProps) {
 
       {/* 订单流 */}
       <div ref={feedRef} className="mt-10 scroll-mt-24 md:mt-12">
-        <Panel className="px-5 py-6 md:px-8 md:py-8">
+        <Panel className="px-5 py-6 shadow-panel md:px-8 md:py-8">
           <OrderFeed
             orders={rows}
             total={orders.length}

@@ -28,7 +28,7 @@ export function PlansGrid({ plans, loading, onUse, onDuplicate, onRename, onDele
     return (
       <div className={cx('grid grid-cols-1 gap-3 sm:grid-cols-2', className)}>
         {[0, 1].map((i) => (
-          <div key={i} className="rounded-xl bg-white p-4 ring-1 ring-inset ring-line">
+          <div key={i} className="rounded-2xl bg-white p-4 ring-1 ring-inset ring-line">
             <Skeleton className="h-3 w-14" />
             <Skeleton className="mt-2.5 h-4 w-32" />
             <Skeleton className="mt-4 h-3 w-full" />
@@ -60,7 +60,7 @@ export function PlansGrid({ plans, loading, onUse, onDuplicate, onRename, onDele
         return (
           <article
             key={p.id}
-            className="group flex flex-col rounded-xl bg-white p-4 ring-1 ring-inset ring-line transition-colors duration-150 hover:bg-wash"
+            className="group flex flex-col rounded-2xl bg-white p-4 ring-1 ring-inset ring-line transition-colors duration-150 hover:bg-wash"
           >
             <div className="flex items-start justify-between gap-2">
               <div className="min-w-0">
@@ -70,12 +70,12 @@ export function PlansGrid({ plans, loading, onUse, onDuplicate, onRename, onDele
                 <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
                   {p.tag ? <Badge tone="neutral">{p.tag}</Badge> : null}
                   {p.source === 'history' ? <Badge tone="neutral">来自历史</Badge> : null}
-                  <span className="tnum text-[11px] text-ink-faint">{pieces} 件</span>
+                  <span className="tnum text-[11.5px] text-ink-faint">{pieces} 件</span>
                 </div>
               </div>
 
               {/* 操作平时收起，hover / 聚焦才出现；触屏常驻 */}
-              <div className="flex shrink-0 items-center gap-0.5 opacity-100 transition-opacity duration-200 md:opacity-0 md:group-hover:opacity-100 md:group-focus-within:opacity-100">
+              <div className="flex shrink-0 items-center gap-0.5 opacity-100 transition-opacity duration-150 md:opacity-0 md:group-hover:opacity-100 md:group-focus-within:opacity-100">
                 <button
                   type="button"
                   onClick={() => onDuplicate(p)}
@@ -105,18 +105,18 @@ export function PlansGrid({ plans, loading, onUse, onDuplicate, onRename, onDele
 
             <ul className="mt-3 flex-1 space-y-1">
               {shown.map((it, i) => (
-                <li key={`${it.productCode}-${i}`} className="flex items-baseline gap-2 text-[12.5px] text-ink-soft">
-                  <span className="tnum w-5 shrink-0 text-right text-[11px] text-ink-faint">{it.quantity}×</span>
+                <li key={`${it.productCode}-${i}`} className="flex items-baseline gap-2 text-[13px] text-ink-soft">
+                  <span className="tnum w-5 shrink-0 text-right text-[11.5px] text-ink-faint">{it.quantity}×</span>
                   <span className="truncate" title={it.name}>
                     {it.name}
                   </span>
                 </li>
               ))}
-              {rest > 0 ? <li className="pl-[28px] text-[11px] text-ink-faint">还有 {rest} 项</li> : null}
+              {rest > 0 ? <li className="pl-[28px] text-[11.5px] text-ink-faint">还有 {rest} 项</li> : null}
             </ul>
 
             <div className="mt-3.5 flex items-center justify-between gap-2 border-t border-hair pt-3">
-              <span className="flex min-w-0 items-center gap-1.5 text-[11px] text-ink-faint">
+              <span className="flex min-w-0 items-center gap-1.5 text-[11.5px] text-ink-faint">
                 <IconStore size={11} />
                 <span className="truncate" title={p.storeName}>
                   {p.storeName || p.storeCode}
@@ -137,12 +137,12 @@ export function PlansGrid({ plans, loading, onUse, onDuplicate, onRename, onDele
       })}
 
       {plans.length % 2 === 1 ? (
-        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-line p-5 text-center">
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-line p-5 text-center">
           <span className="flex items-center gap-1.5 text-[11.5px] text-ink-mute">
             <IconPlus size={11} />
             还能再存一个
           </span>
-          <span className="mt-1.5 text-[11px] leading-relaxed text-ink-faint">下次调好之后点「存成常用方案」</span>
+          <span className="mt-1.5 text-[11.5px] leading-relaxed text-ink-faint">下次调好之后点「存成常用方案」</span>
         </div>
       ) : null}
     </div>

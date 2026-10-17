@@ -107,9 +107,15 @@ function MatchNotice({ matched, summary }: { matched: MatchedView[]; summary: Ad
 function ChildTags({ tags }: { tags: { name: string; changed?: boolean }[] }) {
   if (tags.length === 0) return null;
   return (
-    <div className="mt-1 flex flex-wrap gap-x-2 gap-y-0.5 pl-7">
+    <div className="mt-1.5 flex flex-wrap gap-1.5 pl-7">
       {tags.map((t, i) => (
-        <span key={i} className={cx('text-[10px] leading-relaxed', t.changed ? 'text-[#7a5a1c]' : 'text-ink-faint')}>
+        <span
+          key={i}
+          className={cx(
+            'rounded-full px-2 py-0.5 text-[11.5px] font-bold',
+            t.changed ? 'bg-gold-400 text-ink' : 'bg-ink/8 text-ink-faint',
+          )}
+        >
           {t.name}
         </span>
       ))}
@@ -125,10 +131,10 @@ function Compare({ matched, candidate }: { matched: MatchedView[]; candidate: Ca
 
   return (
     <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-[1fr_auto_1fr] sm:items-center">
-      <div className="rounded-2xl bg-[#f6f1ec] p-4">
+      <div className="rounded-2xl bg-ink/5 p-4 ring-2 ring-ink/10">
         <div className="flex items-baseline justify-between">
-          <span className="eyebrow">原方案</span>
-          <span className="tnum text-[9.5px] text-ink-faint">共 {matched.reduce((n, m) => n + m.quantity, 0)} 件</span>
+          <span className="eyebrow bg-ink text-white">原方案</span>
+          <span className="tnum text-[11.5px] text-ink-faint">共 {matched.reduce((n, m) => n + m.quantity, 0)} 件</span>
         </div>
         <div className="mt-3 space-y-1.5">
           {matched.map((m, i) => {
@@ -136,8 +142,8 @@ function Compare({ matched, candidate }: { matched: MatchedView[]; candidate: Ca
             return (
               <div key={i}>
                 <div className="flex items-baseline gap-2">
-                  <span className="tnum w-5 shrink-0 text-right text-[9.5px] text-ink-faint">{m.quantity}×</span>
-                  <span className={cx('truncate text-[12px]', gone ? 'text-ink-faint line-through' : 'text-ink-soft')} title={m.name}>
+                  <span className="tnum w-5 shrink-0 text-right text-[11.5px] text-ink-faint">{m.quantity}×</span>
+                  <span className={cx('truncate text-[13.5px] font-bold', gone ? 'text-ink-faint line-through' : 'text-ink-soft')} title={m.name}>
                     {m.name}
                   </span>
                 </div>
@@ -149,26 +155,26 @@ function Compare({ matched, candidate }: { matched: MatchedView[]; candidate: Ca
       </div>
 
       <div className="hidden justify-center sm:flex" aria-hidden="true">
-        <span className="grid h-7 w-7 place-items-center rounded-full bg-white text-ink-faint shadow-pill ring-1 ring-line">
-          <IconArrow size={12} />
+        <span className="grid h-9 w-9 place-items-center rounded-full bg-ink text-white" aria-hidden="true">
+          <IconArrow size={14} />
         </span>
       </div>
 
-      <div className="rounded-2xl bg-wash p-4 ring-1 ring-inset ring-line">
+      <div className="rounded-2xl bg-gold-100 p-4 ring-2 ring-gold-300">
         <div className="flex items-baseline justify-between">
-          <span className="eyebrow text-brand-700">调整后</span>
-          <span className="tnum text-[9.5px] text-ink-faint">共 {count(candidate.items)} 件</span>
+          <span className="eyebrow bg-brand-500 text-white">调整后</span>
+          <span className="tnum text-[11.5px] text-ink-faint">共 {count(candidate.items)} 件</span>
         </div>
         <div className="mt-3 space-y-1.5">
           {candidate.items.length === 0 ? (
-            <p className="text-[11px] text-ink-faint">这一版没有任何餐品</p>
+            <p className="text-[13px] font-bold text-ink-mute">这一版没有任何餐品</p>
           ) : (
             candidate.items.map((item, i) => (
               <div key={`${item.productCode}-${i}`}>
                 <div className="flex items-baseline gap-2">
-                  <span className="tnum w-5 shrink-0 text-right text-[9.5px] text-ink-faint">{item.quantity}×</span>
+                  <span className="tnum w-5 shrink-0 text-right text-[11.5px] text-ink-faint">{item.quantity}×</span>
                   <span
-                    className={cx('truncate text-[12px]', added.has(item.name) ? 'font-medium text-brand-700' : 'text-ink')}
+                    className={cx('truncate text-[13.5px] font-bold', added.has(item.name) ? 'text-brand-700' : 'text-ink')}
                     title={item.name}
                   >
                     {item.name}
@@ -204,25 +210,26 @@ function CandidateCard({ candidate, active, onSelect }: { candidate: CandidatePl
         }
       }}
       className={cx(
-        'cursor-pointer rounded-2xl p-4 transition-[background-color,box-shadow] duration-200 ease-out',
+        'cursor-pointer rounded-2xl p-4 transition-colors duration-100 ease-out',
+        // 选中 = 黄底黑框（麦当劳的「已选中」就是这个反白），未选 = 白底灰框
         active
-          ? 'bg-white shadow-panel ring-1 ring-inset ring-brand-300'
-          : 'bg-[#fbf7f3] ring-1 ring-inset ring-transparent hover:bg-[#f8f2ec]',
+          ? 'bg-gold-400 ring-[3px] ring-ink shadow-[0_4px_0_rgba(13,13,13,0.16)]'
+          : 'bg-white ring-2 ring-ink/12 hover:bg-gold-100',
       )}
     >
       <div className="flex items-start gap-2.5">
         <span
           className={cx(
-            'mt-1 grid h-4 w-4 shrink-0 place-items-center rounded-full border transition-colors duration-200',
-            active ? 'border-brand-500 bg-brand-500' : 'border-[#d8d0c8] bg-white',
+            'mt-1 grid h-5 w-5 shrink-0 place-items-center rounded-full border-[3px] transition-colors duration-100',
+            active ? 'border-ink bg-ink' : 'border-ink/25 bg-white',
           )}
           aria-hidden="true"
         >
-          {active ? <span className="h-1.5 w-1.5 rounded-full bg-white" /> : null}
+          {active ? <span className="h-2 w-2 rounded-full bg-gold-400" /> : null}
         </span>
 
         <div className="min-w-0 flex-1">
-          <p className="truncate text-[13px] text-ink">{candidate.label}</p>
+          <p className={cx('truncate text-[15px] font-black', active ? 'text-ink' : 'text-ink')}>{candidate.label}</p>
           <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
             {candidate.withinBudget === true ? <Badge tone="ok">在预算内</Badge> : null}
             {candidate.withinBudget === false ? <Badge tone="danger">超预算</Badge> : null}
@@ -233,35 +240,39 @@ function CandidateCard({ candidate, active, onSelect }: { candidate: CandidatePl
         <div className="shrink-0 text-right">
           {price ? (
             <>
-              <div className="tnum display text-[19px] leading-none text-ink">
-                <span className="mr-0.5 font-sans text-[11px] font-normal text-ink-faint">¥</span>
+              <div className="tnum text-[24px] font-black leading-none text-ink">
+                <span className="mr-0.5 text-[14px]">¥</span>
                 {yuan(price.priceCents)}
               </div>
               {price.originalPriceCents > price.priceCents ? (
-                <div className="tnum mt-1 text-[11px] text-ink-faint line-through">¥{yuan(price.originalPriceCents)}</div>
+                <div className="tnum mt-1 text-[11.5px] text-ink-faint line-through">¥{yuan(price.originalPriceCents)}</div>
               ) : null}
             </>
           ) : (
-            <div className="text-[11px] text-brand-700">核价失败</div>
+            <div className="rounded-full bg-brand-50 px-2.5 py-1 text-[12px] font-bold text-brand-700">核价失败</div>
           )}
         </div>
       </div>
 
-      <div className="mt-3 space-y-1 border-t border-white/70 pt-3">
+      <div className="mt-3 space-y-1.5 border-t-2 border-ink/10 pt-3">
         {candidate.items.map((item, i) => (
           <div key={`${item.productCode}-${i}`}>
             <div className="flex items-baseline gap-2">
-              <span className="tnum w-4 shrink-0 text-right text-[9.5px] text-ink-faint">{item.quantity}</span>
-              <span className="truncate text-[12px] text-ink-soft">{item.name}</span>
+              <span className="tnum w-5 shrink-0 rounded-full bg-ink/10 px-1 text-center text-[11.5px] font-black text-ink-soft">
+                {item.quantity}
+              </span>
+              <span className="truncate text-[13.5px] font-bold text-ink-soft">{item.name}</span>
             </div>
             {item.children.length > 0 ? (
-              <div className="flex flex-wrap gap-x-2 gap-y-0.5 pl-[24px]">
+              <div className="mt-1.5 flex flex-wrap gap-1.5 pl-[28px]">
                 {item.children.map((c, j) => (
                   <span
                     key={j}
                     className={cx(
-                      'text-[10px] leading-relaxed',
-                      changedNames.has(c.name) || (c.aliasNames && c.aliasNames.length > 0) ? 'text-[#7a5a1c]' : 'text-ink-faint',
+                      'rounded-full px-2 py-0.5 text-[11.5px] font-bold',
+                      changedNames.has(c.name) || (c.aliasNames && c.aliasNames.length > 0)
+                        ? 'bg-brand-500 text-white'
+                        : 'bg-ink/8 text-ink-faint',
                     )}
                   >
                     {c.roundName ? `${c.roundName}·` : ''}
@@ -275,21 +286,21 @@ function CandidateCard({ candidate, active, onSelect }: { candidate: CandidatePl
       </div>
 
       {candidate.budgetNote || (candidate.priceChecks && candidate.priceChecks.length > 0) || notes.length > 0 ? (
-        <div className="mt-2.5 space-y-1 border-t border-white/70 pt-2.5">
+        <div className="mt-3 space-y-1.5 border-t-2 border-ink/10 pt-3">
           {candidate.budgetNote ? (
-            <p className="flex items-start gap-1.5 text-[10.5px] leading-relaxed text-[#7a5a1c]">
-              <IconAlert size={11} className="mt-0.5 shrink-0" />
+            <p className="flex items-start gap-2 text-[13px] font-medium leading-relaxed text-[#6b4a00]">
+              <IconAlert size={13} className="mt-0.5 shrink-0" />
               <span>{candidate.budgetNote}。系统不会为了凑预算偷偷换掉你要的东西。</span>
             </p>
           ) : null}
           {(candidate.priceChecks ?? []).map((n, i) => (
-            <p key={i} className="flex items-start gap-1.5 text-[10.5px] leading-relaxed text-[#7a5a1c]">
-              <IconAlert size={11} className="mt-0.5 shrink-0" />
+            <p key={i} className="flex items-start gap-2 text-[13px] font-medium leading-relaxed text-[#6b4a00]">
+              <IconAlert size={13} className="mt-0.5 shrink-0" />
               <span>{n}</span>
             </p>
           ))}
           {notes.map((e, i) => (
-            <p key={i} className="text-[10.5px] leading-relaxed text-ink-faint">
+            <p key={i} className="text-[13px] leading-relaxed text-ink-mute">
               {e}
             </p>
           ))}
@@ -297,12 +308,12 @@ function CandidateCard({ candidate, active, onSelect }: { candidate: CandidatePl
       ) : null}
 
       {price ? (
-        <div className="mt-2.5 flex items-center justify-between gap-2 text-[9.5px] text-ink-faint">
+        <div className="mt-3 flex items-center justify-between gap-2 rounded-full bg-ink/6 px-3 py-1.5 text-[12px] font-bold text-ink-mute">
           <span className="flex items-center gap-1.5">
-            <IconReceipt size={10} />
+            <IconReceipt size={12} />
             官方核价 · 共 {price.lines.reduce((n, l) => n + l.quantity, 0)} 件
           </span>
-          {price.traceId ? <span className="code text-[10.5px]">trace {price.traceId.slice(0, 8)}</span> : null}
+          {price.traceId ? <span className="code text-[11.5px] font-medium text-ink-faint">trace {price.traceId.slice(0, 8)}</span> : null}
         </div>
       ) : null}
     </div>
@@ -351,17 +362,19 @@ export function AdjustResultView({
       ) : null}
 
       <section>
-        <div className="mb-3 flex items-baseline justify-between gap-3">
-          <h3 className="display text-[17px] text-ink">改了什么</h3>
-          <span className="eyebrow">前后对照</span>
+        <div className="mb-3 flex items-center justify-between gap-3">
+          <h3 className="display text-[21px] text-ink">改了什么</h3>
+          <span className="eyebrow bg-ink text-white">前后对照</span>
         </div>
         <Compare matched={result.matched} candidate={selected} />
       </section>
 
       <section>
-        <div className="mb-3 flex items-baseline justify-between gap-3">
-          <h3 className="display text-[17px] text-ink">候选方案</h3>
-          <span className="tnum text-[9.5px] text-ink-faint">{result.candidates.length} 个</span>
+        <div className="mb-3 flex items-center justify-between gap-3">
+          <h3 className="display text-[21px] text-ink">候选方案</h3>
+          <span className="tnum rounded-full bg-ink/8 px-3 py-1 text-[12px] font-black text-ink-mute">
+            {result.candidates.length} 个
+          </span>
         </div>
         <div className="space-y-2.5" role="radiogroup" aria-label="候选方案">
           {result.candidates.map((c) => (
@@ -370,17 +383,17 @@ export function AdjustResultView({
         </div>
       </section>
 
-      <div className="flex flex-wrap items-center gap-3 border-t border-hair pt-4">
+      <div className="flex flex-wrap items-center gap-3 border-t-[3px] border-ink pt-5">
         <button
           type="button"
           onClick={onSave}
           disabled={!selected.price}
-          className="inline-flex h-8 items-center gap-1.5 rounded-full bg-white px-3.5 text-[11.5px] font-medium text-ink-soft ring-1 ring-inset ring-line transition-colors duration-200 hover:bg-ink hover:text-white active:scale-[0.97] disabled:opacity-35"
+          className="inline-flex h-11 items-center gap-2 rounded-full bg-white px-5 text-[13.5px] font-black text-ink shadow-[0_3px_0_rgba(13,13,13,0.2)] ring-2 ring-ink/12 transition-colors duration-100 hover:bg-gold-100 active:translate-y-[3px] active:shadow-none disabled:opacity-35"
         >
           存成常用方案
-          <IconArrow size={10} />
+          <IconArrow size={12} />
         </button>
-        <span className="text-[10.5px] text-ink-faint">下次说「还是老样子」就能调出来</span>
+        <span className="text-[13px] text-ink-mute">下次说「还是老样子」就能调出来</span>
       </div>
     </div>
   );

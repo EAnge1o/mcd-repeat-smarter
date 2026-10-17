@@ -19,7 +19,7 @@ interface ComposerProps {
  *
  * 用 focus-within 给整个浮层描边，而不是只给 textarea：输入时用户感知的是「我在这一层里」，
  * 边框只画在文本框上会让底部那排快捷短语看起来是独立控件。
- * 发送键是一个墨色圆钮，不用方块 —— 圆钮在这么空的版式里才不像按钮贴纸。
+ * 发送键是**红色实体圆钮** —— 麦当劳的主操作永远是红的，且按下会陷进去。
  */
 export function Composer({
   onSubmit,
@@ -58,8 +58,8 @@ export function Composer({
   return (
     <div
       className={cx(
-        'float rounded-2xl transition-[box-shadow,ring] duration-300 ease-out',
-        focused && 'ring-1 ring-brand-400/80',
+        'float rounded-[26px] transition-[box-shadow,transform] duration-150 ease-out',
+        focused && 'shadow-[0_6px_0_rgba(13,13,13,0.14),0_16px_34px_-14px_rgba(13,13,13,0.3)]',
         className,
       )}
     >
@@ -80,16 +80,16 @@ export function Composer({
           }
         }}
         className={cx(
-          'block w-full resize-none bg-transparent text-[13.5px] leading-[1.85] text-ink outline-none',
-          'placeholder:text-ink-faint disabled:text-ink-faint',
-          compact ? 'px-5 pt-3.5 pb-1' : 'px-6 pt-5 pb-1.5 md:text-[14.5px]',
+          'block w-full resize-none bg-transparent font-medium text-ink outline-none',
+          'placeholder:font-normal placeholder:text-ink-faint disabled:text-ink-faint',
+          compact ? 'px-5 pt-4 pb-1 text-[13.5px]' : 'px-7 pt-6 pb-2 text-[15px] leading-[1.8] md:text-[16px]',
         )}
       />
 
       <div className={cx('flex items-end justify-between gap-3', compact ? 'px-2.5 pb-2.5' : 'px-2.5 pb-2.5 md:px-3.5 md:pb-3.5')}>
         {quickPrompts.length > 0 ? (
           <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-1.5 gap-y-1.5">
-            <span className="eyebrow shrink-0 pl-2">试着说</span>
+            <span className="eyebrow shrink-0 pl-1">试着说</span>
             {quickPrompts.map((p) => (
               <button
                 key={p}
@@ -99,14 +99,14 @@ export function Composer({
                   ref.current?.focus();
                 }}
                 disabled={disabled || loading}
-                className="shrink-0 whitespace-nowrap rounded-full bg-[#f6f1ec] px-3 py-1 text-[11px] text-ink-soft transition-[background-color,color,transform] duration-200 ease-out hover:bg-white hover:text-ink active:scale-[0.97] disabled:opacity-40"
+                className="shrink-0 whitespace-nowrap rounded-full bg-ink/6 px-3.5 py-1.5 text-[13px] font-bold text-ink-soft transition-colors duration-100 hover:bg-gold-400 hover:text-ink active:translate-y-[2px] disabled:opacity-40"
               >
                 {p}
               </button>
             ))}
           </div>
         ) : (
-          <span className="eyebrow shrink-0 pb-2.5 pl-2">Enter 发送 · Shift 换行</span>
+          <span className="shrink-0 pb-2.5 pl-1 text-[11.5px] font-bold text-ink-faint">Enter 发送 · Shift 换行</span>
         )}
 
         <button
@@ -115,9 +115,11 @@ export function Composer({
           disabled={!active}
           aria-label="开始调整"
           className={cx(
-            'grid shrink-0 place-items-center rounded-full transition-[background-color,color,transform] duration-200 ease-out active:scale-[0.94]',
-            compact ? 'h-9 w-9' : 'h-10 w-10',
-            active ? 'bg-ink text-white hover:bg-[#3a312c]' : 'cursor-not-allowed bg-[#e9e3dd] text-[#b6ada4]',
+            'grid shrink-0 place-items-center rounded-full transition-[background-color,transform] duration-100 ease-out',
+            compact ? 'h-9 w-9' : 'h-12 w-12',
+            active
+              ? 'bg-brand-500 text-white shadow-brand-press hover:bg-brand-600 active:translate-y-[3px] active:shadow-none'
+              : 'cursor-not-allowed bg-ink/12 text-ink-faint',
           )}
         >
           {loading ? (

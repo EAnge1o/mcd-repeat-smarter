@@ -98,7 +98,7 @@ export function ConfirmSheet({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-[#2b201b]/30 p-0 backdrop-blur-[3px] sm:items-center sm:p-6"
+      className="fixed inset-0 z-50 flex items-end justify-center bg-ink/60 p-0 sm:items-center sm:p-6"
       onClick={onClose}
       role="presentation"
     >
@@ -107,25 +107,25 @@ export function ConfirmSheet({
         role="dialog"
         aria-modal="true"
         aria-label="订单确认"
-        className="animate-fade-up flex max-h-[92vh] w-full max-w-[560px] flex-col overflow-hidden rounded-t-2xl bg-white shadow-float sm:rounded-2xl"
+        className="animate-fade-up flex max-h-[92vh] w-full max-w-[580px] flex-col overflow-hidden rounded-t-[28px] border-[3px] border-ink bg-white shadow-[0_-6px_0_rgba(13,13,13,0.12)] sm:rounded-[28px]"
       >
         {/* 头 */}
-        <div className="flex shrink-0 items-start gap-3 border-b border-hair px-6 py-5">
-          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-brand-50 text-brand-600" aria-hidden="true">
-            <IconReceipt size={16} />
+        <div className="flex shrink-0 items-start gap-4 border-b-[3px] border-ink bg-brand-500 px-6 py-5 text-white">
+          <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-gold-400 text-ink" aria-hidden="true">
+            <IconReceipt size={19} />
           </span>
           <div className="min-w-0 flex-1">
-            <p className="eyebrow">最后一步</p>
-            <h2 className="display mt-1.5 text-[19px] text-ink">确认这一单</h2>
-            <p className="mt-0.5 text-[11px] text-ink-mute">提交前请核对门店、餐品与金额</p>
+            <p className="text-[12px] font-black uppercase tracking-[0.14em] text-white/75">最后一步</p>
+            <h2 className="display mt-1 text-[26px] text-white">确认这一单</h2>
+            <p className="mt-1 text-[12.5px] font-medium text-white/80">提交前请核对门店、餐品与金额</p>
           </div>
           <button
             type="button"
             onClick={onClose}
             aria-label="关闭"
-            className="grid h-8 w-8 shrink-0 place-items-center rounded-full text-ink-faint transition-colors duration-200 hover:bg-[#f6f1ec] hover:text-ink"
+            className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-ink/25 text-white transition-colors duration-100 hover:bg-ink/45"
           >
-            <IconClose size={15} />
+            <IconClose size={16} />
           </button>
         </div>
 
@@ -146,21 +146,23 @@ export function ConfirmSheet({
           ) : null}
 
           {result ? (
-            <div className="rounded-2xl bg-sage px-4 py-4 ring-1 ring-inset ring-[#d9e8de]">
-              <p className="flex items-center gap-2 text-[13px] text-[#2f5641]">
-                <IconCheck size={15} />
-                {result.mode === 'demo' ? '演示下单完成' : '订单已提交'}
+            <div className="rounded-2xl bg-gold-400 px-5 py-4">
+              <p className="flex items-center gap-2 text-[15px] font-black text-ink">
+                <span className="grid h-6 w-6 place-items-center rounded-full bg-ink text-gold-400">
+                  <IconCheck size={13} />
+                </span>
+                {result.mode === 'demo' ? '演示下单完成' : '下单成功！'}
               </p>
               {result.orderId ? (
-                <p className="code mt-1.5 break-all text-[11px] text-[#3d6a52]">订单号 {result.orderId}</p>
+                <p className="code mt-2 break-all text-[12.5px] font-medium text-ink/70">订单号 {result.orderId}</p>
               ) : null}
-              <p className="mt-1.5 text-[11.5px] leading-relaxed text-[#3f6b52]">{result.note}</p>
+              <p className="mt-2 text-[13px] font-medium leading-relaxed text-ink/75">{result.note}</p>
               {result.payUrl ? (
                 <a
                   href={result.payUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="mt-3 inline-flex h-8 items-center rounded-full bg-ink px-3.5 text-[11.5px] font-medium text-white transition-colors duration-200 hover:bg-[#3a312c]"
+                  className="mt-3.5 inline-flex h-11 items-center rounded-full bg-ink px-6 text-[14px] font-black text-white shadow-[0_3px_0_rgba(13,13,13,0.3)] transition-colors duration-100 hover:bg-ink-soft active:translate-y-[3px] active:shadow-none"
                 >
                   去支付
                 </a>
@@ -171,29 +173,29 @@ export function ConfirmSheet({
           {preview && !result ? (
             <>
               {/* 门店与来源：用户必须能确认「下到哪家店」 */}
-              <div className="flex items-center gap-3 rounded-2xl bg-wash px-4 py-3">
-                <IconStore size={15} className="shrink-0 text-ink-mute" />
+              <div className="flex items-center gap-3 rounded-2xl bg-ink px-4 py-3.5 text-white">
+                <IconStore size={17} className="shrink-0 text-gold-400" />
                 <div className="min-w-0">
-                  <p className="truncate text-[13px] text-ink">{storeName || `门店 ${storeCode}`}</p>
-                  <p className="truncate text-[10.5px] text-ink-faint">
+                  <p className="truncate text-[14px] font-black">{storeName || `门店 ${storeCode}`}</p>
+                  <p className="truncate text-[12.5px] text-white/65">
                     {BE_TYPE_LABEL[beType]} · {mode === 'demo' ? '演示数据，不会产生真实订单' : '麦当劳 MCP 实时'}
                   </p>
                 </div>
               </div>
 
               {/* 餐品 */}
-              <div className="overflow-hidden rounded-2xl bg-[#fbf7f3]">
-                <ul className="divide-y divide-hair">
+              <div className="overflow-hidden rounded-2xl ring-2 ring-ink/12">
+                <ul className="divide-y-2 divide-ink/8">
                   {items.map((item, i) => {
                     // 金额按商品编码从官方核价结果里取；取不到就不显示金额，绝不猜
                     const line = preview.price.lines.find((l) => l.productCode === item.productCode);
                     return (
                       <li key={`${item.productCode}-${i}`} className="flex items-baseline gap-2.5 px-4 py-2.5">
-                        <span className="tnum shrink-0 text-[10px] text-ink-faint">{item.quantity}×</span>
+                        <span className="tnum shrink-0 rounded-full bg-ink px-2 py-0.5 text-[11.5px] font-black text-white">{item.quantity}×</span>
                         <span className="min-w-0 flex-1">
-                          <span className="block truncate text-[12.5px] text-ink">{item.name}</span>
+                          <span className="block truncate text-[14px] font-bold text-ink">{item.name}</span>
                           {item.children.length > 0 ? (
-                            <span className="mt-1 block truncate text-[10px] text-ink-faint">
+                            <span className="mt-1 block truncate text-[11.5px] text-ink-faint">
                               {item.children.map((c) => `${c.roundName ? `${c.roundName}·` : ''}${c.name}`).join(' / ')}
                             </span>
                           ) : null}
@@ -207,12 +209,12 @@ export function ConfirmSheet({
                 {/* 只有真的存在优惠时才展开原价/优惠明细；
                     否则它会和底部的「应付」变成两个一样的数字 */}
                 {preview.price.discountCents > 0 ? (
-                  <div className="space-y-1 border-t border-hair bg-white/70 px-4 py-2.5 text-[11.5px]">
+                  <div className="space-y-1.5 border-t-2 border-ink/8 bg-gold-100 px-4 py-3 text-[12.5px] font-bold">
                     <div className="flex justify-between text-ink-mute">
                       <span>商品原价</span>
                       <span className="tnum">¥{yuan(preview.price.originalPriceCents)}</span>
                     </div>
-                    <div className="flex justify-between text-[#3f6b52]">
+                    <div className="flex justify-between text-brand-600">
                       <span>优惠</span>
                       <span className="tnum">−¥{yuan(preview.price.discountCents)}</span>
                     </div>
@@ -225,8 +227,8 @@ export function ConfirmSheet({
                   <p className="eyebrow mb-2">这次改的</p>
                   <ul className="space-y-1">
                     {changeNotes.map((n, i) => (
-                      <li key={i} className="flex items-start gap-1.5 text-[11px] leading-relaxed text-ink-soft">
-                        <IconCheck size={11} className="mt-0.5 shrink-0 text-[#3f6b52]" />
+                      <li key={i} className="flex items-start gap-2 text-[13px] font-medium leading-relaxed text-ink-soft">
+                        <IconCheck size={13} className="mt-0.5 shrink-0 text-brand-600" />
                         <span>{n}</span>
                       </li>
                     ))}
@@ -244,14 +246,28 @@ export function ConfirmSheet({
                       onClick={() => setTakeWay(t.code)}
                       aria-pressed={takeWay === t.code}
                       className={cx(
-                        'rounded-2xl px-3 py-2.5 text-left transition-[background-color,box-shadow] duration-200 ease-out',
+                        'rounded-2xl px-4 py-3 text-left transition-colors duration-100 ease-out',
                         takeWay === t.code
-                          ? 'bg-wash ring-1 ring-inset ring-brand-300'
-                          : 'bg-[#fbf7f3] ring-1 ring-inset ring-transparent hover:bg-[#f8f2ec]',
+                          ? 'bg-brand-500 text-white'
+                          : 'bg-ink/4 ring-2 ring-ink/10 hover:bg-gold-100',
                       )}
                     >
-                      <span className="block truncate text-[12px] text-ink">{t.title}</span>
-                      <span className="mt-0.5 block truncate text-[10px] text-ink-faint">{t.subtitle}</span>
+                      <span
+                        className={cx(
+                          'block truncate text-[14px] font-black',
+                          takeWay === t.code ? 'text-white' : 'text-ink',
+                        )}
+                      >
+                        {t.title}
+                      </span>
+                      <span
+                        className={cx(
+                          'mt-0.5 block truncate text-[12px]',
+                          takeWay === t.code ? 'text-white/75' : 'text-ink-faint',
+                        )}
+                      >
+                        {t.subtitle}
+                      </span>
                     </button>
                   ))}
                 </div>
@@ -260,7 +276,7 @@ export function ConfirmSheet({
               {preview.priceChecks.length > 0 ? (
                 <ul className="space-y-1">
                   {preview.priceChecks.map((n, i) => (
-                    <li key={i} className="flex items-start gap-1.5 text-[10.5px] leading-relaxed text-[#7a5a1c]">
+                    <li key={i} className="flex items-start gap-1.5 text-[13px] leading-relaxed text-[#6b4a00]">
                       <IconAlert size={11} className="mt-0.5 shrink-0" />
                       <span>{n}</span>
                     </li>
@@ -273,31 +289,31 @@ export function ConfirmSheet({
 
         {/* 底 */}
         {preview && !result ? (
-          <div className="shrink-0 border-t border-hair bg-[#fffdfc] px-6 py-4">
-            <div className="flex items-baseline justify-between">
-              <span className="flex items-center gap-2 text-[11px] text-ink-mute">
-                应付
+          <div className="shrink-0 border-t-[3px] border-ink bg-canvas px-6 py-4">
+            <div className="flex items-center justify-between gap-4">
+              <span className="flex flex-wrap items-center gap-2">
+                <span className="eyebrow">应付</span>
                 {mode === 'demo' ? <Badge tone="warn">演示</Badge> : null}
               </span>
-              <span className="tnum display text-[27px] leading-none text-ink">
-                <span className="mr-1 font-sans text-[13px] font-normal text-ink-faint">¥</span>
+              <span className="tnum text-[36px] font-black leading-none text-brand-600">
+                <span className="mr-1 text-[20px]">¥</span>
                 {yuan(preview.price.priceCents)}
               </span>
             </div>
 
-            <p className="mt-2.5 text-[10px] leading-relaxed text-ink-faint">
+            <p className="mt-2.5 text-[12.5px] leading-relaxed text-ink-mute">
               金额为官方接口实时核价，提交时可能因门店库存或活动变化产生微小差异，实际以门店出餐为准。
               {mode === 'demo' ? ' 当前为演示数据，不会产生真实订单。' : ''}
             </p>
 
-            <label className="mt-3 flex cursor-pointer items-start gap-2.5 rounded-2xl bg-[#fbf7f3] px-3.5 py-2.5">
+            <label className="mt-3.5 flex cursor-pointer items-start gap-3 rounded-2xl bg-white px-4 py-3 ring-2 ring-ink/12">
               <input
                 type="checkbox"
                 checked={checked}
                 onChange={(e) => setChecked(e.target.checked)}
-                className="mt-1 h-3.5 w-3.5 shrink-0 accent-brand-500"
+                className="mt-1 h-5 w-5 shrink-0 accent-brand-500"
               />
-              <span className="text-[11.5px] leading-relaxed text-ink-soft">
+              <span className="text-[13px] font-medium leading-relaxed text-ink-soft">
                 我已核对门店、餐品与金额，确认提交这一单。
                 <span className="text-ink-faint">（系统不会在你确认前下单）</span>
               </span>
@@ -306,18 +322,18 @@ export function ConfirmSheet({
             <Button
               variant="primary"
               size="lg"
-              className="mt-3 w-full"
+              className="mt-4 h-14 w-full text-[16px]"
               disabled={!checked || submitting}
               onClick={() => void submit()}
             >
               {submitting ? (
                 <>
-                  <span className="h-3.5 w-3.5 animate-spin-slow rounded-full border-2 border-white/30 border-t-white" />
+                  <span className="h-4 w-4 animate-spin-slow rounded-full border-[3px] border-white/35 border-t-white" />
                   提交中…
                 </>
               ) : (
                 <>
-                  <IconCheck size={13} />
+                  <IconCheck size={16} />
                   确认下单{mode === 'demo' ? '（演示）' : ''}
                 </>
               )}

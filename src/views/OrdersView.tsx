@@ -29,8 +29,8 @@ export function OrdersView({
     <div>
       <header className="flex flex-wrap items-end justify-between gap-x-8 gap-y-5">
         <div>
-          <h1 className="display text-[28px] leading-tight text-ink md:text-[36px]">订单记录</h1>
-          <p className="mt-2 max-w-[34rem] text-pretty text-[13px] leading-[1.85] text-ink-mute">
+          <h1 className="display text-[34px] leading-[1.05] text-ink md:text-[46px]">订单记录</h1>
+          <p className="mt-3 max-w-[36rem] text-pretty text-[14.5px] font-medium leading-[1.8] text-ink-mute">
             {mode === 'live'
               ? '来自你的麦当劳账号，按下单时间倒序。金额取接口返回的实付值，接口没返回的显示为「—」，不按 0 算。'
               : '当前为内置演示数据，不是真实账号。切到真实 MCP 后会读取你自己的历史订单。'}

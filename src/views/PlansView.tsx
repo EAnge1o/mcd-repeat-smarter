@@ -29,8 +29,8 @@ export function PlansView({
     <div>
       <header className="flex flex-wrap items-end justify-between gap-x-6 gap-y-4">
         <div className="max-w-[560px]">
-          <h1 className="display text-[28px] leading-tight text-ink md:text-[36px]">常用方案</h1>
-          <p className="mt-2 max-w-[34rem] text-pretty text-[13px] leading-[1.85] text-ink-mute">
+          <h1 className="display text-[34px] leading-[1.05] text-ink md:text-[46px]">常用方案</h1>
+          <p className="mt-3 max-w-[36rem] text-pretty text-[14.5px] font-medium leading-[1.8] text-ink-mute">
             方案存的是商品编码，不是一句话。价格每次下单前都会按门店重新核，所以这里的数字只代表「当时那一单」。
           </p>
         </div>

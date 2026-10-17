@@ -9,10 +9,10 @@ export function cx(...parts: (string | false | null | undefined)[]): string {
 
 /**
  * 只有两类容器：
- * - `layer="float"` 真正浮起来的一层（输入框、弹层），有一枚投影；
- * - `layer="panel"` 页面上的分栏块，只比底色亮半档。
+ * - `layer="float"` 真正浮起来的一层（输入框、弹层），有硬阴影；
+ * - `layer="panel"` 页面上的分栏块，纯白卡片 + 实线描边。
  *
- * 面板里不要再套面板 —— 嵌套卡片会把页面切成货架，也让「哪里是主体」变得不清楚。
+ * 面板里不要再套面板 —— 嵌套卡片会把页面切成货架。
  */
 export function Panel({
   children,
@@ -29,9 +29,9 @@ export function Panel({
 }
 
 /**
- * 栏目头：标题 + 一句必要的口径说明。
+ * 栏目头：黄色分类标签 + 超重黑体标题 + 一句口径说明。
  *
- * 说明文字是可选项 —— 大部分栏目不需要解释自己，硬塞一句说明只会让页面变密。
+ * 标签是实心黄胶囊而不是灰色小字 —— 这是麦当劳菜单分类的做法。
  */
 export function SectionHead({
   index,
@@ -51,16 +51,16 @@ export function SectionHead({
   return (
     <div className={cx('flex flex-wrap items-end justify-between gap-x-6 gap-y-3', className)}>
       <div className="min-w-0">
-        {index ? <span className="eyebrow block">{index}</span> : null}
+        {index ? <span className="eyebrow mb-2.5">{index}</span> : null}
         <h2
           className={cx(
             'display text-ink',
-            size === 'sm' ? 'mt-1.5 text-[19px] md:text-[21px]' : 'text-[23px] md:text-[27px]',
+            size === 'sm' ? 'text-[22px] md:text-[25px]' : 'text-[27px] md:text-[32px]',
           )}
         >
           {title}
         </h2>
-        {desc ? <p className="mt-2 max-w-[30rem] text-pretty text-[12.5px] leading-[1.8] text-ink-mute">{desc}</p> : null}
+        {desc ? <p className="mt-2.5 max-w-[30rem] text-pretty text-[13.5px] leading-[1.8] text-ink-mute">{desc}</p> : null}
       </div>
       {action ? <div className="shrink-0 pb-0.5">{action}</div> : null}
     </div>
@@ -69,25 +69,28 @@ export function SectionHead({
 
 /* ------------------------------------------------------------------ 按钮 */
 
-type Variant = 'primary' | 'secondary' | 'ghost' | 'danger';
+type Variant = 'primary' | 'secondary' | 'gold' | 'ghost' | 'danger';
 type Size = 'sm' | 'md' | 'lg';
 
+/*
+ * 麦当劳的按钮有一个关键特征：**按下去会陷进去**。
+ * 不是阴影变淡，而是整块往下位移、下方的实心阴影露出 3px ——
+ * 这个「实体按键」的反馈是它区别于普通 SaaS 按钮的核心手感。
+ */
 const VARIANT: Record<Variant, string> = {
-  /*
-   * 主操作是品牌红 —— 全站唯一大面积用红的地方。
-   * 基态用 brand-600 而不是 500：白字在 500 上只有 4.87:1，落在 AA 边缘；
-   * 600 是 5.96:1，按钮这种「必须看清的动作」不该在及格线上晃。
-   */
-  primary: 'bg-brand-600 text-white hover:bg-brand-700 active:bg-brand-700',
-  secondary: 'bg-white text-ink-soft ring-1 ring-inset ring-line hover:bg-wash hover:text-ink',
-  ghost: 'text-ink-mute hover:bg-wash hover:text-ink',
-  danger: 'bg-white text-brand-700 ring-1 ring-inset ring-brand-200 hover:bg-brand-50',
+  primary:
+    'bg-brand-500 text-white shadow-brand-press hover:bg-brand-600 active:translate-y-[3px] active:shadow-none',
+  secondary:
+    'bg-white text-ink shadow-[0_3px_0_rgba(13,13,13,0.16)] ring-2 ring-ink/12 hover:bg-gold-100 active:translate-y-[3px] active:shadow-none',
+  gold: 'bg-gold-400 text-ink shadow-[0_3px_0_rgba(154,106,0,1)] hover:bg-gold-300 active:translate-y-[3px] active:shadow-none',
+  ghost: 'text-ink-soft hover:bg-ink/6 hover:text-ink',
+  danger: 'bg-white text-brand-600 shadow-[0_3px_0_rgba(163,24,16,0.3)] ring-2 ring-brand-200 hover:bg-brand-50 active:translate-y-[3px] active:shadow-none',
 };
 
 const SIZE: Record<Size, string> = {
-  sm: 'h-8 gap-1.5 px-3.5 text-[12px]',
-  md: 'h-10 gap-2 px-5 text-[13px]',
-  lg: 'h-11 gap-2 px-6 text-[13.5px]',
+  sm: 'h-9 gap-1.5 px-4 text-[13px]',
+  md: 'h-11 gap-2 px-6 text-[14px]',
+  lg: 'h-13 gap-2.5 px-7 text-[15px] py-3',
 };
 
 export function Button({
@@ -96,14 +99,16 @@ export function Button({
   className,
   children,
   ...rest
-}: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: Variant; size?: Size }) {  return (
+}: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: Variant; size?: Size }) {
+  return (
     <button
       type="button"
       {...rest}
       className={cx(
-        'inline-flex shrink-0 items-center justify-center rounded-lg font-medium',
-        'transition-[background-color,color,box-shadow,transform] duration-150 ease-out',
-        'active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 disabled:active:scale-100',
+        // 药丸形是麦当劳数字产品的签名形状
+        'inline-flex shrink-0 items-center justify-center rounded-full font-bold',
+        'transition-[background-color,color,box-shadow,transform] duration-100 ease-out',
+        'disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none disabled:active:translate-y-0',
         VARIANT[variant],
         SIZE[size],
         className,
@@ -119,20 +124,19 @@ export function Button({
 type Tone = 'neutral' | 'ok' | 'warn' | 'danger' | 'brand';
 
 const TONE: Record<Tone, string> = {
-  neutral: 'bg-wash text-ink-mute',
-  ok: 'bg-sage text-[#3d6a52]',
-  warn: 'bg-butter text-[#77571d]',
-  danger: 'bg-brand-50 text-brand-700',
-  brand: 'bg-brand-50 text-brand-700',
+  neutral: 'bg-ink/8 text-ink-soft',
+  ok: 'bg-sage text-[#2e6b41]',
+  warn: 'bg-gold-200 text-[#7a5600]',
+  danger: 'bg-brand-500 text-white',
+  brand: 'bg-gold-400 text-ink',
 };
 
 /**
- * 标记。只有在真的要分类时才用 —— 一屏里超过三枚标记，就说明信息没想清楚，
- * 应该拆成组而不是贴标签。
+ * 标记。只有在真的要分类时才用 —— 一屏里超过三枚标记，就说明信息没想清楚。
  */
 export function Badge({ tone = 'neutral', children, className }: { tone?: Tone; children: ReactNode; className?: string }) {
   return (
-    <span className={cx('inline-flex items-center rounded px-1.5 py-0.5 text-[10.5px] leading-[1.6]', TONE[tone], className)}>
+    <span className={cx('inline-flex items-center rounded-full px-2.5 py-0.5 text-[11.5px] font-bold leading-[1.7]', TONE[tone], className)}>
       {children}
     </span>
   );
@@ -141,10 +145,10 @@ export function Badge({ tone = 'neutral', children, className }: { tone?: Tone; 
 /* ------------------------------------------------------------------ 提示 */
 
 const ALERT: Record<'info' | 'ok' | 'warn' | 'error', { box: string; title: string }> = {
-  info: { box: 'bg-white text-ink-soft ring-line', title: 'text-ink' },
-  ok: { box: 'bg-sage text-[#3d6a52] ring-[#d5e5da]', title: 'text-[#2e5740]' },
-  warn: { box: 'bg-butter text-[#77571d] ring-[#eee0c2]', title: 'text-[#5f4415]' },
-  error: { box: 'bg-brand-50 text-brand-700 ring-[#f1d2cd]', title: 'text-[#8c160c]' },
+  info: { box: 'bg-white text-ink-soft ring-ink/12', title: 'text-ink' },
+  ok: { box: 'bg-sage text-[#2e6b41] ring-[#bcd8c4]', title: 'text-[#255636]' },
+  warn: { box: 'bg-gold-100 text-[#7a5600] ring-[#e8cf8a]', title: 'text-[#5e4200]' },
+  error: { box: 'bg-brand-500 text-white ring-brand-700', title: 'text-white' },
 };
 
 export function Alert({
@@ -163,12 +167,12 @@ export function Alert({
   const t = ALERT[kind];
   return (
     <div
-      className={cx('rounded-xl px-4 py-3.5 text-[12.5px] leading-relaxed ring-1', t.box, className)}
+      className={cx('rounded-2xl px-5 py-4 text-[13.5px] leading-relaxed ring-2', t.box, className)}
       role={kind === 'error' ? 'alert' : 'status'}
     >
-      <div className={cx('font-medium', t.title)}>{title}</div>
+      <div className={cx('font-bold', t.title)}>{title}</div>
       {children ? <div className="mt-1.5 opacity-90">{children}</div> : null}
-      {hint ? <div className="mt-1.5 text-[11.5px] opacity-70">{hint}</div> : null}
+      {hint ? <div className="mt-1.5 text-[13px] opacity-70">{hint}</div> : null}
     </div>
   );
 }
@@ -192,8 +196,23 @@ export function EmptyState({
 }) {
   return (
     <div className={cx('flex flex-col items-center justify-center text-center', compact ? 'px-5 py-9' : 'px-6 py-14')}>
-      <p className="display text-[17px] text-ink">{title}</p>
-      {desc ? <p className="mt-2 max-w-[26rem] text-pretty text-[12.5px] leading-[1.8] text-ink-mute">{desc}</p> : null}
+      {/* 空状态用金拱门。这是麦当劳最强的形状资产，出现在空状态正好合适 */}
+      <span
+        className="mb-4 grid h-14 w-14 place-items-center rounded-full bg-gold-400"
+        aria-hidden="true"
+      >
+        <svg width="30" height="29" viewBox="0 0 104 100" fill="none">
+          <path
+            d="M13 92V66C13 37 23.9 8 32.5 8S52 37 52 66V92C52 37 60.6 8 71.5 8S91 37 91 66V92"
+            stroke="#0d0d0d"
+            strokeWidth="14"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      </span>
+      <p className="display text-[19px] text-ink">{title}</p>
+      {desc ? <p className="mt-2 max-w-[26rem] text-pretty text-[13.5px] leading-[1.8] text-ink-mute">{desc}</p> : null}
       {action ? <div className="mt-5">{action}</div> : null}
     </div>
   );
@@ -202,10 +221,9 @@ export function EmptyState({
 /* ------------------------------------------------------------------ 指标 */
 
 /**
- * 指标排版。**不给单项套卡片** —— 卡片边界不携带信息，只会把注意力切成四份。
+ * 指标排版。**不给单项套卡片** —— 卡片边界不携带信息。
  *
- * 只有一个主角（`lead`）：它用衬线放大到能一眼看到。其余用 `rest` 排成一行次级信息，
- * 靠字重和颜色退后，而不是靠格子退后。
+ * 主角用超重黑体 + 品牌红放大到一眼可见；其余退成一行次级信息。
  */
 export function MetricLead({
   label,
@@ -223,24 +241,24 @@ export function MetricLead({
   if (loading) {
     return (
       <div>
-        <Skeleton className="h-3 w-16" />
-        <Skeleton className="mt-3 h-9 w-40" />
+        <Skeleton className="h-6 w-24 rounded-full" />
+        <Skeleton className="mt-3 h-11 w-44" />
       </div>
     );
   }
   return (
     <div>
       <p className="eyebrow">{label}</p>
-      <p className="mt-2 flex items-baseline gap-1.5">
-        <span className="tnum display text-[34px] leading-none text-ink md:text-[42px]">{value}</span>
-        {unit ? <span className="text-[12px] text-ink-mute">{unit}</span> : null}
+      <p className="mt-2.5 flex items-baseline gap-2">
+        <span className="tnum display text-[40px] leading-none text-brand-600 md:text-[52px]">{value}</span>
+        {unit ? <span className="text-[13px] font-bold text-ink-mute">{unit}</span> : null}
       </p>
-      {note ? <p className="mt-2.5 text-[12px] leading-relaxed text-ink-mute">{note}</p> : null}
+      {note ? <p className="mt-3 text-[13px] leading-relaxed text-ink-mute">{note}</p> : null}
     </div>
   );
 }
 
-/** 次级指标：横向排布的一串小数字，无格子无竖线。 */
+/** 次级指标：横向排布的一串小数字，胶囊标签 + 粗黑数字。 */
 export function MetricPair({
   items,
   loading,
@@ -250,9 +268,9 @@ export function MetricPair({
 }) {
   if (loading) {
     return (
-      <div className="flex flex-wrap gap-x-8 gap-y-3">
+      <div className="flex flex-wrap gap-x-4 gap-y-3">
         {[0, 1, 2].map((i) => (
-          <div key={i}>
+          <div key={i} className="rounded-2xl bg-white px-4 py-3 ring-2 ring-ink/10">
             <Skeleton className="h-2.5 w-12" />
             <Skeleton className="mt-2 h-4 w-16" />
           </div>
@@ -261,11 +279,11 @@ export function MetricPair({
     );
   }
   return (
-    <dl className="flex flex-wrap gap-x-8 gap-y-3">
+    <dl className="flex flex-wrap gap-x-3 gap-y-3">
       {items.map((it) => (
-        <div key={it.label}>
-          <dt className="eyebrow">{it.label}</dt>
-          <dd className="tnum mt-1.5 text-[15px] leading-none text-ink-soft">{it.value}</dd>
+        <div key={it.label} className="rounded-2xl bg-white px-4 py-2.5 ring-2 ring-ink/10">
+          <dt className="text-[11.5px] font-bold uppercase tracking-wider text-ink-faint">{it.label}</dt>
+          <dd className="tnum mt-1 text-[17px] font-black leading-none text-ink">{it.value}</dd>
         </div>
       ))}
     </dl>
@@ -277,14 +295,14 @@ export function MetricPair({
 /** 涨跌指示。方向同时由箭头和正负号表达，不靠颜色单独传递状态。 */
 export function TrendPill({ dir, text }: { dir: 'up' | 'down' | 'flat'; text: string }) {
   const map = {
-    up: { color: 'text-[#3d6a52]', arrow: 'M6 14l5-5 3 3 6-6' },
-    down: { color: 'text-brand-700', arrow: 'M6 8l5 5 3-3 6 6' },
+    up: { color: 'text-[#2e6b41]', arrow: 'M6 14l5-5 3 3 6-6' },
+    down: { color: 'text-brand-600', arrow: 'M6 8l5 5 3-3 6 6' },
     flat: { color: 'text-ink-mute', arrow: 'M6 12h12' },
   }[dir];
 
   return (
-    <span className={cx('tnum inline-flex items-center gap-1 text-[11.5px]', map.color)}>
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <span className={cx('tnum inline-flex items-center gap-1 text-[13px] font-bold', map.color)}>
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
         <path d={map.arrow} />
       </svg>
       {text}
@@ -308,8 +326,8 @@ export function Toasts({ items }: { items: ToastItem[] }) {
           key={t.id}
           role="status"
           className={cx(
-            'animate-fade-up rounded-lg px-4 py-2 text-[12.5px] font-medium shadow-float',
-            t.kind === 'error' ? 'bg-[#2a1310] text-[#ffe6e3]' : 'bg-ink text-white',
+            'animate-fade-up rounded-full px-5 py-2.5 text-[13.5px] font-bold text-white shadow-float',
+            t.kind === 'error' ? 'bg-brand-600' : 'bg-ink',
           )}
         >
           {t.text}

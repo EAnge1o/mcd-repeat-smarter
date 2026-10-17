@@ -30,7 +30,7 @@ export function AboutView({
     <div>
       <header className="max-w-[620px]">
         <div className="flex items-center gap-3">
-          <span className="grid h-9 w-9 place-items-center rounded-xl bg-brand-500" aria-hidden="true">
+          <span className="grid h-9 w-9 place-items-center rounded-2xl bg-brand-500" aria-hidden="true">
             <IconArches size={17} />
           </span>
           <p className="eyebrow">参赛作品 · 非官方产品</p>
@@ -40,7 +40,7 @@ export function AboutView({
           <br />
           听懂你这次改的
         </h1>
-        <p className="mt-3 max-w-[34rem] text-pretty text-[12.5px] leading-[1.95] text-ink-mute">
+        <p className="mt-3 max-w-[34rem] text-pretty text-[13px] leading-[1.95] text-ink-mute">
           基于麦当劳官方 MCP 的个性化点单助手。所有判断都落在「你的历史订单 + 门店实时菜单」这两件事实之上，不猜口味，也不编造优惠。
         </p>
       </header>
@@ -64,7 +64,7 @@ export function AboutView({
             {FLOW.map((f, i) => (
               <li key={f.step} className={i === 0 ? 'pb-5' : 'border-t border-hair py-5'}>
                 <div className="flex gap-4">
-                  <span className="tnum shrink-0 pt-0.5 text-[9.5px] tracking-[0.1em] text-brand-600">{f.step}</span>
+                  <span className="tnum shrink-0 pt-0.5 text-[11.5px] tracking-[0.1em] text-brand-600">{f.step}</span>
                   <div className="min-w-0">
                     <p className="text-[13.5px] text-ink">{f.title}</p>
                     <p className="mt-1.5 text-[11.5px] leading-[1.85] text-ink-mute">{f.body}</p>
@@ -81,8 +81,8 @@ export function AboutView({
           <dl className="mt-5">
             {SOURCES.map(([k, v], i) => (
               <div key={k} className={i === 0 ? 'py-2.5' : 'border-t border-hair py-2.5'}>
-                <dt className="text-[11px] text-ink-mute">{k}</dt>
-                <dd className="mt-0.5 text-[10.5px] leading-relaxed text-ink-soft">{v}</dd>
+                <dt className="text-[11.5px] text-ink-mute">{k}</dt>
+                <dd className="mt-0.5 text-[13px] leading-relaxed text-ink-soft">{v}</dd>
               </div>
             ))}
           </dl>
@@ -93,7 +93,7 @@ export function AboutView({
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="max-w-[42rem] text-pretty">
             <p className="eyebrow">关于这个作品</p>
-            <div className="mt-3 space-y-2.5 text-[12px] leading-[1.95] text-ink-soft">
+            <div className="mt-3 space-y-2.5 text-[13px] leading-[1.95] text-ink-soft">
               <p>
                 这是麦当劳中国程序员节开发者创新挑战赛的参赛作品，
                 <strong className="font-medium text-ink">非官方产品</strong>

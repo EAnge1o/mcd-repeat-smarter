@@ -35,7 +35,13 @@ function Amount({ order, size = 'md' }: { order: HistoryOrder; size?: 'md' | 'lg
     );
   }
   return (
-    <span className={cx('tnum display', c === 0 ? 'text-ink-faint' : 'text-ink', size === 'lg' ? 'text-[17px]' : 'text-[15px]')}>
+    <span
+      className={cx(
+        'tnum font-black',
+        c === 0 ? 'text-ink-faint' : 'text-ink',
+        size === 'lg' ? 'text-[22px]' : 'text-[17px]',
+      )}
+    >
       ¥{yuan(c)}
     </span>
   );
@@ -109,15 +115,20 @@ export function OrdersTable({
 
   const rows = limit ? sorted.slice(0, limit) : sorted;
 
-  /** 按「年-月」分组。分组标题只在跨月时出现，不重复渲染。 */
+  /**
+   * 按「年-月」分组。分组标题只在跨月时出现，不重复渲染。
+   *
+   * key 必须带上序号：按金额排序后同一个月会被切成两段（比如 7 月有两单一多一少），
+   * 只用「2026年7月」当 key 会撞车，React 复用错节点，展开态会串到别的行上。
+   */
   const groups = useMemo(() => {
     const out: { key: string; label: string; items: HistoryOrder[] }[] = [];
     for (const o of rows) {
       const d = new Date(o.createTime);
-      const key = Number.isNaN(d.getTime()) ? '未知' : `${d.getFullYear()}年${d.getMonth() + 1}月`;
+      const label = Number.isNaN(d.getTime()) ? '未知' : `${d.getFullYear()}年${d.getMonth() + 1}月`;
       const last = out[out.length - 1];
-      if (last && last.key === key) last.items.push(o);
-      else out.push({ key, label: key, items: [o] });
+      if (last && last.label === label) last.items.push(o);
+      else out.push({ key: `${label}-${out.length}`, label, items: [o] });
     }
     return out;
   }, [rows]);
@@ -126,13 +137,13 @@ export function OrdersTable({
     return (
       <div className="space-y-4 py-1">
         {[0, 1, 2].map((i) => (
-          <div key={i} className="flex items-center gap-4">
-            <Skeleton className="h-3 w-14" />
+          <div key={i} className="flex items-center gap-4 rounded-2xl bg-white p-4 ring-2 ring-ink/10">
+            <Skeleton className="h-9 w-14 rounded-full" />
             <div className="min-w-0 flex-1">
-              <Skeleton className="h-3.5 w-1/2" />
-              <Skeleton className="mt-2 h-2.5 w-1/4" />
+              <Skeleton className="h-4 w-1/2" />
+              <Skeleton className="mt-2.5 h-3 w-1/4" />
             </div>
-            <Skeleton className="h-4 w-16" />
+            <Skeleton className="h-5 w-16" />
           </div>
         ))}
       </div>
@@ -147,17 +158,17 @@ export function OrdersTable({
     <div>
       {/* 控件区：搜索 + 排序。只有真的能筛、能排才放出来 */}
       {controls ? (
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-3 pb-4">
-          <div className="relative min-w-[200px] flex-1 sm:max-w-[280px]">
-            <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-faint">
-              <IconSearch size={14} />
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-3 pb-5">
+          <div className="relative min-w-[220px] flex-1 sm:max-w-[320px]">
+            <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-ink-mute">
+              <IconSearch size={16} />
             </span>
             <input
               value={q}
               onChange={(e) => setQ(e.target.value)}
               placeholder="搜门店、餐品或订单号"
               aria-label="搜索订单"
-              className="h-9 w-full rounded-lg bg-white pl-9 pr-3 text-[12.5px] text-ink ring-1 ring-inset ring-line transition-colors duration-150 placeholder:text-ink-faint focus:bg-white focus:outline-none focus:ring-brand-400"
+              className="h-11 w-full rounded-full bg-white pl-11 pr-4 text-[13.5px] font-medium text-ink ring-2 ring-ink/15 transition-shadow duration-100 placeholder:font-normal placeholder:text-ink-faint focus:bg-white focus:outline-none focus:ring-ink/40"
             />
           </div>
 
@@ -169,8 +180,10 @@ export function OrdersTable({
                 onClick={() => setSort(s.key)}
                 aria-pressed={sort === s.key}
                 className={cx(
-                  'rounded-md px-2.5 py-1.5 text-[12px] transition-colors duration-150',
-                  sort === s.key ? 'bg-ink text-white' : 'text-ink-mute hover:bg-wash hover:text-ink',
+                  'rounded-full px-4 py-2 text-[13px] font-bold transition-colors duration-100',
+                  sort === s.key
+                    ? 'bg-ink text-white shadow-[0_3px_0_rgba(13,13,13,0.28)] active:translate-y-[2px] active:shadow-none'
+                    : 'bg-white text-ink-mute ring-2 ring-ink/12 hover:bg-gold-100 hover:text-ink',
                 )}
               >
                 {s.label}
@@ -178,7 +191,7 @@ export function OrdersTable({
             ))}
           </div>
 
-          <p className="tnum text-[11.5px] text-ink-mute">
+          <p className="tnum rounded-full bg-ink/6 px-3.5 py-2 text-[13px] font-bold text-ink-mute">
             {q.trim() ? `${sorted.length} / ${orders.length} 单` : `共 ${orders.length} 单`}
           </p>
         </div>
@@ -193,7 +206,7 @@ export function OrdersTable({
             <button
               type="button"
               onClick={() => setQ('')}
-              className="rounded-md px-3 py-1.5 text-[12px] text-ink-mute transition-colors duration-150 hover:bg-wash hover:text-ink"
+              className="rounded-full bg-ink px-4 py-2 text-[13px] font-bold text-white transition-colors duration-100 hover:bg-ink-soft"
             >
               清空搜索
             </button>
@@ -201,39 +214,54 @@ export function OrdersTable({
         />
       ) : (
         <div>
-          {groups.map((g) => (
-            <section key={g.key} className="mb-2 last:mb-0">
-              <h3 className={cx('eyebrow -mx-1 px-1 py-2', stickyMonths && 'sticky top-14 z-10 bg-canvas/95 backdrop-blur-sm')}>
+          {groups.map((g, gi) => {
+            // 同一个月份可能被排序切成两段（下面那段不接在上面），加序号避免读者以为重复渲染
+            const twin = groups.findIndex((x) => x.label === g.label) !== gi;
+            return (
+            <section key={g.key} className="mb-7 last:mb-0">
+              <h3
+                className={cx(
+                  'display -mx-1 mb-3 mt-2 inline-block rounded-full bg-ink px-4 py-1.5 text-[14px] text-gold-400',
+                  stickyMonths && 'sticky top-16 z-10',
+                )}
+              >
                 {g.label}
+                {twin ? ` · 续 ${groups.filter((x) => x.label === g.label).indexOf(g) + 1}` : ''}
               </h3>
 
-              <ul>
+              <ul className="space-y-2.5">
                 {g.items.map((o) => {
                   const open = openId === o.orderId;
                   const pieces = o.items.reduce((n, i) => n + i.quantity, 0);
 
                   return (
-                    <li key={o.orderId} className="border-b border-hair last:border-b-0">
+                    <li
+                      key={o.orderId}
+                      className={cx(
+                        'overflow-hidden rounded-2xl bg-white ring-2 transition-shadow duration-100',
+                        open ? 'shadow-[0_4px_0_rgba(13,13,13,0.16)] ring-ink/20' : 'shadow-[0_2px_0_rgba(13,13,13,0.1)] ring-ink/12 hover:shadow-[0_3px_0_rgba(13,13,13,0.14)]',
+                      )}
+                    >
                       <button
                         type="button"
                         onClick={() => toggle(o.orderId)}
                         aria-expanded={open}
                         aria-controls={`order-detail-${o.orderId}`}
                         className={cx(
-                          'group grid w-full grid-cols-[3.5rem_minmax(0,1fr)_auto] items-start gap-x-4 px-2 py-3.5 text-left',
-                          'transition-colors duration-150 ease-out md:grid-cols-[4.5rem_minmax(0,1fr)_auto] md:gap-x-6',
-                          open ? 'bg-wash' : 'hover:bg-wash',
+                          'group grid w-full grid-cols-[3.5rem_minmax(0,1fr)_auto] items-start gap-x-4 px-4 py-4 text-left',
+                          'transition-colors duration-100 ease-out md:grid-cols-[4.5rem_minmax(0,1fr)_auto] md:gap-x-6',
+                          open ? 'bg-ink/4' : 'hover:bg-gold-100',
                         )}
                       >
                         {/* 时间：最轻的一列。两行放得下月日和时分，不必挤成一行 */}
-                        <span className="tnum pt-0.5 text-[11.5px] leading-[1.45] text-ink-faint">
+                        <span className="tnum rounded-full bg-ink px-2.5 py-1.5 text-center text-[11.5px] font-bold leading-[1.4] text-white">
                           <span className="block">{fmtDateTime(o.createTime).split(' ')[0]}</span>
-                          <span className="block">{fmtDateTime(o.createTime).split(' ')[1]}</span>
+                          <span className="block text-gold-400">{fmtDateTime(o.createTime).split(' ')[1]}</span>
                         </span>
 
                         {/* 餐品：主角。不截断 —— 认不出点了什么，这一行就等于没信息 */}
                         <span className="min-w-0">
-                          <span className="block text-[13.5px] leading-[1.65] text-ink">
+                          <span className="block text-[15px] font-bold leading-[1.6] text-ink">
                             {o.items.length === 0 ? (
                               <span className="text-ink-faint">（无明细）</span>
                             ) : (
@@ -248,10 +276,10 @@ export function OrdersTable({
                               ))
                             )}
                           </span>
-                          <span className="mt-1 block truncate text-[11.5px] text-ink-faint">
+                          <span className="mt-1.5 block truncate text-[13px] text-ink-mute">
                             {o.storeName || o.storeCode}
-                            <span className="px-1.5">·</span>
-                            <span className="tnum">{pieces} 件</span>
+                            <span className="px-1.5 text-ink-faint">·</span>
+                            <span className="tnum font-bold text-ink-faint">{pieces} 件</span>
                           </span>
                         </span>
 
@@ -260,8 +288,8 @@ export function OrdersTable({
                           <Amount order={o} />
                           <span
                             className={cx(
-                              'text-ink-faint transition-transform duration-150 ease-out group-hover:text-ink-mute',
-                              open ? 'rotate-180' : '',
+                              'grid h-7 w-7 place-items-center rounded-full bg-ink/6 text-ink-mute transition-transform duration-150 ease-out group-hover:bg-ink group-hover:text-white',
+                              open ? 'rotate-180 bg-ink text-white' : '',
                             )}
                             aria-hidden="true"
                           >
@@ -271,19 +299,19 @@ export function OrdersTable({
                       </button>
 
                       {open ? (
-                        <div id={`order-detail-${o.orderId}`} className="animate-fade-in bg-wash px-2 pb-4 pt-1 md:px-3">
-                          <div className="grid gap-x-10 gap-y-4 md:grid-cols-[minmax(0,1fr)_auto]">
+                        <div id={`order-detail-${o.orderId}`} className="animate-fade-in border-t-2 border-ink/10 bg-gold-100/50 px-4 pb-5 pt-4 md:px-5">
+                          <div className="grid gap-x-10 gap-y-5 md:grid-cols-[minmax(0,1fr)_auto]">
                             <ul className="min-w-0 space-y-2">
                               {o.items.map((it, i) => (
                                 <li key={`${o.orderId}-detail-${it.productCode}-${i}`}>
-                                  <p className="flex items-baseline gap-2.5 text-[12.5px] leading-[1.7] text-ink">
-                                    <span className="tnum w-6 shrink-0 text-right text-[11.5px] text-ink-faint">
+                                  <p className="flex items-baseline gap-3 text-[14px] font-bold leading-[1.7] text-ink">
+                                    <span className="tnum w-7 shrink-0 rounded-full bg-brand-500 px-1.5 py-0.5 text-center text-[11.5px] font-black text-white">
                                       {it.quantity}×
                                     </span>
                                     <span className="min-w-0 flex-1">{it.name}</span>
                                   </p>
                                   {it.children.length > 0 ? (
-                                    <p className="mt-0.5 pl-[34px] text-[11.5px] leading-relaxed text-ink-mute">
+                                    <p className="mt-1 pl-[38px] text-[13px] leading-relaxed text-ink-mute">
                                       {it.children
                                         .map((c) => `${c.roundName ? `${c.roundName} · ` : ''}${c.name}`)
                                         .join(' / ')}
@@ -293,7 +321,7 @@ export function OrdersTable({
                               ))}
                             </ul>
 
-                            <dl className="space-y-1.5 text-[11.5px] md:w-[190px]">
+                            <dl className="space-y-2 text-[13px] md:w-[200px]">
                               {[
                                 ['门店', o.storeName || o.storeCode],
                                 ['取餐方式', BE_TYPE_LABEL[o.beType] ?? '—'],
@@ -303,14 +331,14 @@ export function OrdersTable({
                                 <div key={k} className="flex gap-3">
                                   <dt className="shrink-0 text-ink-faint">{k}</dt>
                                   <dd
-                                    className={cx('min-w-0 flex-1 truncate text-ink-soft', k === '订单号' && 'code text-[11px]')}
+                                    className={cx('min-w-0 flex-1 truncate font-bold text-ink', k === '订单号' && 'code text-[11.5px] font-medium text-ink-soft')}
                                     title={v}
                                   >
                                     {v}
                                   </dd>
                                 </div>
                               ))}
-                              <div className="flex gap-3 pt-1">
+                              <div className="flex gap-3 border-t-2 border-ink/10 pt-2.5">
                                 <dt className="shrink-0 text-ink-faint">实付</dt>
                                 <dd>
                                   <Amount order={o} size="lg" />
@@ -320,13 +348,13 @@ export function OrdersTable({
                           </div>
 
                           {onUse ? (
-                            <div className="mt-4 pl-0 md:pl-[34px]">
+                            <div className="mt-5 pl-0 md:pl-[38px]">
                               <button
                                 type="button"
                                 onClick={() => onUse(o)}
-                                className="inline-flex h-8 items-center gap-1.5 rounded-md bg-white px-3.5 text-[12px] font-medium text-ink-soft ring-1 ring-inset ring-line transition-[background-color,color] duration-150 ease-out hover:bg-ink hover:text-white active:scale-[0.98]"
+                                className="inline-flex h-10 items-center gap-2 rounded-full bg-brand-500 px-5 text-[13.5px] font-black text-white shadow-brand-press transition-colors duration-100 hover:bg-brand-600 active:translate-y-[3px] active:shadow-none"
                               >
-                                <IconRefresh size={12} />
+                                <IconRefresh size={13} />
                                 照这一单再来
                               </button>
                             </div>
@@ -338,7 +366,8 @@ export function OrdersTable({
                 })}
               </ul>
             </section>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

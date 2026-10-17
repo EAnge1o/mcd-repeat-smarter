@@ -273,7 +273,7 @@ export default function App() {
         onUsePlan={handleUsePlan}
       />
 
-      <div className="lg:pl-[228px]">
+      <div className="lg:pl-[248px]">
         <Topbar
           plans={plans}
           orders={orders}
@@ -285,7 +285,7 @@ export default function App() {
           onPickStore={() => setStorePickerOpen(true)}
         />
 
-        <main className="px-4 pb-28 pt-8 md:px-8 md:pt-12">
+        <main className="px-4 pb-28 pt-8 md:px-8 md:pt-10">
           <div className="mx-auto max-w-[1180px]">
             {view === 'overview' ? (
               <Overview
@@ -383,16 +383,16 @@ export default function App() {
       {view === 'order' && result && selectedCandidate ? (
         <div
           data-region="actionbar"
-          className="fixed bottom-0 left-0 right-0 z-30 border-t border-hair bg-[#faf8f6]/80 backdrop-blur-xl lg:left-[228px]"
+          className="fixed bottom-0 left-0 right-0 z-30 border-t-[3px] border-ink bg-canvas lg:left-[248px]"
         >
           <div className="mx-auto flex max-w-[1180px] items-center justify-between gap-4 px-4 py-3 md:px-8">
             <div className="min-w-0">
               <p className="eyebrow truncate">已选 · {selectedCandidate.items.reduce((n, i) => n + i.quantity, 0)} 件</p>
               <p className="mt-1 flex items-baseline gap-2">
-                <span className="tnum display text-[19px] leading-none text-ink">
+                <span className="tnum text-[21px] font-black leading-none text-ink">
                   {selectedCandidate.price ? `¥${(selectedCandidate.price.priceCents / 100).toFixed(2)}` : '核价失败'}
                 </span>
-                <span className="truncate text-[11px] text-ink-faint">{selectedCandidate.label}</span>
+                <span className="truncate text-[13px] font-bold text-ink-mute">{selectedCandidate.label}</span>
               </p>
             </div>
             <Button
@@ -459,7 +459,7 @@ export default function App() {
                 type="button"
                 onClick={() => setSaveOpen(false)}
                 aria-label="关闭"
-                className="grid h-8 w-8 shrink-0 place-items-center rounded-full text-ink-faint transition-colors duration-200 hover:bg-[#f6f1ec] hover:text-ink"
+                className="grid h-8 w-8 shrink-0 place-items-center rounded-full text-ink-faint transition-colors duration-150 hover:bg-ink/8 hover:text-ink"
               >
                 <IconClose size={15} />
               </button>
@@ -475,7 +475,7 @@ export default function App() {
                   value={saveName}
                   onChange={(e) => setSaveName(e.target.value)}
                   placeholder="例如 我的日常午餐"
-                  className="h-10 w-full rounded-xl bg-[#f8f4f0] px-3.5 text-[13px] text-ink outline-none ring-1 ring-inset ring-transparent transition-all duration-200 placeholder:text-ink-faint focus:bg-white focus:ring-brand-300"
+                  className="h-12 w-full rounded-full bg-ink/5 px-5 text-[14px] font-medium text-ink outline-none ring-2 ring-transparent transition-shadow duration-100 placeholder:font-normal placeholder:text-ink-faint focus:bg-white focus:ring-ink/25"
                 />
               </div>
 
@@ -490,8 +490,8 @@ export default function App() {
                       aria-pressed={saveTag === t}
                       className={
                         saveTag === t
-                          ? 'rounded-full bg-ink px-3 py-1 text-[11px] font-medium text-white transition-colors duration-200'
-                          : 'rounded-full bg-[#f6f1ec] px-3 py-1 text-[11px] text-ink-soft transition-colors duration-200 hover:bg-white hover:ring-1 hover:ring-line'
+                          ? 'rounded-full bg-brand-500 px-3.5 py-1.5 text-[13px] font-black text-white'
+                          : 'rounded-full bg-ink/6 px-3.5 py-1.5 text-[13px] font-bold text-ink-soft transition-colors duration-100 hover:bg-ink/12'
                       }
                     >
                       {t}
@@ -505,10 +505,10 @@ export default function App() {
                 <ul className="divide-y divide-hair overflow-hidden rounded-2xl bg-[#fbf7f3]">
                   {selectedCandidate.items.map((it, i) => (
                     <li key={i} className="flex items-baseline gap-2.5 px-3.5 py-2">
-                      <span className="tnum shrink-0 text-[10px] text-ink-faint">{it.quantity}×</span>
-                      <span className="min-w-0 flex-1 truncate text-[12px] text-ink">{it.name}</span>
+                      <span className="tnum shrink-0 text-[11.5px] font-bold text-ink-faint">{it.quantity}×</span>
+                      <span className="min-w-0 flex-1 truncate text-[13px] font-bold text-ink">{it.name}</span>
                       {it.children.length > 0 ? (
-                        <span className="shrink-0 truncate text-[10px] text-ink-faint">{it.children.map((c) => c.name).join(' / ')}</span>
+                        <span className="shrink-0 truncate text-[11.5px] text-ink-faint">{it.children.map((c) => c.name).join(' / ')}</span>
                       ) : null}
                     </li>
                   ))}

@@ -43,20 +43,20 @@ export function OrderFeed({
     <section aria-labelledby="feed-title">
       <div className="flex flex-wrap items-end justify-between gap-x-5 gap-y-3">
         <div className="flex flex-wrap items-baseline gap-x-3 gap-y-2">
-          <h2 id="feed-title" className="display text-[21px] leading-none text-ink md:text-[24px]">
+          <h2 id="feed-title" className="display text-[26px] leading-none text-ink md:text-[30px]">
             最近订单
           </h2>
           {filterLabel ? (
-            <span className="inline-flex items-center gap-1.5 rounded bg-wash py-1 pl-2.5 pr-1.5 text-[11.5px] text-ink-mute">
+            <span className="inline-flex items-center gap-2 rounded-full bg-gold-400 py-1.5 pl-3.5 pr-1.5 text-[13px] font-black text-ink">
               {filterLabel}
-              <span className="tnum text-ink-faint">{matchCount} 单</span>
+              <span className="tnum">{matchCount} 单</span>
               <button
                 type="button"
                 onClick={onClearFilter}
-                className="rounded bg-white px-1.5 py-0.5 text-[11px] font-medium text-ink-soft transition-colors duration-150 hover:bg-canvas"
+                className="grid h-5 w-5 place-items-center rounded-full bg-ink/15 text-[11.5px] font-black transition-colors duration-100 hover:bg-ink hover:text-white"
                 aria-label="清除时段筛选"
               >
-                清除
+                ×
               </button>
             </span>
           ) : null}
@@ -65,10 +65,10 @@ export function OrderFeed({
         <button
           type="button"
           onClick={onViewAll}
-          className="group inline-flex items-center gap-1.5 pb-1 text-[12px] font-medium text-ink-mute transition-colors duration-150 hover:text-ink"
+          className="group inline-flex h-9 items-center gap-1.5 rounded-full bg-ink/6 px-4 text-[13px] font-black text-ink transition-colors duration-100 hover:bg-gold-400"
         >
           全部 {total} 单
-          <IconArrow size={10} className="transition-transform duration-150 group-hover:translate-x-0.5" />
+          <IconArrow size={11} className="transition-transform duration-100 group-hover:translate-x-0.5" />
         </button>
       </div>
 
@@ -80,7 +80,7 @@ export function OrderFeed({
           action={filterLabel ? undefined : emptyAction}
         />
       ) : (
-        <div className="mt-2">
+        <div className="mt-4">
           <OrdersTable
             orders={orders}
             loading={loading}

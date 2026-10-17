@@ -49,7 +49,7 @@ export function StoreSearch({ defaultCity, beType, currentStoreCode, onPick }: S
             id="city"
             value={city}
             onChange={(e) => setCity(e.target.value)}
-            className="h-10 w-full rounded-xl bg-[#f8f4f0] px-3 text-[13px] text-ink outline-none ring-1 ring-inset ring-transparent transition-all duration-200 focus:bg-white focus:ring-brand-300"
+            className="h-10 w-full rounded-2xl bg-ink/5 px-3 text-[13px] text-ink outline-none ring-1 ring-inset ring-transparent transition-all duration-150 focus:bg-white focus:ring-brand-300"
           />
         </div>
 
@@ -65,7 +65,7 @@ export function StoreSearch({ defaultCity, beType, currentStoreCode, onPick }: S
             onKeyDown={(e) => {
               if (e.key === 'Enter') void search();
             }}
-            className="h-10 w-full rounded-xl bg-[#f8f4f0] px-3 text-[13px] text-ink outline-none ring-1 ring-inset ring-transparent transition-all duration-200 placeholder:text-ink-faint focus:bg-white focus:ring-brand-300"
+            className="h-10 w-full rounded-2xl bg-ink/5 px-3 text-[13px] text-ink outline-none ring-1 ring-inset ring-transparent transition-all duration-150 placeholder:text-ink-faint focus:bg-white focus:ring-brand-300"
           />
         </div>
 
@@ -101,7 +101,7 @@ export function StoreSearch({ defaultCity, beType, currentStoreCode, onPick }: S
                   type="button"
                   onClick={() => onPick(s)}
                   className={cx(
-                    'flex w-full items-center gap-3 rounded-2xl px-3 py-2.5 text-left transition-[background-color,box-shadow] duration-200 ease-out',
+                    'flex w-full items-center gap-3 rounded-2xl px-3 py-2.5 text-left transition-[background-color,box-shadow] duration-150 ease-out',
                     active
                       ? 'bg-wash ring-1 ring-inset ring-brand-200'
                       : 'bg-[#fbf7f3] ring-1 ring-inset ring-transparent hover:bg-[#f8f2ec]',
@@ -111,26 +111,26 @@ export function StoreSearch({ defaultCity, beType, currentStoreCode, onPick }: S
                     <IconStore size={14} />
                   </span>
                   <span className="min-w-0 flex-1">
-                    <span className="block truncate text-[12.5px] text-ink">{s.storeName}</span>
-                    <span className="block truncate text-[10.5px] text-ink-faint">{s.address}</span>
+                    <span className="block truncate text-[13px] text-ink">{s.storeName}</span>
+                    <span className="block truncate text-[13px] text-ink-faint">{s.address}</span>
                   </span>
                   {/* 营业状态决定这家店能不能核价，必须在列表里就写清楚，
                       否则用户只能靠「下单失败」反推自己选了一家休息的店 */}
                   <span className="shrink-0 text-right">
                     {s.businessStatus ? (
-                      <span className="block text-[9px] leading-[1.5] tracking-[0.08em] text-[#3f6b52]">
+                      <span className="block text-[11.5px] leading-[1.5] tracking-[0.08em] text-[#3f6b52]">
                         营业中
                         {s.businessEndTime ? <span className="block text-ink-faint">至 {s.businessEndTime}</span> : null}
                       </span>
                     ) : (
-                      <span className="block text-[9px] leading-[1.5] tracking-[0.08em] text-ink-faint">
+                      <span className="block text-[11.5px] leading-[1.5] tracking-[0.08em] text-ink-faint">
                         休息中
                         {s.businessStartTime ? <span className="block text-ink-faint">{s.businessStartTime} 起</span> : null}
                       </span>
                     )}
                   </span>
                   {s.distance !== undefined ? (
-                    <span className="tnum shrink-0 text-[9.5px] text-ink-faint">{s.distance}m</span>
+                    <span className="tnum shrink-0 text-[11.5px] text-ink-faint">{s.distance}m</span>
                   ) : null}
                   <IconArrow size={11} className="shrink-0 text-ink-faint" />
                 </button>
@@ -188,13 +188,13 @@ export function StorePicker({
           <div className="min-w-0 flex-1">
             <p className="eyebrow">切换门店</p>
             <h2 className="display mt-1.5 text-[19px] text-ink">在哪家店取</h2>
-            <p className="mt-0.5 text-[11px] text-ink-mute">门店会决定菜单、价格和可选优惠</p>
+            <p className="mt-0.5 text-[11.5px] text-ink-mute">门店会决定菜单、价格和可选优惠</p>
           </div>
           <button
             type="button"
             onClick={onClose}
             aria-label="关闭"
-            className="grid h-8 w-8 place-items-center rounded-full text-ink-faint transition-colors duration-200 hover:bg-[#f6f1ec] hover:text-ink"
+            className="grid h-8 w-8 place-items-center rounded-full text-ink-faint transition-colors duration-150 hover:bg-ink/8 hover:text-ink"
           >
             <IconClose size={15} />
           </button>

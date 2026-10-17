@@ -117,9 +117,9 @@ export function Topbar({
   const results = (
     <>
       {hits.length === 0 ? (
-        <p className="px-4 py-5 text-[12.5px] leading-relaxed text-ink-mute">没有匹配的方案或订单。换个关键词，或者直接去「点单」说一句话。</p>
+        <p className="px-4 py-5 text-[13px] leading-relaxed text-ink-mute">没有匹配的方案或订单。换个关键词，或者直接去「点单」说一句话。</p>
       ) : (
-        <ul className="max-h-[60vh] overflow-y-auto p-1.5">
+        <ul className="max-h-[60vh] overflow-y-auto p-2">
           {hits.map((h) => (
             <li key={h.id}>
               <button
@@ -130,12 +130,12 @@ export function Topbar({
                   setMobileSearch(false);
                   setQ('');
                 }}
-                className="flex w-full items-start gap-2.5 rounded-md px-2.5 py-2 text-left transition-colors duration-150 hover:bg-wash"
+                className="flex w-full items-start gap-3 rounded-2xl px-3 py-2.5 text-left transition-colors duration-100 hover:bg-gold-100"
               >
-                <span className="mt-0.5 shrink-0 text-[10.5px] text-ink-faint">{h.kind}</span>
+                <span className="mt-0.5 shrink-0 rounded-full bg-ink/8 px-2 py-0.5 text-[11.5px] font-bold text-ink-mute">{h.kind}</span>
                 <span className="min-w-0 flex-1">
-                  <span className="block truncate text-[12.5px] text-ink">{h.title}</span>
-                  <span className="block truncate text-[11px] text-ink-faint">{h.sub}</span>
+                  <span className="block truncate text-[13px] font-bold text-ink">{h.title}</span>
+                  <span className="block truncate text-[11.5px] text-ink-faint">{h.sub}</span>
                 </span>
               </button>
             </li>
@@ -146,36 +146,44 @@ export function Topbar({
   );
 
   return (
-    <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-hair bg-canvas/92 px-4 backdrop-blur-md md:px-8">
+    <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b-[3px] border-ink bg-canvas px-4 md:px-8">
       <button
         type="button"
-        className="grid h-9 w-9 shrink-0 place-items-center rounded-md text-ink-mute transition-colors duration-150 hover:bg-wash hover:text-ink lg:hidden"
+        className="grid h-10 w-10 shrink-0 place-items-center rounded-full text-ink transition-colors duration-100 hover:bg-ink/8 lg:hidden"
         onClick={onOpenMobile}
         aria-label="打开导航"
       >
         <IconMenu />
       </button>
 
-      {/* 左：只放数据来源的状态，不放标题（页面自己有） */}
-      <div className="hidden min-w-0 flex-1 items-center gap-2 text-[12px] text-ink-mute md:flex">
+      {/* 左：数据来源状态 —— 黄色药丸，麦当劳式的状态标签 */}
+      <div className="hidden min-w-0 flex-1 items-center gap-2 md:flex">
         <span
           className={cx(
-            'inline-block h-1.5 w-1.5 shrink-0 rounded-full',
-            mode === 'live' ? 'bg-[#5f9d78]' : 'bg-[#d2a34a]',
+            'inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-[13px] font-black',
+            mode === 'live' ? 'bg-gold-400 text-ink' : 'bg-ink text-gold-400',
           )}
-          aria-hidden="true"
-        />
-        <span className="truncate">
-          {mode === 'live' ? '麦当劳接口实时返回' : '演示数据'}
-          {lastSync ? <span className="tnum text-ink-faint"> · 最近读取 {lastSync}</span> : null}
+        >
+          <span
+            className={cx(
+              'inline-block h-2 w-2 rounded-full',
+              mode === 'live' ? 'bg-ink' : 'bg-gold-400',
+            )}
+            aria-hidden="true"
+          />
+          {mode === 'live' ? '真实接口' : '演示数据'}
+        </span>
+        <span className="truncate text-[13px] text-ink-mute">
+          {mode === 'live' ? '门店与价格来自麦当劳接口实时返回' : '门店、餐品与价格均为内置示例'}
+          {lastSync ? <span className="tnum"> · 最近读取 {lastSync}</span> : null}
         </span>
       </div>
       <div className="min-w-0 flex-1 md:hidden" />
 
       {/* 搜索：宽屏内联，窄屏点开全宽命令条 */}
-      <div ref={boxRef} className="relative hidden w-full max-w-[240px] md:block">
-        <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-faint">
-          <IconSearch size={14} />
+      <div ref={boxRef} className="relative hidden w-full max-w-[280px] md:block">
+        <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-mute">
+          <IconSearch size={15} />
         </span>
         <input
           value={q}
@@ -192,10 +200,10 @@ export function Topbar({
           }}
           placeholder="搜方案、订单、餐品"
           aria-label="搜索方案、订单或餐品"
-          className="h-9 w-full rounded-lg bg-white pl-9 pr-3.5 text-[12.5px] text-ink ring-1 ring-inset ring-line transition-colors duration-150 placeholder:text-ink-faint focus:bg-white focus:outline-none focus:ring-brand-400"
+          className="h-10 w-full rounded-full bg-white pl-10 pr-4 text-[13px] font-medium text-ink ring-2 ring-ink/15 transition-shadow duration-100 placeholder:font-normal placeholder:text-ink-faint focus:bg-white focus:outline-none focus:ring-ink/40"
         />
         {open && q.trim() ? (
-          <div className="float absolute left-0 right-0 top-11 z-40 overflow-hidden rounded-xl">{results}</div>
+          <div className="float absolute left-0 right-0 top-12 z-40 overflow-hidden rounded-2xl">{results}</div>
         ) : null}
       </div>
 
@@ -203,7 +211,7 @@ export function Topbar({
         <button
           type="button"
           onClick={() => setMobileSearch(true)}
-          className="grid h-9 w-9 place-items-center rounded-md text-ink-mute transition-colors duration-150 hover:bg-wash hover:text-ink md:hidden"
+          className="grid h-10 w-10 place-items-center rounded-full text-ink transition-colors duration-100 hover:bg-ink/8 md:hidden"
           aria-label="搜索"
         >
           <IconSearch size={16} />
@@ -212,9 +220,9 @@ export function Topbar({
         <button
           type="button"
           onClick={onPickStore}
-          className="hidden h-8 items-center gap-1.5 rounded-md px-2.5 text-[12px] text-ink-mute transition-colors duration-150 hover:bg-wash hover:text-ink xl:flex"
+          className="hidden h-9 items-center gap-2 rounded-full bg-ink/6 px-3.5 text-[13px] font-bold text-ink transition-colors duration-100 hover:bg-ink/12 xl:flex"
         >
-          <IconStore size={13} className="text-ink-faint" />
+          <IconStore size={14} className="text-brand-600" />
           <span className="max-w-[130px] truncate">{storeName || '选择门店'}</span>
         </button>
 
@@ -225,21 +233,21 @@ export function Topbar({
             aria-expanded={noticeOpen}
             aria-label="数据来源"
             className={cx(
-              'grid h-9 w-9 place-items-center rounded-md transition-colors duration-150 hover:bg-wash',
-              noticeOpen ? 'bg-wash text-ink' : 'text-ink-mute',
+              'grid h-10 w-10 place-items-center rounded-full transition-colors duration-100 hover:bg-ink/8',
+              noticeOpen ? 'bg-ink text-white hover:bg-ink/12' : 'text-ink',
             )}
           >
-            <IconBell size={15} />
+            <IconBell size={16} />
           </button>
 
           {noticeOpen ? (
-            <div className="float absolute right-0 top-11 z-40 w-[300px] overflow-hidden rounded-xl">
-              <p className="eyebrow border-b border-hair px-4 py-3">数据来源</p>
-              <ul className="divide-y divide-hair">
+            <div className="float absolute right-0 top-12 z-40 w-[320px] overflow-hidden rounded-2xl">
+              <p className="bg-ink px-4 py-2.5 text-[13px] font-black text-gold-400">数据来源</p>
+              <ul className="divide-y divide-ink/8">
                 {notices.map((n) => (
                   <li key={n.title} className="px-4 py-3">
-                    <p className="text-[12px] font-medium text-ink">{n.title}</p>
-                    <p className="mt-1 text-[11px] leading-relaxed text-ink-faint">{n.body}</p>
+                    <p className="text-[13px] font-bold text-ink">{n.title}</p>
+                    <p className="mt-1 text-[13px] leading-relaxed text-ink-mute">{n.body}</p>
                   </li>
                 ))}
               </ul>
@@ -251,7 +259,7 @@ export function Topbar({
           type="button"
           onClick={() => onNavigate('about')}
           aria-label="关于本项目"
-          className="ml-0.5 grid h-7 w-7 place-items-center rounded-full bg-wash text-[11px] font-medium text-ink-mute transition-colors duration-150 hover:bg-[#efe9e3] hover:text-ink"
+          className="ml-0.5 grid h-10 w-10 place-items-center rounded-full bg-brand-500 text-[13px] font-black text-white shadow-brand-press transition-colors duration-100 hover:bg-brand-600 active:translate-y-[3px] active:shadow-none"
         >
           我
         </button>
@@ -259,9 +267,9 @@ export function Topbar({
 
       {/* 窄屏搜索：整条命令栏浮在页面之上 */}
       {mobileSearch ? (
-        <div className="fixed inset-0 z-[55] bg-[#2b201b]/20 md:hidden">
-          <div className="float animate-fade-up mx-3 mt-3 overflow-hidden rounded-xl">
-            <div className="flex items-center gap-2 border-b border-hair px-4 py-3">
+        <div className="fixed inset-0 z-[55] bg-ink/50 md:hidden">
+          <div className="float animate-fade-up mx-3 mt-3 overflow-hidden rounded-2xl">
+            <div className="flex items-center gap-2.5 border-b-2 border-ink/10 px-4 py-3.5">
               <IconSearch size={15} className="shrink-0 text-ink-faint" />
               <input
                 ref={mobileInput}
@@ -269,7 +277,7 @@ export function Topbar({
                 onChange={(e) => setQ(e.target.value)}
                 placeholder="搜方案、订单、餐品"
                 aria-label="搜索"
-                className="h-7 min-w-0 flex-1 bg-transparent text-[13px] text-ink outline-none placeholder:text-ink-faint"
+                className="h-7 min-w-0 flex-1 bg-transparent text-[14px] font-medium text-ink outline-none placeholder:font-normal placeholder:text-ink-faint"
               />
               <button
                 type="button"
@@ -278,12 +286,12 @@ export function Topbar({
                   setQ('');
                 }}
                 aria-label="关闭搜索"
-                className="grid h-7 w-7 place-items-center rounded-md text-ink-faint hover:text-ink"
+                className="grid h-8 w-8 place-items-center rounded-full text-ink-faint hover:bg-ink/8 hover:text-ink"
               >
                 <IconClose size={15} />
               </button>
             </div>
-            {q.trim() ? results : <p className="px-4 py-5 text-[12.5px] text-ink-faint">输入方案名、订单号、门店或餐品名。</p>}
+            {q.trim() ? results : <p className="px-4 py-5 text-[13px] text-ink-faint">输入方案名、订单号、门店或餐品名。</p>}
           </div>
         </div>
       ) : null}

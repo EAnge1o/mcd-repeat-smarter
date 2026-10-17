@@ -8,43 +8,36 @@
   html {
     -webkit-text-size-adjust: 100%;
     scrollbar-gutter: stable;
-    background: #faf8f6;
+    background: #fdf6ec;
   }
 
   /*
-   * 页面底：一张暖白纸。
-   *
-   * 这里刻意不叠任何东西 —— 不用网格线、不用多团光斑、不用玻璃模糊。
-   * 满屏纹理会让「内容」和「底纹」打架，久了整页发灰；消费品牌官网的做法
-   * 是把底色当成安静的存在，靠留白和字重分区，而不是靠装饰。
+   * 页面底：麦当劳纸质物料的奶油白。
+   * 不叠任何纹理 —— 麦当劳的视觉冲击靠**色块和字重**，不靠底纹。
    */
   body {
-    background: #faf8f6;
+    background: #fdf6ec;
   }
 
   body {
     @apply font-sans text-ink antialiased;
     margin: 0;
-    font-size: 13.5px;
-    line-height: 1.8;
+    font-size: 14.5px;
+    line-height: 1.75;
     font-weight: 400;
-    /* 中文在小字号下不容易分辨，稍微加一点字距 */
-    letter-spacing: 0.006em;
+    letter-spacing: 0;
   }
 
   ::selection {
-    background: rgba(218, 41, 28, 0.14);
+    background: rgba(214, 35, 21, 0.18);
   }
 
   /* 焦点环统一走品牌红，键盘可见、鼠标不出现 */
   :where(a, button, input, textarea, select, [tabindex]):focus-visible {
-    @apply outline-none ring-2 ring-brand-500/35 ring-offset-2 ring-offset-[#faf8f6];
+    @apply outline-none ring-[3px] ring-brand-500/45 ring-offset-2 ring-offset-[#fdf6ec];
   }
 
-  /*
-   * 浮层里的输入框不再自己描一圈 —— .float 在 focus-within 时整层已经换了环，
-   * 再叠一个方框会变成「玻璃盒里还有个红盒子」。焦点指示由外层承担。
-   */
+  /* 浮层里的输入框不再自己描一圈 —— .float 在 focus-within 时整层已经换了环 */
   .float :where(textarea, input):focus-visible {
     @apply outline-none ring-0 ring-offset-0;
   }
@@ -57,15 +50,15 @@
 
   * {
     scrollbar-width: thin;
-    scrollbar-color: rgba(40, 32, 28, 0.16) transparent;
+    scrollbar-color: rgba(13, 13, 13, 0.24) transparent;
   }
   *::-webkit-scrollbar {
-    width: 9px;
-    height: 9px;
+    width: 10px;
+    height: 10px;
   }
   *::-webkit-scrollbar-thumb {
     border-radius: 999px;
-    background: rgba(40, 32, 28, 0.14);
+    background: rgba(13, 13, 13, 0.2);
     border: 3px solid transparent;
     background-clip: content-box;
   }
@@ -90,62 +83,79 @@
 
 @layer components {
   /*
-   * 两类容器，只有两类：
-   * .float  真正浮起来的那一层（输入框、弹层）—— 实白，靠一枚投影离底；
-   * .panel  页面上的分栏块 —— 只比底色亮半档，靠一条发丝线划界，不投影。
+   * 两类容器：
+   * .float  浮起来的那一层（输入框、弹层）—— 纯白 + 一枚硬阴影；
+   * .panel  页面上的分栏块 —— 纯白卡片 + 实线描边。
    *
-   * 两处都去掉了 backdrop-filter。玻璃拟态在暖白底上看不出「玻璃」，
-   * 只会让文字压在模糊层上发虚；真正需要分层的地方，用不透明度就够。
+   * 两处都没有 backdrop-filter。美式快餐的数字产品要的是「实」——
+   * 纸片、贴纸、色块的实体感，不是磨砂玻璃。
    */
   .float {
-    background: #fffdfc;
-    border: 1px solid rgba(40, 32, 28, 0.07);
-    box-shadow: 0 18px 40px -28px rgba(56, 38, 32, 0.35), 0 1px 2px rgba(56, 38, 32, 0.04);
+    background: #ffffff;
+    border: 2px solid rgba(13, 13, 13, 0.12);
+    box-shadow: 0 4px 0 rgba(13, 13, 13, 0.1), 0 12px 28px -14px rgba(13, 13, 13, 0.25);
   }
 
   .panel {
-    background: #fffdfc;
-    border: 1px solid rgba(40, 32, 28, 0.08);
-  }
-
-  /* 衬线标题：字距收紧，行高压到 1 附近，中文才会显出发育良好的字形 */
-  .display {
-    font-family: 'Noto Serif SC', 'Songti SC', 'STSong', Georgia, serif;
-    font-weight: 500;
-    letter-spacing: -0.035em;
-    line-height: 1.08;
+    background: #ffffff;
+    border: 2px solid rgba(13, 13, 13, 0.11);
   }
 
   /*
-   * 栏目小标签。刻意不用等宽字体 —— mono 只留给真正像代码的东西（订单号、坐标）。
-   * 全站铺 mono 会让中文小字看着像日志，而不是零售品牌的说明文字。
+   * 标题字体。**麦当劳没有一个衬线字**。
+   * 900 字重 + 收紧字距 + 行高压到 1 上下，中文才有那种「印刷招贴」的冲劲。
+   */
+  .display {
+    font-family: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;
+    font-weight: 900;
+    letter-spacing: -0.045em;
+    line-height: 1.05;
+  }
+
+  /*
+   * 栏目小标签。用黄色实底 + 黑字 —— 这是麦当劳菜单上分类标签的做法：
+   * 深色压色块，不是灰灰的小字。
    */
   .eyebrow {
-    font-size: 10.5px;
+    display: inline-flex;
+    align-items: center;
+    background: #ffc72c;
+    color: #0d0d0d;
+    font-size: 11px;
     line-height: 1.5;
-    letter-spacing: 0.1em;
-    color: #6b625b;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    padding: 2px 9px;
+    border-radius: 999px;
   }
 
-  /* 发丝分隔线。用渐变做两端淡出，比一条实线干净 */
+  /* 发丝分隔线。美式快餐用实色，不用渐变淡出 */
   .hair {
-    height: 1px;
-    background: linear-gradient(90deg, rgba(40, 32, 28, 0.13), rgba(40, 32, 28, 0.07) 60%, transparent);
+    height: 2px;
+    background: rgba(13, 13, 13, 0.1);
   }
 
-  /* 订单号这类「像代码」的字符串才用等宽，页面上其他地方一律不用 */
+  /* 订单号这类「像代码」的字符串才用等宽 */
   .code {
     font-family: 'DM Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     font-feature-settings: 'tnum' 1;
   }
 
-  /* 骨架：一条扫光。不用脉冲——数据面板里脉冲会让整页像在抖 */
+  /*
+   * 拱门。金拱门是麦当劳最强的形状资产，全站允许它出现在两个位置：
+   * 品牌区和空状态。不要到处撒 —— 拱门之所以有力是因为它稀有。
+   */
+  .arch {
+    border-radius: 999px 999px 22px 22px;
+  }
+
+  /* 骨架：一条扫光 */
   .skeleton {
-    @apply relative overflow-hidden rounded-md bg-[#f0ebe6];
+    @apply relative overflow-hidden rounded-lg bg-[#f2e8d8];
   }
   .skeleton::after {
     content: '';
     @apply absolute inset-0 -translate-x-full animate-shimmer;
-    background-image: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.7), transparent);
+    background-image: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.85), transparent);
   }
 }
