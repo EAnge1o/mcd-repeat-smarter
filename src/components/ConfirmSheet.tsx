@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { BE_TYPE_LABEL, type BeType, type PlanItem } from '../../server/domain/types';
 import { api, ApiRequestError, type ConfirmResult, type PreviewResult } from '../api';
-import { Alert, LoadingBlock } from './Common';
-import { IconAlert, IconCheck, IconClose, IconReceipt } from './Icons';
+import { Alert, LoadingBlock, SectionHead } from './Common';
+import { IconAlert, IconCheck, IconClose, IconReceipt, IconStore } from './Icons';
 
 const yuan = (cents?: number) => (cents === undefined ? '—' : (cents / 100).toFixed(2));
 
@@ -18,6 +18,13 @@ interface ConfirmSheetProps {
   onOrdered: (result: ConfirmResult) => void;
 }
 
+/**
+ * 订单确认。
+ *
+ * 这里是全流程里唯一会产生真实副作用的地方，所以视觉上只做一件事：
+ * 把「门店 / 餐品 / 金额」三件事按顺序摆清楚，再让用户主动勾选。
+ * 提交按钮在勾选之前一直是禁用态，这一点不能因为样式而弱化。
+ */
 export function ConfirmSheet({
   open,
   onClose,
@@ -116,18 +123,18 @@ export function ConfirmSheet({
 
           {result && (
             <div className={`result-box${result.mode === 'demo' ? ' result-box--demo' : ''}`}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontWeight: 700 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 7, fontWeight: 700, fontSize: 14 }}>
                 <IconCheck size={16} />
                 {result.mode === 'demo' ? '演示下单完成' : '订单已提交'}
               </div>
               {result.orderId && (
-                <div className="tiny" style={{ fontFamily: 'var(--font-num)', wordBreak: 'break-all' }}>
+                <div style={{ fontFamily: 'var(--f-mono)', fontSize: 11.5, wordBreak: 'break-all' }}>
                   订单号 {result.orderId}
                 </div>
               )}
-              <div className="tiny">{result.note}</div>
+              <div>{result.note}</div>
               {result.payUrl && (
-                <a className="btn btn--primary" href={result.payUrl} target="_blank" rel="noreferrer" style={{ marginTop: 4 }}>
+                <a className="btn btn--primary btn--sm" href={result.payUrl} target="_blank" rel="noreferrer" style={{ marginTop: 6 }}>
                   去支付
                 </a>
               )}
@@ -136,79 +143,69 @@ export function ConfirmSheet({
 
           {preview && !result && (
             <>
-              <div className="card" style={{ padding: '16px 18px' }}>
-                <div className="kv">
-                  <span>门店</span>
-                  <span style={{ fontWeight: 600 }}>{storeName || storeCode}</span>
-                </div>
-                <div className="kv">
-                  <span>点餐方式</span>
-                  <span style={{ fontWeight: 600 }}>
-                    {BE_TYPE_LABEL[beType]}
-                    {mode === 'demo' ? '（演示）' : ''}
-                  </span>
-                </div>
-                <div className="kv">
-                  <span>数据来源</span>
-                  <span>{mode === 'demo' ? '演示数据（非真实）' : '麦当劳 MCP 实时'}</span>
+              {/* 门店与来源：用户必须能确认「下到哪家店」 */}
+              <div className="store-block">
+                <IconStore size={15} />
+                <div style={{ minWidth: 0 }}>
+                  <div className="store-block__name">{storeName || `门店 ${storeCode}`}</div>
+                  <div className="store-block__meta">
+                    {BE_TYPE_LABEL[beType]} · {mode === 'demo' ? '演示数据，不会产生真实订单' : '麦当劳 MCP 实时'}
+                  </div>
                 </div>
               </div>
 
               <div>
-                <div className="section-title">
-                  <h2>餐品清单</h2>
-                  <span className="section-title__hint">{preview.price.lines.reduce((n, l) => n + l.quantity, 0)} 件</span>
-                </div>
-                <div className="card" style={{ padding: '16px 18px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+                <div className="items">
                   {items.map((item, i) => {
                     // 金额按商品编码从官方核价结果里取；取不到就不显示金额，绝不猜
                     const line = preview.price.lines.find((l) => l.productCode === item.productCode);
                     return (
-                      <div key={`${item.productCode}-${i}`} className="line-item">
-                        <span className="line-item__qty">{item.quantity}</span>
-                        <div className="line-item__body" style={{ display: 'flex', justifyContent: 'space-between', gap: 10 }}>
-                          <div style={{ minWidth: 0 }}>
-                            <span className="line-item__name">{item.name}</span>
-                            {item.children.length > 0 && (
-                              <div className="line-item__children">
-                                {item.children.map((c, j) => (
-                                  <span key={j} className="child-tag">
-                                    {c.roundName ? `${c.roundName}·` : ''}
-                                    {c.name}
-                                  </span>
-                                ))}
-                              </div>
-                            )}
-                          </div>
-                          {line && (
-                            <span className="num" style={{ flex: '0 0 auto', color: 'var(--ink-600)' }}>
-                              ¥{yuan(line.subtotalCents)}
-                            </span>
-                          )}
-                        </div>
+                      <div key={`${item.productCode}-${i}`} className="item-row">
+                        <span className="item-row__qty">{item.quantity}×</span>
+                        <span className="item-row__nm">{item.name}</span>
+                        <span className="item-row__amt">{line ? `¥${yuan(line.subtotalCents)}` : ''}</span>
+                        {item.children.length > 0 && (
+                          <span className="item-row__kids">
+                            {item.children.map((c) => `${c.roundName ? `${c.roundName}·` : ''}${c.name}`).join(' / ')}
+                          </span>
+                        )}
                       </div>
                     );
                   })}
                 </div>
+
+                {/* 只有真的存在优惠时才展开原价/优惠明细；
+                    否则它会和底部的「应付」变成两个一样的数字 */}
+                {preview.price.discountCents > 0 && (
+                  <div className="sums">
+                    <div className="sums__row">
+                      <span>商品原价</span>
+                      <span>¥{yuan(preview.price.originalPriceCents)}</span>
+                    </div>
+                    <div className="sums__row sums__row--discount">
+                      <span>优惠</span>
+                      <span>−¥{yuan(preview.price.discountCents)}</span>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {changeNotes.length > 0 && (
                 <div>
-                  <div className="section-title">
-                    <h2>你改动的内容</h2>
-                  </div>
-                  <div className="candidate__explain">
+                  <SectionHead title="这次改的" />
+                  <div className="cand__notes" style={{ borderTop: 0, paddingTop: 0, marginTop: -4 }}>
                     {changeNotes.map((n, i) => (
-                      <div key={i}>{n}</div>
+                      <div key={i} className="cand__note">
+                        <IconCheck size={12} />
+                        <span>{n}</span>
+                      </div>
                     ))}
                   </div>
                 </div>
               )}
 
               <div>
-                <div className="section-title">
-                  <h2>取餐方式</h2>
-                </div>
+                <SectionHead title="取餐方式" />
                 <div className="takeway-row">
                   {preview.takeWayList.map((t) => (
                     <button
@@ -224,33 +221,16 @@ export function ConfirmSheet({
                 </div>
               </div>
 
-              <div className="receipt" style={{ padding: '18px 20px 24px' }}>
-                <div className="receipt__label" style={{ marginBottom: 8 }}>
-                  Amount due
-                </div>
-                <div className="kv" style={{ paddingTop: 0 }}>
-                  <span>商品原价</span>
-                  <span className="num">¥{yuan(preview.price.originalPriceCents)}</span>
-                </div>
-                {preview.price.discountCents > 0 && (
-                  <div className="kv" style={{ color: 'var(--green-700)' }}>
-                    <span>优惠</span>
-                    <span className="num">−¥{yuan(preview.price.discountCents)}</span>
-                  </div>
-                )}
-                <div className="total-row">
-                  <span className="total-row__label">应付</span>
-                  <span className="total-row__value">¥{yuan(preview.price.priceCents)}</span>
-                </div>
-              </div>
-
               {preview.priceChecks.length > 0 && (
-                <div className="check-row">
-                  <IconAlert size={15} />
-                  <span>{preview.priceChecks.join('；')}</span>
+                <div className="cand__notes" style={{ marginTop: 0, paddingTop: 0, borderTop: 0 }}>
+                  {preview.priceChecks.map((n, i) => (
+                    <div key={i} className="cand__note cand__note--warn">
+                      <IconAlert size={12} />
+                      <span>{n}</span>
+                    </div>
+                  ))}
                 </div>
               )}
-
             </>
           )}
         </div>
@@ -259,12 +239,14 @@ export function ConfirmSheet({
           <div className="sheet__foot">
             <div className="foot-total">
               <span>应付</span>
-              <span className="foot-total__value">¥{yuan(preview.price.priceCents)}</span>
+              <span className="foot-total__value num">¥{yuan(preview.price.priceCents)}</span>
             </div>
+
             <p className="sheet__caveat">
               金额为官方接口实时核价，提交时可能因门店库存或活动变化产生微小差异，实际以门店出餐为准。
               {mode === 'demo' && ' 当前为演示数据，不会产生真实订单。'}
             </p>
+
             <label className="confirm-check">
               <input type="checkbox" checked={checked} onChange={(e) => setChecked(e.target.checked)} />
               <span>
@@ -272,13 +254,17 @@ export function ConfirmSheet({
                 <span className="muted">（系统不会在你确认前下单）</span>
               </span>
             </label>
-            <button type="button" className="btn btn--primary btn--block" disabled={!checked || submitting} onClick={submit}>
+
+            <button type="button" className="btn btn--primary btn--block btn--lg" disabled={!checked || submitting} onClick={submit}>
               {submitting ? (
                 <>
                   <div className="spinner" /> 提交中…
                 </>
               ) : (
-                <>确认下单{mode === 'demo' ? '（演示）' : ''}</>
+                <>
+                  <IconCheck size={15} />
+                  确认下单{mode === 'demo' ? '（演示）' : ''}
+                </>
               )}
             </button>
           </div>

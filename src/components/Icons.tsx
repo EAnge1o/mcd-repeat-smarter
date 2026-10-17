@@ -100,6 +100,12 @@ export const IconArrow = ({ size = 14, className }: IconProps) => (
   </svg>
 );
 
+export const IconBack = ({ size = 16, className }: IconProps) => (
+  <svg {...base(size)} className={className}>
+    <path d="M19 12H5M11 5.5 4.5 12l6.5 6.5" />
+  </svg>
+);
+
 export const IconReceipt = ({ size = 16, className }: IconProps) => (
   <svg {...base(size)} className={className}>
     <path d="M6 3.8h12v16.4l-2.4-1.6-2.4 1.6-2.4-1.6-2.4 1.6L6 20.2z" />
@@ -131,5 +137,33 @@ export const IconBag = ({ size = 16, className }: IconProps) => (
   <svg {...base(size)} className={className}>
     <path d="M5.4 8.4h13.2l-1 11.2a1 1 0 0 1-1 .9H7.4a1 1 0 0 1-1-.9z" />
     <path d="M8.8 8.4V6.6a3.2 3.2 0 0 1 6.4 0v1.8" />
+  </svg>
+);
+
+/**
+ * 金拱门。两座拱共用中间一条腿，三个底端齐平。
+ *
+ * 用一条粗描边画骨架，不填实心剪影——拱内留白，17px 下仍读得出「两个拱」。
+ * 三个比例要点（改之前先看这里，别凭感觉调）：
+ * 1. 腿在下半段保持竖直（到 y=66 才开始起拱）。全程用贝塞尔会让腿从底端就外扩，形状软成一把扇子。
+ * 2. 拱顶收窄成尖圆，不是宽穹顶。宽穹顶会读成小写字母 m。
+ * 3. 描边 14/104 ≈ 0.135，是拱间距的 0.36——再细就散，再粗两个拱会粘住。
+ */
+export const IconArches = ({ size = 19, className }: IconProps) => (
+  <svg
+    width={(size * 104) / 100}
+    height={size}
+    viewBox="0 0 104 100"
+    fill="none"
+    className={className}
+    aria-hidden="true"
+  >
+    <path
+      d="M13 92V66C13 37 23.9 8 32.5 8S52 37 52 66V92C52 37 60.6 8 71.5 8S91 37 91 66V92"
+      stroke="currentColor"
+      strokeWidth="14"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
   </svg>
 );

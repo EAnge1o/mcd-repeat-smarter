@@ -1,6 +1,30 @@
 import type { ReactNode } from 'react';
 import { IconAlert, IconInfo } from './Icons';
 
+/**
+ * 章节头：标题 + 一句说明 + 右侧计数。
+ *
+ * 去掉了早期版本的 `01 / 02` 编号 —— 编号在真实产品里没有信息量，
+ * 只会让页面看起来像模板大纲。层级改用字号与细线表达。
+ */
+export function SectionHead({
+  title,
+  desc,
+  meta,
+}: {
+  title: string;
+  desc?: string;
+  meta?: ReactNode;
+}) {
+  return (
+    <div className="section__head">
+      <h2 className="section__title">{title}</h2>
+      {desc && <span className="section__desc">{desc}</span>}
+      {meta ? <span className="section__meta">{meta}</span> : null}
+    </div>
+  );
+}
+
 export function SourceBadge({ mode }: { mode: 'live' | 'demo' }) {
   if (mode === 'demo') {
     return (
@@ -88,9 +112,9 @@ export function LoadingBlock({ text = '正在向麦当劳 MCP 查询…' }: { te
 
 export function SkeletonRows({ rows = 3 }: { rows?: number }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
       {Array.from({ length: rows }).map((_, i) => (
-        <div key={i} className="skeleton" style={{ height: i === 0 ? 18 : 13, width: `${[92, 74, 58][i % 3]}%` }} />
+        <div key={i} className="skeleton" style={{ height: i === 0 ? 14 : 11, width: `${[92, 74, 58][i % 3]}%` }} />
       ))}
     </div>
   );

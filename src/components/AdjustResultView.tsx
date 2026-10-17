@@ -1,15 +1,16 @@
 import type { CandidatePlan, PlanItem } from '../../server/domain/types';
 import type { AdjustResult, MatchedView } from '../api';
-import { StatusBadge } from './Common';
-import { IconAlert, IconArrow, IconCheck, IconReceipt, IconSparkle } from './Icons';
+import { SectionHead, StatusBadge } from './Common';
+import { IconAlert, IconArrow, IconCheck, IconReceipt } from './Icons';
 
 const yuan = (cents?: number) => (cents === undefined ? '—' : (cents / 100).toFixed(2));
-/** 把解析出的意图渲染成用户能复核的标签 —— 让「AI 理解了什么」可见。 */
+
+/** 把解析出的意图渲染成可复核的标签 —— 让「AI 理解了什么」看得见、可纠正。 */
 function ChangeTags({ result }: { result: AdjustResult }) {
   const { intent } = result;
   const tags: { kind: string; text: string }[] = [];
 
-  if (intent.wantsRepeat) tags.push({ kind: 'keep', text: '照旧 / 保留原方案' });
+  if (intent.wantsRepeat) tags.push({ kind: 'keep', text: '照旧 · 保留原方案' });
 
   for (const c of intent.changes) {
     if (c.type === 'keep') continue;
@@ -26,14 +27,12 @@ function ChangeTags({ result }: { result: AdjustResult }) {
     }
   }
 
-  if (tags.length === 0) {
-    tags.push({ kind: 'keep', text: '按原方案' });
-  }
+  if (tags.length === 0) tags.push({ kind: 'keep', text: '按原方案' });
 
   return (
-    <div className="change-tags">
+    <div className="said__chips">
       {tags.map((t, i) => (
-        <span key={i} className={`change-tag change-tag--${t.kind}`}>
+        <span key={i} className={`tag tag--${t.kind}`}>
           {t.text}
         </span>
       ))}
@@ -45,46 +44,43 @@ function ChangeTags({ result }: { result: AdjustResult }) {
 function MatchNotice({ matched, summary }: { matched: MatchedView[]; summary: AdjustResult['matchSummary'] }) {
   if (!summary.hasRisk) {
     return (
-      <div style={{ display: 'flex', alignItems: 'center', gap: 7, fontSize: 12.5, color: 'var(--ink-400)' }}>
-        <IconCheck size={14} />
-        原方案里的商品当前都还能点
+      <div className="tiny" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+        <IconCheck size={13} />
+        原方案里的商品当前都还能点到
       </div>
     );
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
       {matched.map((m, i) => {
         const risky = m.status !== 'exact' || m.children.some((c) => c.status !== 'exact');
         if (!risky) return null;
         return (
-          <div key={i} className="alert alert--warn" style={{ alignItems: 'flex-start' }}>
+          <div key={i} className="alert alert--warn">
             <IconAlert />
             <div className="alert__body">
               <div style={{ display: 'flex', alignItems: 'center', gap: 7, flexWrap: 'wrap' }}>
-                <span style={{ fontWeight: 700 }}>{m.name}</span>
+                <span style={{ fontWeight: 600, color: 'var(--ink)' }}>{m.name}</span>
                 <StatusBadge status={m.status} />
-                {m.currentName && m.currentName !== m.name && (
-                  <span style={{ fontSize: 12.5 }}>
-                    → 现已对应「{m.currentName}」
-                  </span>
-                )}
+                {m.currentName && m.currentName !== m.name && <span className="tiny">→ 现已对应「{m.currentName}」</span>}
               </div>
 
               {m.children
                 .filter((c) => c.status !== 'exact')
                 .map((c, j) => (
-                  <div key={j} style={{ fontSize: 12.5, marginTop: 5 }}>
-                    子项「{c.name}」{c.status === 'substituted' ? '已下架，替换为' : '编码变更，对应'}
-                    「{c.currentName}」
+                  <div key={j} className="tiny" style={{ marginTop: 4 }}>
+                    子项「{c.name}」{c.status === 'substituted' ? '已下架，替换为' : '编码变更，对应'}「{c.currentName}」
                     {c.alternatives.length > 0 && (
-                      <span style={{ opacity: 0.75 }}>（也可选：{c.alternatives.map((a) => `${a.name} ${a.diffPrice ?? ''}`).join('、')}）</span>
+                      <span style={{ opacity: 0.75 }}>
+                        （也可选：{c.alternatives.map((a) => `${a.name} ${a.diffPrice ?? ''}`).join('、')}）
+                      </span>
                     )}
                   </div>
                 ))}
 
               {m.notes.map((n, k) => (
-                <div key={k} style={{ fontSize: 12, marginTop: 4, opacity: 0.8 }}>
+                <div key={k} className="tiny" style={{ marginTop: 3, opacity: 0.85 }}>
                   {n}
                 </div>
               ))}
@@ -96,67 +92,77 @@ function MatchNotice({ matched, summary }: { matched: MatchedView[]; summary: Ad
   );
 }
 
-function ItemLine({ item, mode }: { item: PlanItem; mode: 'before' | 'after' }) {
+function ChildTags({ tags }: { tags: { name: string; changed?: boolean }[] }) {
+  if (tags.length === 0) return null;
   return (
-    <div>
-      <div className="diff__row">
-        <span className="item-pill__qty" style={{ minWidth: 20 }}>
-          {item.quantity}×
+    <div className="cmp__kids">
+      {tags.map((t, i) => (
+        <span key={i} className={t.changed ? 'cmp__kid--changed' : undefined}>
+          {t.name}
         </span>
-        <span style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.name}</span>
-      </div>
-      {item.children.length > 0 && (
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, paddingLeft: 30, marginTop: 3 }}>
-          {item.children.map((c, i) => (
-            <span key={i} className={`child-tag${mode === 'after' && c.aliasNames && c.aliasNames.length > 0 ? ' child-tag--changed' : ''}`}>
-              {c.name}
-            </span>
-          ))}
-        </div>
-      )}
+      ))}
     </div>
   );
 }
 
-function DiffView({ matched, candidate }: { matched: MatchedView[]; candidate: CandidatePlan }) {
-  const beforeItems = matched.map((m) => m);
-  const afterItems = candidate.items;
+/** 原方案 → 调整后：两栏并列，中间一个方向箭头 */
+function Compare({ matched, candidate }: { matched: MatchedView[]; candidate: CandidatePlan }) {
+  const removed = new Set(candidate.changes.filter((c) => c.type === 'removed' || c.type === 'unavailable').map((c) => c.before ?? c.target));
+  const added = new Set(candidate.changes.filter((c) => c.type === 'added').map((c) => c.after ?? c.target));
+  const count = (items: PlanItem[]) => items.reduce((n, i) => n + i.quantity, 0);
 
   return (
-    <div className="diff">
-      <div className="diff__col">
-        <div className="diff__head">原方案</div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
-          {beforeItems.map((m, i) => (
-            <div key={i}>
-              <div className={`diff__row${m.status === 'unavailable' ? ' diff__row--removed' : ''}`}>
-                <span className="item-pill__qty" style={{ minWidth: 20 }}>
-                  {m.quantity}×
-                </span>
-                <span style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>{m.name}</span>
-              </div>
-              {m.children.length > 0 && (
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, paddingLeft: 30, marginTop: 3 }}>
-                  {m.children.map((c, j) => (
-                    <span key={j} className={`child-tag${c.status !== 'exact' ? ' child-tag--changed' : ''}`}>
-                      {c.name}
-                    </span>
-                  ))}
+    <div className="cmp">
+      <div className="cmp__col">
+        <div className="cmp__head">
+          <span className="cmp__title">原方案</span>
+          <span className="cmp__count">共 {matched.reduce((n, m) => n + m.quantity, 0)} 件</span>
+        </div>
+        <div className="cmp__rows">
+          {matched.map((m, i) => {
+            const gone = m.status === 'unavailable' || removed.has(m.name);
+            return (
+              <div key={i}>
+                <div className={`cmp__row${gone ? ' cmp__row--removed' : ''}`}>
+                  <span className="cmp__qty">{m.quantity}×</span>
+                  <span className="cmp__nm" title={m.name}>
+                    {m.name}
+                  </span>
                 </div>
-              )}
-            </div>
-          ))}
+                <ChildTags tags={m.children.map((c) => ({ name: c.name, changed: c.status !== 'exact' }))} />
+              </div>
+            );
+          })}
         </div>
       </div>
 
-      <div className="diff__col">
-        <div className="diff__head">调整后</div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
-          {afterItems.length === 0 ? (
-            <div className="muted tiny">没有商品</div>
+      <div className="cmp__mid" aria-hidden="true">
+        <span>
+          <IconArrow size={14} />
+        </span>
+      </div>
+
+      <div className="cmp__col cmp__col--after">
+        <div className="cmp__head">
+          <span className="cmp__title">调整后</span>
+          <span className="cmp__count">共 {count(candidate.items)} 件</span>
+        </div>
+        <div className="cmp__rows">
+          {candidate.items.length === 0 ? (
+            <div className="tiny muted">这一版没有任何餐品</div>
           ) : (
-            afterItems.map((item, i) => (
-              <ItemLine key={i} item={item} mode="after" />
+            candidate.items.map((item, i) => (
+              <div key={`${item.productCode}-${i}`}>
+                <div className={`cmp__row${added.has(item.name) ? ' cmp__row--added' : ''}`}>
+                  <span className="cmp__qty">{item.quantity}×</span>
+                  <span className="cmp__nm" title={item.name}>
+                    {item.name}
+                  </span>
+                </div>
+                <ChildTags
+                  tags={item.children.map((c) => ({ name: c.name, changed: Boolean(c.aliasNames && c.aliasNames.length > 0) }))}
+                />
+              </div>
             ))
           )}
         </div>
@@ -175,13 +181,11 @@ function CandidateCard({
   onSelect: () => void;
 }) {
   const price = candidate.price;
-  const changedChildren = new Set(
-    candidate.changes.filter((c) => c.type === 'replaced').map((c) => c.after ?? ''),
-  );
+  const changedNames = new Set(candidate.changes.filter((c) => c.type === 'replaced').map((c) => c.after ?? ''));
 
   return (
     <div
-      className={`candidate${active ? ' candidate--active' : ''}`}
+      className={`cand${active ? ' cand--active' : ''}`}
       role="radio"
       aria-checked={active}
       tabIndex={0}
@@ -193,20 +197,20 @@ function CandidateCard({
         }
       }}
     >
-      <div className="candidate__head">
-        <span className="select-dot" />
-        <div style={{ minWidth: 0, flex: 1 }}>
-          <div className="candidate__label">{candidate.label}</div>
-          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 5 }}>
+      <div className="cand__head">
+        <span className="radio" aria-hidden="true" />
+        <div className="cand__main">
+          <div className="cand__label">{candidate.label}</div>
+          <div className="cand__badges">
             {candidate.withinBudget === true && (
               <span className="badge badge--ok">
-                <IconCheck size={12} />
+                <IconCheck size={11} />
                 在预算内
               </span>
             )}
             {candidate.withinBudget === false && (
               <span className="badge badge--red">
-                <IconAlert size={12} />
+                <IconAlert size={11} />
                 超预算
               </span>
             )}
@@ -215,82 +219,84 @@ function CandidateCard({
             )}
           </div>
         </div>
-        <div className="candidate__price">
+
+        <div className="cand__price">
           {price ? (
             <>
-              <div className="candidate__amount price-pop">
+              <div className="cand__amount num">
                 <small>¥</small>
                 {yuan(price.priceCents)}
               </div>
               {price.originalPriceCents > price.priceCents && (
-                <div className="candidate__strike">¥{yuan(price.originalPriceCents)}</div>
+                <div className="cand__strike">¥{yuan(price.originalPriceCents)}</div>
               )}
             </>
           ) : (
-            <div className="candidate__amount" style={{ fontSize: 14, color: 'var(--red-600)' }}>
+            <div className="cand__amount num" style={{ fontSize: 14, color: 'var(--red)' }}>
               核价失败
             </div>
           )}
         </div>
       </div>
 
-      <div className="candidate__items">
+      <div className="cand__items">
         {candidate.items.map((item, i) => (
-          <div key={`${item.productCode}-${i}`} className="line-item">
-            <span className="line-item__qty">{item.quantity}</span>
-            <div className="line-item__body">
-              <div className="line-item__name">{item.name}</div>
-              {item.children.length > 0 && (
-                <div className="line-item__children">
-                  {item.children.map((c, j) => (
-                    <span
-                      key={j}
-                      className={`child-tag${changedChildren.has(c.name) || (c.aliasNames && c.aliasNames.length > 0) ? ' child-tag--changed' : ''}`}
-                    >
-                      {c.roundName ? `${c.roundName}·` : ''}
-                      {c.name}
-                    </span>
-                  ))}
-                </div>
-              )}
+          <div key={`${item.productCode}-${i}`}>
+            <div className="cand__line">
+              <span className="cand__qty">{item.quantity}</span>
+              <span className="cand__nm">{item.name}</span>
             </div>
+            {item.children.length > 0 && (
+              <div className="cand__kids">
+                {item.children.map((c, j) => (
+                  <span
+                    key={j}
+                    className={
+                      changedNames.has(c.name) || (c.aliasNames && c.aliasNames.length > 0)
+                        ? 'cand__kid--changed'
+                        : undefined
+                    }
+                  >
+                    {c.roundName ? `${c.roundName}·` : ''}
+                    {c.name}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
         ))}
       </div>
 
-      {candidate.budgetNote && (
-        <div className="check-row">
-          <IconAlert size={15} />
-          <span>{candidate.budgetNote}。系统不会为了凑预算偷偷换掉你要的东西。</span>
-        </div>
-      )}
-
-      {candidate.priceChecks && candidate.priceChecks.length > 0 && (
-        <div className="check-row">
-          <IconAlert size={15} />
-          <span>{candidate.priceChecks.join('；')}</span>
-        </div>
-      )}
-
-      {candidate.explain.length > 0 && (
-        <div className="candidate__explain">
-          {candidate.explain.slice(0, 5).map((e, i) => (
-            <div key={i}>{e}</div>
+      {(candidate.budgetNote || (candidate.priceChecks && candidate.priceChecks.length > 0) || candidate.explain.length > 0) && (
+        <div className="cand__notes">
+          {candidate.budgetNote && (
+            <div className="cand__note cand__note--warn">
+              <IconAlert size={12} />
+              <span>{candidate.budgetNote}。系统不会为了凑预算偷偷换掉你要的东西。</span>
+            </div>
+          )}
+          {candidate.priceChecks &&
+            candidate.priceChecks.map((n, i) => (
+              <div key={i} className="cand__note cand__note--warn">
+                <IconAlert size={12} />
+                <span>{n}</span>
+              </div>
+            ))}
+          {candidate.explain.slice(0, 4).map((e, i) => (
+            <div key={i} className="cand__note cand__note--plain">
+              {e}
+            </div>
           ))}
         </div>
       )}
 
       {price && (
-        <div className="candidate__foot">
-          <span className="tiny muted" style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
-            <IconReceipt size={13} />
+        <div className="cand__foot">
+          <span className="cand__foot-left">
+            <IconReceipt size={12} />
             官方核价 · 共 {price.lines.reduce((n, l) => n + l.quantity, 0)} 件
           </span>
-          {price.traceId && (
-            <span className="tiny" style={{ color: 'var(--ink-300)', fontFamily: 'var(--font-num)' }}>
-              trace {price.traceId.slice(0, 8)}
-            </span>
-          )}
+          {price.traceId && <span>trace {price.traceId.slice(0, 8)}</span>}
         </div>
       )}
     </div>
@@ -316,10 +322,11 @@ export function AdjustResultView({
     result.candidates.every((c) => c.withinBudget === false);
 
   return (
-    <div className="stack">
-      <div className="quote">
-        <div className="quote__label">你刚才说</div>
-        <div className="quote__text">{result.intent.raw}</div>
+    <div className="result">
+      {/* 用户原话 + 解析出的修改点：先让用户确认「我理解对了没有」 */}
+      <div className="said">
+        <div className="said__label">你刚才说</div>
+        <div className="said__text">「{result.intent.raw}」</div>
         <ChangeTags result={result} />
       </div>
 
@@ -328,7 +335,9 @@ export function AdjustResultView({
           <IconAlert />
           <div className="alert__body">
             <div className="alert__title">有一部分没听懂</div>
-            <div>「{result.intent.unrecognized.join('、')}」这部分没能转成具体修改。你可以换个说法，例如「不要薯条」「薯条换成玉米杯」「不超过 20 元」。</div>
+            <div>
+              「{result.intent.unrecognized.join('、')}」这部分没能转成具体修改。你可以换个说法，例如「不要薯条」「薯条换成玉米杯」「不超过 20 元」。
+            </div>
           </div>
         </div>
       )}
@@ -345,36 +354,30 @@ export function AdjustResultView({
         </div>
       )}
 
-      <div className="card card--pad">
-        <div className="section-title">
-          <h2>改了什么</h2>
-          <span className="section-title__hint">{result.intent.wantsRepeat ? '基于上次那份' : '基于原方案'}</span>
-        </div>
-        <DiffView matched={result.matched} candidate={selected} />
-      </div>
+      <section className="section section--flush">
+        <SectionHead title="改了什么" desc="左边是你原来的，右边是这一次要下的" meta="前后对照" />
+        <Compare matched={result.matched} candidate={selected} />
+      </section>
 
-      <div>
-        <div className="section-title">
-          <h2>候选方案</h2>
-          <span className="section-title__hint">
-            <IconSparkle size={12} /> 金额均来自官方核价
-          </span>
-        </div>
-        <div className="stack" role="radiogroup" aria-label="候选方案">
+      <section className="section section--flush">
+        <SectionHead
+          title="候选方案"
+          desc="选一个再往下走，金额以官方接口为准"
+          meta={`${result.candidates.length} 个`}
+        />
+        <div className="cands" role="radiogroup" aria-label="候选方案">
           {result.candidates.map((c) => (
             <CandidateCard key={c.id} candidate={c} active={c.id === selected.id} onSelect={() => onSelect(c.id)} />
           ))}
         </div>
-      </div>
+      </section>
 
-      <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-        <button type="button" className="btn btn--ghost" onClick={onSave} disabled={!selected.price}>
-          <IconArrow size={14} />
+      <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'center' }}>
+        <button type="button" className="btn btn--ghost btn--sm" onClick={onSave} disabled={!selected.price}>
           存成常用方案
+          <IconArrow size={12} />
         </button>
-        <span className="tiny muted" style={{ alignSelf: 'center' }}>
-          下次直接说「还是老样子」就能调出来
-        </span>
+        <span className="tiny">下次说「还是老样子」就能调出来</span>
       </div>
     </div>
   );

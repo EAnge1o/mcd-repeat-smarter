@@ -104,7 +104,7 @@ try {
 
   await desktop.type('textarea', UTTERANCE, { delay: 6 });
   await desktop.click('.composer__send');
-  await desktop.waitForSelector('.candidate', { timeout: 60000 });
+  await desktop.waitForSelector('.cand', { timeout: 60000 });
   await sleep(1400);
   await flattenActionBar(desktop);
   await desktop.screenshot({ path: shotPath('adjust-desktop.png'), fullPage: true });
@@ -134,7 +134,7 @@ try {
 
   await mobile.type('textarea', UTTERANCE, { delay: 6 });
   await mobile.click('.composer__send');
-  await mobile.waitForSelector('.candidate', { timeout: 60000 });
+  await mobile.waitForSelector('.cand', { timeout: 60000 });
   await sleep(1400);
   await flattenActionBar(mobile);
   await mobile.screenshot({ path: shotPath('adjust-mobile.png'), fullPage: true });

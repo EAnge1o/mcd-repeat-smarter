@@ -1,61 +1,47 @@
 import type { HabitProfile } from '../../server/domain/types';
-import { IconClock, IconHistory } from './Icons';
 
 /**
- * 习惯摘要：所有数字都来自 MCP 真实历史订单统计。
- * 样本为空时只展示引导，不假装认识用户。
+ * 习惯摘要。
+ *
+ * 所有数字都来自 MCP 真实历史订单统计，不是编的。
+ * 呈现为一行「事实」而不是四个卡片格：首屏最贵的是纵向空间，
+ * 四张数据卡会把标题和输入区推下去，也会让页面看起来像后台看板。
+ * 每条只保留「一句话能读完」的量 —— 宁少勿挤。
  */
 export function HabitBar({ habit }: { habit: HabitProfile }) {
   if (habit.sampleSize === 0) {
     return (
-      <div className="habit">
-        <span className="habit__pill">
-          <IconHistory size={14} />
-          还没有历史订单
-        </span>
-        <span className="habit__pill" style={{ color: 'var(--ink-400)' }}>
-          先手动挑一份存成「老样子」，之后一句话就能改
-        </span>
+      <div className="facts">
+        <div className="facts__item">
+          <span className="facts__value">还没有可读的历史订单</span>
+          <span className="facts__label">先挑一份存成常用方案</span>
+        </div>
       </div>
     );
   }
 
   const main = habit.topItems[0];
-  const child = habit.topChildren[0];
 
   return (
-    <div className="habit">
-      <span className="habit__pill habit__pill--accent">
-        <IconHistory size={14} />
-        近 {habit.sampleSize} 单
-      </span>
+    <div className="facts">
+      <div className="facts__item">
+        <span className="facts__value num">{habit.sampleSize}</span>
+        <span className="facts__label">单历史</span>
+      </div>
 
       {main && (
-        <span className="habit__pill">
-          <span className="habit__num">{main.count}</span>
-          {main.name}
-        </span>
-      )}
-
-      {child && (
-        <span className="habit__pill">
-          <span className="habit__num">{child.count}</span>
-          常配{child.name}
-        </span>
+        <div className="facts__item" title={`${main.name} · 点过 ${main.count} 次`}>
+          <span className="facts__label">常点</span>
+          <span className="facts__value">{main.name}</span>
+          <span className="facts__label num">×{main.count}</span>
+        </div>
       )}
 
       {habit.topHour && (
-        <span className="habit__pill">
-          <IconClock size={13} />
-          多在{habit.topHour.label}下单
-        </span>
-      )}
-
-      {habit.topStore && habit.topStore.count === habit.sampleSize && (
-        <span className="habit__pill" style={{ maxWidth: 260 }}>
-          <IconHistory size={13} />
-          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{habit.topStore.storeName}</span>
-        </span>
+        <div className="facts__item">
+          <span className="facts__label">最常在</span>
+          <span className="facts__value">{habit.topHour.label}</span>
+        </div>
       )}
     </div>
   );
