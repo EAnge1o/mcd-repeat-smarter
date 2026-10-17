@@ -1,12 +1,13 @@
+import { useCallback, useMemo, useRef, useState } from 'react';
 import type { HistoryOrder, Plan } from '../../server/domain/types';
-import { Badge, Button, Card, CardHead, EmptyState, Alert, cx } from '../components/ui';
-import { KpiCard, KpiCardSkeleton, KpiGrid } from '../components/KpiCard';
+import { Button } from '../components/ui';
+import { Hero } from '../components/Hero';
+import { MemoryRail } from '../components/MemoryRail';
+import { PlanList } from '../components/PlanList';
 import { SpendTrend } from '../components/SpendTrend';
-import { HourDonut, type Bucket } from '../components/HourDonut';
-import { OrdersTable } from '../components/OrdersTable';
-import { PlansGrid } from '../components/PlansGrid';
-import { IconArrow, IconBookmark, IconReceipt, IconSparkle, IconWallet } from '../components/Icons';
-import type { Kpi, SpendPoint } from '../lib/metrics';
+import { OrderFeed } from '../components/OrderFeed';
+import { IconArrow, IconSparkle } from '../components/Icons';
+import { bucketOf, type Bucket, type Choice, type Kpi, type SpendPoint } from '../lib/metrics';
 import type { ViewKey } from '../components/Sidebar';
 
 interface TopItem {
@@ -20,10 +21,12 @@ interface OverviewProps {
   mode: 'live' | 'demo';
   demoReason?: string;
   storeName: string;
+  lastSync: string | null;
   kpis: Kpi[];
   series: { points: SpendPoint[]; skipped: number };
   buckets: Bucket[];
   tops: TopItem[];
+  choices: Choice[];
   orders: HistoryOrder[];
   ordersLoading: boolean;
   plans: Plan[];
@@ -31,60 +34,38 @@ interface OverviewProps {
   onNavigate: (v: ViewKey) => void;
   onUsePlan: (p: Plan) => void;
   onUseOrder: (o: HistoryOrder) => void;
-  onDeletePlan: (p: Plan) => void;
-  onDuplicatePlan: (p: Plan) => void;
-  onRenamePlan: (p: Plan) => void;
   onUseLatest: () => void;
+  /** 主舞台输入框提交的一句话 */
+  onSubmit: (text: string) => void;
 }
 
-const KPI_ICON = [IconReceipt, IconWallet, IconSparkle, IconBookmark];
+/** 概览页默认展开几单。点趋势图定位到更靠后的一单时会临时放宽，见下方 limit */
+const FEED_LIMIT = 6;
 
-/** 常点单品横条。用横向条而不是饼图：单品之间是「次数」这种同量纲比较，条长最直观。 */
-function TopItems({ items, total }: { items: TopItem[]; total: number }) {
-  if (items.length === 0) {
-    return <EmptyState compact title="还没有常点单品" desc="历史订单里没有可统计的餐品明细。" />;
-  }
+const reducedMotion = () => typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  const max = Math.max(...items.map((i) => i.count), 1);
-
-  return (
-    <ul className="space-y-2 px-4 py-3.5 md:px-5">
-      {items.map((it, i) => (
-        <li key={it.productCode} className="group">
-          <div className="flex items-baseline justify-between gap-2">
-            <span className="flex min-w-0 items-baseline gap-1.5">
-              <span className="tnum w-3 shrink-0 text-[10px] text-[#6f6a62]">{i + 1}</span>
-              <span className="truncate text-[12px] text-[#4b4945]" title={it.name}>
-                {it.name}
-              </span>
-            </span>
-            <span className="tnum shrink-0 text-[11px] text-[#6f6a62]">
-              {it.count} 次
-              <span className="ml-1 text-[10px] text-[#6f6a62]">{Math.round((it.count / Math.max(total, 1)) * 100)}%</span>
-            </span>
-          </div>
-          <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-[#f2f0ec]">
-            <div
-              className={cx('h-full rounded-full transition-all duration-200 ease-out', i === 0 ? 'bg-brand-500' : 'bg-[#e2665a]')}
-              style={{ width: `${Math.max((it.count / max) * 100, 6)}%` }}
-            />
-          </div>
-        </li>
-      ))}
-    </ul>
-  );
-}
-
+/**
+ * 概览页。
+ *
+ * 版式不是「一排统计卡 + 三行图表」，而是一个主舞台加一条注解栏：
+ * 左边是「现在下一单」（输入框 + 常点 + 方案快捷），右边是「你到底记住了我什么」。
+ * 统计性质的趋势和订单历史放到页面下半部分，用通栏条带呈现 —— 它们是回看型信息，
+ * 不该占掉首屏最贵的那块面积。
+ *
+ * 三处联动都是真功能，不是装饰：点时段筛订单、点趋势点定位到那一单、点订单就地展开。
+ */
 export function Overview(props: OverviewProps) {
   const {
     dateLabel,
     mode,
     demoReason,
     storeName,
+    lastSync,
     kpis,
     series,
     buckets,
     tops,
+    choices,
     orders,
     ordersLoading,
     plans,
@@ -92,136 +73,190 @@ export function Overview(props: OverviewProps) {
     onNavigate,
     onUsePlan,
     onUseOrder,
-    onDeletePlan,
-    onDuplicatePlan,
-    onRenamePlan,
     onUseLatest,
+    onSubmit,
   } = props;
 
+  const [bucket, setBucket] = useState<string | null>(null);
+  const [openOrder, setOpenOrder] = useState<string | null>(null);
+  const [seed, setSeed] = useState('');
+  const feedRef = useRef<HTMLDivElement>(null);
+
+  const kpiOf = useCallback((key: string) => kpis.find((k) => k.key === key), [kpis]);
+  const avg = kpiOf('avg');
+  const total = kpiOf('orders');
+
+  const top = tops[0] ?? null;
+  const topShare = top && orders.length > 0 ? Math.round((top.count / orders.length) * 100) : 0;
+
+  const activeBucket = buckets.find((b) => b.key === bucket) ?? null;
+
+  const filtered = useMemo(() => (bucket ? orders.filter((o) => bucketOf(o.createTime) === bucket) : orders), [orders, bucket]);
+
+  // 筛选时把命中的单全部列出来（用户既然收窄了范围，就该看到收窄后的全部）；
+  // 定位到某一单时，如果它排在默认条数之后，就把列表放宽到能包含它 —— 否则点了没反应
+  const rows = useMemo(() => {
+    const focusIdx = openOrder ? filtered.findIndex((o) => o.orderId === openOrder) : -1;
+    const base = bucket ? Math.min(filtered.length, 20) : FEED_LIMIT;
+    return filtered.slice(0, Math.max(base, focusIdx + 1));
+  }, [filtered, openOrder, bucket]);
+
+  const scrollToFeed = useCallback(() => {
+    feedRef.current?.scrollIntoView({ behavior: reducedMotion() ? 'auto' : 'smooth', block: 'start' });
+  }, []);
+
+  const pickBucket = (key: string | null) => {
+    setBucket(key);
+    setOpenOrder(null);
+    if (key) window.setTimeout(scrollToFeed, 30);
+  };
+
+  const pickPoint = (p: SpendPoint) => {
+    setBucket(null);
+    setOpenOrder(p.orderId);
+    window.setTimeout(scrollToFeed, 30);
+  };
+
+  const quickPrompts = useMemo(() => {
+    const list = ['还是老样子'];
+    if (top) list.push(`再来一份${top.name}`);
+    list.push('不要薯条，换个别的', '预算 20 元以内');
+    return list;
+  }, [top]);
+
+  const trendNote =
+    series.points.length > 0 ? `近 ${series.points.length} 笔订单的实付金额` : '按时间正序';
+
   return (
-    <div className="space-y-4 md:space-y-5">
-      {/* 页头 */}
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div className="min-w-0">
-          <p className="truncate text-[11px] text-[#6f6a62]">
-            {dateLabel}
-            {storeName ? <span className="text-[#57534c]"> · {storeName}</span> : null}
-          </p>
-          <h1 className="mt-1 text-xl font-semibold tracking-tight text-[#111827] md:text-2xl">
-            今天，还是<span className="text-brand-600">老样子</span>吗？
-          </h1>
-          <p className="mt-1 text-xs text-[#57534c]">记得你的习惯，也听得懂你今天的小变化。</p>
+    <div>
+      {/* 页头：一行元信息，不抢标题的注意力 */}
+      <header className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1.5">
+        <p className="min-w-0 truncate text-[11.5px] text-[#6f6a62]">
+          <span className="tnum">{dateLabel}</span>
+          {storeName ? (
+            <>
+              <span className="px-1.5 text-[#b3afa7]">/</span>
+              <span className="text-[#57534c]">{storeName}</span>
+            </>
+          ) : null}
+        </p>
+        <p className="flex shrink-0 items-center gap-1.5 text-[11px] text-[#6f6a62]">
+          <span
+            className={mode === 'live' ? 'inline-block h-1.5 w-1.5 rounded-full bg-[#22c55e]' : 'inline-block h-1.5 w-1.5 rounded-full bg-[#f59e0b]'}
+            aria-hidden="true"
+          />
+          {mode === 'live' ? 'MCP 实时数据' : '演示数据'}
+          {lastSync ? <span className="tnum">· {lastSync} 读取</span> : null}
+        </p>
+      </header>
+
+      {/* 主区：左舞台 + 右注解栏 */}
+      <div className="mt-6 grid gap-x-10 gap-y-9 md:mt-8 xl:grid-cols-12 xl:items-start">
+        <div className="min-w-0 space-y-7 xl:col-span-8 xl:space-y-8">
+          <Hero
+            lastOrder={orders[0] ?? null}
+            loading={ordersLoading}
+            quickPrompts={quickPrompts}
+            prefill={seed}
+            demoReason={mode === 'demo' ? demoReason ?? '未连接真实 MCP' : undefined}
+            onSubmit={(text) => {
+              setSeed('');
+              onSubmit(text);
+            }}
+            onUseLatest={onUseLatest}
+          />
+
+          <section aria-labelledby="plans-title" className="border-t border-line pt-5">
+            <div className="flex items-baseline justify-between gap-3">
+              <div className="flex items-baseline gap-2.5">
+                <h2 id="plans-title" className="text-[15px] font-semibold tracking-tight text-[#111827]">
+                  常用方案
+                </h2>
+                <span className="tnum text-[11px] text-[#6f6a62]">{plans.length} 个</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => onNavigate('plans')}
+                className="group inline-flex items-center gap-1 rounded-md py-0.5 text-[11.5px] font-medium text-[#57534c] transition-colors duration-150 hover:text-brand-600"
+              >
+                管理
+                <IconArrow size={11} className="transition-transform duration-150 group-hover:translate-x-0.5" />
+              </button>
+            </div>
+
+            <PlanList
+              plans={plans}
+              loading={plansLoading}
+              onUse={onUsePlan}
+              onManage={() => onNavigate('plans')}
+              emptyAction={
+                <Button variant="primary" size="sm" onClick={() => onNavigate('order')}>
+                  <IconSparkle size={13} />
+                  去调一单
+                </Button>
+              }
+            />
+          </section>
         </div>
 
-        <div className="flex flex-wrap gap-2">
-          <Button variant="primary" onClick={() => onNavigate('order')}>
-            <IconSparkle size={14} />
-            开始点单
-          </Button>
-          <Button onClick={() => onNavigate('plans')}>
-            <IconBookmark size={14} />
-            常用方案
-          </Button>
+        <div className="min-w-0 border-t border-line pt-6 xl:col-span-4 xl:border-t-0 xl:pt-0">
+          <MemoryRail
+            top={top ? { name: top.name, count: top.count, share: topShare } : null}
+            choices={choices}
+            avg={{ value: avg?.value ?? '—', hint: avg?.hint ?? '接口未返回金额' }}
+            total={{ value: total?.value ?? '0', unit: total?.unit, hint: total?.hint ?? '还没有历史订单' }}
+            buckets={buckets}
+            activeBucket={bucket}
+            loading={ordersLoading}
+            onPickBucket={pickBucket}
+            onSeed={(text) => setSeed(text)}
+          />
         </div>
       </div>
 
-      {mode === 'demo' ? (
-        <Alert kind="warn" title="当前是演示数据" hint="页面上的门店、餐品、价格均为内置示例，用于体验完整流程，不代表真实供应情况。">
-          {demoReason ?? '未连接真实 MCP'}
-        </Alert>
+      {/* 趋势条带：通栏，不包卡片。一条金额都没有时整段不出现，免得堆三个空状态 */}
+      {ordersLoading || series.points.length > 0 ? (
+        <section aria-labelledby="trend-title" className="mt-9 border-t border-line pt-6 md:mt-11 md:pt-7">
+          <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+            <h2 id="trend-title" className="text-[15px] font-semibold tracking-tight text-[#111827]">
+              消费趋势
+            </h2>
+            <p className="text-[11px] text-[#6f6a62]">
+              {trendNote}
+              {series.points.length > 0 ? <span className="hidden sm:inline"> · 点一下可定位到下面那一单</span> : null}
+            </p>
+          </div>
+          <div className="mt-3">
+            {ordersLoading ? (
+              <div className="skeleton h-[168px] w-full" />
+            ) : (
+              <SpendTrend points={series.points} skipped={series.skipped} selectedId={openOrder} onPick={pickPoint} />
+            )}
+          </div>
+        </section>
       ) : null}
 
-      {/* KPI */}
-      <KpiGrid>
-        {ordersLoading
-          ? [0, 1, 2, 3].map((i) => <KpiCardSkeleton key={i} />)
-          : kpis.map((k, i) => {
-              const Icon = KPI_ICON[i] ?? IconSparkle;
-              return <KpiCard key={k.key} kpi={k} icon={<Icon size={15} />} />;
-            })}
-      </KpiGrid>
-
-      {/* 图表：主图 2/3，辅助图 1/3 */}
-      <div className="grid grid-cols-1 gap-3 md:gap-4 xl:grid-cols-3">
-        <Card className="flex flex-col xl:col-span-2">
-          <CardHead
-            title="消费趋势"
-            desc={series.points.length > 0 ? `近 ${series.points.length} 笔订单的实付金额` : '按时间正序'}
-            action={
-              <Badge tone={mode === 'live' ? 'ok' : 'warn'}>{mode === 'live' ? 'MCP 实付' : '演示数据'}</Badge>
-            }
-          />
-          <div className="flex w-full flex-1 items-center">
-            {ordersLoading ? <div className="skeleton m-4 h-[220px] w-full" /> : <SpendTrend points={series.points} skipped={series.skipped} />}
-          </div>
-        </Card>
-
-        <Card className="flex flex-col">
-          <CardHead title="下单时段" desc="按历史订单的下单时间分桶" />
-          <div className="flex w-full flex-1 items-center">
-            {ordersLoading ? <div className="skeleton m-4 h-[180px] w-full" /> : <HourDonut buckets={buckets} />}
-          </div>
-        </Card>
-      </div>
-
-      {/* 常用方案 + 常点单品 */}
-      <div className="grid grid-cols-1 gap-3 md:gap-4 xl:grid-cols-3">
-        <Card className="xl:col-span-2">
-          <CardHead
-            title="常用方案"
-            desc="整单复用，也可以当作下一次修改的起点"
-            action={
-              <Button size="sm" onClick={() => onNavigate('plans')}>
-                管理
-                <IconArrow size={11} />
-              </Button>
-            }
-          />
-          <PlansGrid
-            plans={plans.slice(0, 2)}
-            loading={plansLoading}
-            onUse={onUsePlan}
-            onDelete={onDeletePlan}
-            onDuplicate={onDuplicatePlan}
-            onRename={onRenamePlan}
-            emptyAction={
-              <Button variant="primary" size="sm" onClick={() => onNavigate('order')}>
-                去调一单
-              </Button>
-            }
-          />
-        </Card>
-
-        <Card>
-          <CardHead title="常点单品" desc="按出现次数排序" action={<span className="tnum text-[11px] text-[#6f6a62]">{orders.length} 单样本</span>} />
-          <TopItems items={tops} total={orders.length} />
-        </Card>
-      </div>
-
-      {/* 最近订单 */}
-      <Card>
-        <CardHead
-          title="最近订单"
-          desc={mode === 'live' ? '读取自你的麦当劳账号' : '内置示例，非真实账号'}
-          action={
-            <Button size="sm" onClick={() => onNavigate('orders')}>
-              查看全部
-              <IconArrow size={11} />
-            </Button>
-          }
-        />
-        <OrdersTable
-          orders={orders}
+      {/* 订单流：通栏，就地展开 */}
+      <div ref={feedRef} className="mt-9 scroll-mt-20 md:mt-11">
+        <OrderFeed
+          orders={rows}
+          total={orders.length}
+          matchCount={filtered.length}
           loading={ordersLoading}
-          limit={5}
+          openId={openOrder}
+          filterLabel={activeBucket ? `${activeBucket.label} ${activeBucket.range}` : null}
+          onToggle={(id) => setOpenOrder((cur) => (cur === id ? null : id))}
           onUse={onUseOrder}
+          onViewAll={() => onNavigate('orders')}
+          onClearFilter={() => pickBucket(null)}
           emptyAction={
             <Button variant="primary" size="sm" onClick={onUseLatest}>
+              <IconSparkle size={13} />
               还是老样子
             </Button>
           }
         />
-      </Card>
+      </div>
     </div>
   );
 }

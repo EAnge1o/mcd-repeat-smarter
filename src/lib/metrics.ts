@@ -70,6 +70,34 @@ export function topItems(orders: HistoryOrder[], limit = 5) {
     .slice(0, limit);
 }
 
+export interface Choice {
+  name: string;
+  count: number;
+  /** 这个子项所属的套餐名，用来解释「选的是套餐里的哪一格」 */
+  parentName: string;
+}
+
+/**
+ * 套餐里最常选的子项。
+ *
+ * 这是比「最常点」更细一层的记忆：用户真正在意的是「红区配鸡排、蓝区配香芋派」这类搭配，
+ * 而不是「又点了一次随心配」。历史订单里带了 children 才能算，没有就返回空数组。
+ */
+export function topChoices(orders: HistoryOrder[], limit = 2): Choice[] {
+  const map = new Map<string, Choice>();
+  for (const o of orders) {
+    for (const it of o.items) {
+      for (const c of it.children ?? []) {
+        const key = c.code || c.name;
+        const cur = map.get(key);
+        if (cur) cur.count += c.quantity;
+        else map.set(key, { name: c.name, count: c.quantity, parentName: it.name });
+      }
+    }
+  }
+  return [...map.values()].sort((a, b) => b.count - a.count).slice(0, limit);
+}
+
 export function computeKpis(orders: HistoryOrder[], plans: Plan[]): Kpi[] {
   const now = Date.now();
 
@@ -169,15 +197,33 @@ const HOUR_BUCKETS = [
   { key: 'night', label: '夜宵', range: '21–06', from: 21, to: 30 },
 ];
 
-/** 下单时段分布。夜宵跨零点，所以把 0–6 点算成 24–30。 */
-export function hourBuckets(orders: HistoryOrder[]) {
+/**
+ * 一单落在哪个时段桶。夜宵跨零点，所以把 0–6 点算成 24–30。
+ *
+ * 抽成独立函数是因为「统计各时段单量」和「点击时段筛选订单」必须用同一套判定，
+ * 各写一份迟早会对不上（比如一边按 11 点算早餐、一边算午餐）。
+ */
+export function bucketOf(iso: string): string | null {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return null;
+  const h = d.getHours();
+  const hh = h < 6 ? h + 24 : h;
+  return HOUR_BUCKETS.find((b) => hh >= b.from && hh < b.to)?.key ?? null;
+}
+
+export interface Bucket {
+  key: string;
+  label: string;
+  range: string;
+  count: number;
+}
+
+/** 下单时段分布。 */
+export function hourBuckets(orders: HistoryOrder[]): Bucket[] {
   const buckets = HOUR_BUCKETS.map((b) => ({ ...b, count: 0 }));
   for (const o of orders) {
-    const d = new Date(o.createTime);
-    if (Number.isNaN(d.getTime())) continue;
-    const h = d.getHours();
-    const hh = h < 6 ? h + 24 : h;
-    const hit = buckets.find((b) => hh >= b.from && hh < b.to);
+    const key = bucketOf(o.createTime);
+    const hit = buckets.find((b) => b.key === key);
     if (hit) hit.count += 1;
   }
   return buckets.map(({ key, label, range, count }) => ({ key, label, range, count }));

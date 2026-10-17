@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { BeType, HistoryOrder, Plan, PlanItem } from '../server/domain/types';
 import { api, ApiRequestError, type AdjustResult, type ConfirmResult, type HealthInfo } from './api';
-import { computeKpis, hourBuckets, spendSeries, topItems } from './lib/metrics';
+import { computeKpis, hourBuckets, spendSeries, topChoices, topItems } from './lib/metrics';
 import { Sidebar, type ViewKey } from './components/Sidebar';
 import { Topbar } from './components/Topbar';
 import { ConfirmSheet } from './components/ConfirmSheet';
@@ -127,6 +127,7 @@ export default function App() {
   const series = useMemo(() => spendSeries(orders, 10), [orders]);
   const buckets = useMemo(() => hourBuckets(orders), [orders]);
   const tops = useMemo(() => topItems(orders, 5), [orders]);
+  const choices = useMemo(() => topChoices(orders, 2), [orders]);
 
   // ---------- 核心：调整 ----------
   const runAdjust = useCallback(
@@ -288,10 +289,12 @@ export default function App() {
                 mode={mode}
                 demoReason={health?.demoReason}
                 storeName={store?.storeName || (store ? `门店 ${store.storeCode}` : '')}
+                lastSync={lastSync}
                 kpis={kpis}
                 series={series}
                 buckets={buckets}
                 tops={tops}
+                choices={choices}
                 orders={orders}
                 ordersLoading={ordersLoading}
                 plans={plans}
@@ -299,10 +302,8 @@ export default function App() {
                 onNavigate={setView}
                 onUsePlan={handleUsePlan}
                 onUseOrder={handleUseOrder}
-                onDeletePlan={(p) => void handleDeletePlan(p)}
-                onDuplicatePlan={(p) => void handleDuplicatePlan(p)}
-                onRenamePlan={(p) => void handleRenamePlan(p)}
                 onUseLatest={handleUseLatest}
+                onSubmit={handleSubmit}
               />
             ) : null}
 

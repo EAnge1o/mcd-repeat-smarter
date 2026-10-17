@@ -81,7 +81,7 @@ export function Composer({
 
       <div className="flex items-center gap-2 border-t border-line px-2 py-2">
         {quickPrompts.length > 0 ? (
-          <div className="flex min-w-0 flex-1 items-center gap-1.5 overflow-x-auto">
+          <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-1.5 gap-y-1">
             <span className="shrink-0 pl-1 text-[11px] text-[#6f6a62]">试着说</span>
             {quickPrompts.map((p) => (
               <button
