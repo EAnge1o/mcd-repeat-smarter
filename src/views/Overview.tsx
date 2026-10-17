@@ -53,14 +53,14 @@ function TopItems({ items, total }: { items: TopItem[]; total: number }) {
         <li key={it.productCode} className="group">
           <div className="flex items-baseline justify-between gap-2">
             <span className="flex min-w-0 items-baseline gap-1.5">
-              <span className="tnum w-3 shrink-0 text-[10px] text-[#c0bcb4]">{i + 1}</span>
+              <span className="tnum w-3 shrink-0 text-[10px] text-[#6f6a62]">{i + 1}</span>
               <span className="truncate text-[12px] text-[#4b4945]" title={it.name}>
                 {it.name}
               </span>
             </span>
             <span className="tnum shrink-0 text-[11px] text-[#6f6a62]">
               {it.count} 次
-              <span className="ml-1 text-[10px] text-[#c0bcb4]">{Math.round((it.count / Math.max(total, 1)) * 100)}%</span>
+              <span className="ml-1 text-[10px] text-[#6f6a62]">{Math.round((it.count / Math.max(total, 1)) * 100)}%</span>
             </span>
           </div>
           <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-[#f2f0ec]">
@@ -105,7 +105,7 @@ export function Overview(props: OverviewProps) {
         <div className="min-w-0">
           <p className="truncate text-[11px] text-[#6f6a62]">
             {dateLabel}
-            {storeName ? <span className="text-[#c0bcb4]"> · {storeName}</span> : null}
+            {storeName ? <span className="text-[#57534c]"> · {storeName}</span> : null}
           </p>
           <h1 className="mt-1 text-xl font-semibold tracking-tight text-[#111827] md:text-2xl">
             今天，还是<span className="text-brand-600">老样子</span>吗？

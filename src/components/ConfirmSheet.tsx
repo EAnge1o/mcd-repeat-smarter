@@ -177,8 +177,8 @@ export function ConfirmSheet({
               </div>
 
               {/* 餐品 */}
-              <div className="rounded-lg border border-line">
-                <ul className="divide-y divide-line">
+              <div className="overflow-hidden rounded-lg bg-[#faf9f7]">
+                <ul className="divide-y divide-[#f0eee9]">
                   {items.map((item, i) => {
                     // 金额按商品编码从官方核价结果里取；取不到就不显示金额，绝不猜
                     const line = preview.price.lines.find((l) => l.productCode === item.productCode);
@@ -202,7 +202,7 @@ export function ConfirmSheet({
                 {/* 只有真的存在优惠时才展开原价/优惠明细；
                     否则它会和底部的「应付」变成两个一样的数字 */}
                 {preview.price.discountCents > 0 ? (
-                  <div className="space-y-1 border-t border-line bg-[#faf9f7] px-3 py-2 text-[12px]">
+                  <div className="space-y-1 border-t border-[#f0eee9] bg-white/60 px-3 py-2 text-[12px]">
                     <div className="flex justify-between text-[#57534c]">
                       <span>商品原价</span>
                       <span className="tnum">¥{yuan(preview.price.originalPriceCents)}</span>
@@ -239,10 +239,10 @@ export function ConfirmSheet({
                       onClick={() => setTakeWay(t.code)}
                       aria-pressed={takeWay === t.code}
                       className={cx(
-                        'rounded-lg border px-2.5 py-2 text-left transition-all duration-150 ease-out',
+                        'rounded-lg border px-2.5 py-2 text-left transition-colors duration-150 ease-out',
                         takeWay === t.code
-                          ? 'border-brand-500 bg-brand-50/50 shadow-[inset_0_0_0_1px_#da291c]'
-                          : 'border-line hover:border-[#d8d4cd] hover:bg-[#faf9f7]',
+                          ? 'border-brand-500 bg-brand-50/50'
+                          : 'border-line bg-[#faf9f7] hover:bg-[#f4f2ee]',
                       )}
                     >
                       <span className="block truncate text-[12px] font-medium text-[#111827]">{t.title}</span>

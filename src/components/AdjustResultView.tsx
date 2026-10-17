@@ -204,10 +204,8 @@ function CandidateCard({ candidate, active, onSelect }: { candidate: CandidatePl
         }
       }}
       className={cx(
-        'cursor-pointer rounded-lg border p-3 transition-all duration-150 ease-out',
-        active
-          ? 'border-brand-500 bg-white shadow-[inset_0_0_0_1px_#da291c]'
-          : 'border-line bg-white hover:border-[#d8d4cd] hover:shadow-card',
+        'cursor-pointer rounded-lg border p-3 transition-colors duration-150 ease-out',
+        active ? 'border-brand-500 bg-brand-50/50' : 'border-line bg-[#faf9f7] hover:bg-[#f4f2ee]',
       )}
     >
       <div className="flex items-start gap-2">
@@ -330,7 +328,7 @@ export function AdjustResultView({
   return (
     <div className="space-y-3">
       {/* 用户原话 + 解析出的修改点：先让用户确认「我理解对了没有」 */}
-      <div className="rounded-lg border border-line bg-white p-3.5">
+      <div className="rounded-lg bg-[#faf9f7] p-3.5">
         <p className="text-[11px] text-[#6f6a62]">你刚才说</p>
         <p className="mt-1 text-[13px] leading-relaxed text-[#111827]">「{result.intent.raw}」</p>
         <ChangeTags result={result} />

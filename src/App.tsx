@@ -491,7 +491,7 @@ export default function App() {
                 <p className="mb-1.5 text-[11px] text-[#57534c]">
                   将保存以下 {selectedCandidate.items.length} 项（结构化编码，不是一句话）
                 </p>
-                <ul className="divide-y divide-line rounded-lg border border-line">
+                <ul className="divide-y divide-[#f0eee9] overflow-hidden rounded-lg bg-[#faf9f7]">
                   {selectedCandidate.items.map((it, i) => (
                     <li key={i} className="flex items-baseline gap-2 px-2.5 py-1.5">
                       <span className="tnum shrink-0 text-[11px] text-[#6f6a62]">{it.quantity}×</span>

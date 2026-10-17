@@ -46,8 +46,8 @@ export function AboutView({
           <CardHead title="它到底做了什么" desc="四步，每一步都可以被你打断和纠正" />
           <ol className="grid grid-cols-1 gap-3 p-4 sm:grid-cols-2 md:p-5">
             {FLOW.map((f) => (
-              <li key={f.step} className="rounded-lg border border-line p-3">
-                <span className="tnum text-[11px] text-[#c0bcb4]">{f.step}</span>
+              <li key={f.step} className="rounded-lg bg-[#faf9f7] p-3">
+                <span className="tnum text-[11px] text-[#6f6a62]">{f.step}</span>
                 <p className="mt-1 text-[13px] font-medium text-[#111827]">{f.title}</p>
                 <p className="mt-1 text-[11.5px] leading-relaxed text-[#57534c]">{f.body}</p>
               </li>

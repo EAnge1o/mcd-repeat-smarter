@@ -101,10 +101,10 @@ export function StoreSearch({ defaultCity, beType, currentStoreCode, onPick }: S
                   type="button"
                   onClick={() => onPick(s)}
                   className={cx(
-                    'flex w-full items-center gap-2.5 rounded-lg border p-2.5 text-left transition-all duration-150 ease-out',
+                    'flex w-full items-center gap-2.5 rounded-lg border p-2.5 text-left transition-colors duration-150 ease-out',
                     active
-                      ? 'border-brand-500 bg-brand-50/40'
-                      : 'border-line bg-white hover:border-[#d8d4cd] hover:bg-[#faf9f7]',
+                      ? 'border-brand-500 bg-brand-50/50'
+                      : 'border-line bg-[#faf9f7] hover:bg-[#f4f2ee]',
                   )}
                 >
                   <span className={cx('grid h-8 w-8 shrink-0 place-items-center rounded-lg', active ? 'bg-brand-100 text-brand-700' : 'bg-[#f2f0ec] text-[#6f6a62]')}>

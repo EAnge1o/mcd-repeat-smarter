@@ -60,7 +60,7 @@ export function PlansGrid({ plans, loading, onUse, onDuplicate, onRename, onDele
         return (
           <article
             key={p.id}
-            className="group flex flex-col rounded-lg border border-line bg-white p-3.5 transition-all duration-150 ease-out hover:border-[#e2dfd9] hover:shadow-card"
+            className="group flex flex-col rounded-lg bg-[#faf9f7] p-3.5 transition-colors duration-150 ease-out hover:bg-[#f4f2ee]"
           >
             <div className="flex items-start justify-between gap-2">
               <div className="min-w-0">
