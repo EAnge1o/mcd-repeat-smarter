@@ -109,7 +109,7 @@ function ChildTags({ tags }: { tags: { name: string; changed?: boolean }[] }) {
   return (
     <div className="mt-0.5 flex flex-wrap gap-1 pl-7">
       {tags.map((t, i) => (
-        <span key={i} className={cx('text-[10px]', t.changed ? 'text-[#8a5a00]' : 'text-[#a8a49c]')}>
+        <span key={i} className={cx('text-[10px]', t.changed ? 'text-[#8a5a00]' : 'text-[#6f6a62]')}>
           {t.name}
         </span>
       ))}
@@ -127,8 +127,8 @@ function Compare({ matched, candidate }: { matched: MatchedView[]; candidate: Ca
     <div className="grid grid-cols-1 gap-2 sm:grid-cols-[1fr_auto_1fr] sm:items-center">
       <div className="rounded-lg border border-line bg-[#faf9f7] p-3">
         <div className="flex items-baseline justify-between">
-          <span className="text-[11px] font-medium text-[#6b6862]">原方案</span>
-          <span className="tnum text-[10px] text-[#a8a49c]">共 {matched.reduce((n, m) => n + m.quantity, 0)} 件</span>
+          <span className="text-[11px] font-medium text-[#57534c]">原方案</span>
+          <span className="tnum text-[10px] text-[#6f6a62]">共 {matched.reduce((n, m) => n + m.quantity, 0)} 件</span>
         </div>
         <div className="mt-2 space-y-1">
           {matched.map((m, i) => {
@@ -136,8 +136,8 @@ function Compare({ matched, candidate }: { matched: MatchedView[]; candidate: Ca
             return (
               <div key={i}>
                 <div className="flex items-baseline gap-1.5">
-                  <span className="tnum w-5 shrink-0 text-right text-[10px] text-[#a8a49c]">{m.quantity}×</span>
-                  <span className={cx('truncate text-[12px]', gone ? 'text-[#a8a49c] line-through' : 'text-[#4b4945]')} title={m.name}>
+                  <span className="tnum w-5 shrink-0 text-right text-[10px] text-[#6f6a62]">{m.quantity}×</span>
+                  <span className={cx('truncate text-[12px]', gone ? 'text-[#6f6a62] line-through' : 'text-[#4b4945]')} title={m.name}>
                     {m.name}
                   </span>
                 </div>
@@ -149,7 +149,7 @@ function Compare({ matched, candidate }: { matched: MatchedView[]; candidate: Ca
       </div>
 
       <div className="hidden justify-center sm:flex" aria-hidden="true">
-        <span className="grid h-6 w-6 place-items-center rounded-full border border-line bg-white text-[#a8a49c]">
+        <span className="grid h-6 w-6 place-items-center rounded-full border border-line bg-white text-[#6f6a62]">
           <IconArrow size={12} />
         </span>
       </div>
@@ -157,16 +157,16 @@ function Compare({ matched, candidate }: { matched: MatchedView[]; candidate: Ca
       <div className="rounded-lg border border-brand-100 bg-brand-50/40 p-3">
         <div className="flex items-baseline justify-between">
           <span className="text-[11px] font-medium text-brand-700">调整后</span>
-          <span className="tnum text-[10px] text-[#a8a49c]">共 {count(candidate.items)} 件</span>
+          <span className="tnum text-[10px] text-[#6f6a62]">共 {count(candidate.items)} 件</span>
         </div>
         <div className="mt-2 space-y-1">
           {candidate.items.length === 0 ? (
-            <p className="text-[11px] text-[#a8a49c]">这一版没有任何餐品</p>
+            <p className="text-[11px] text-[#6f6a62]">这一版没有任何餐品</p>
           ) : (
             candidate.items.map((item, i) => (
               <div key={`${item.productCode}-${i}`}>
                 <div className="flex items-baseline gap-1.5">
-                  <span className="tnum w-5 shrink-0 text-right text-[10px] text-[#a8a49c]">{item.quantity}×</span>
+                  <span className="tnum w-5 shrink-0 text-right text-[10px] text-[#6f6a62]">{item.quantity}×</span>
                   <span
                     className={cx('truncate text-[12px]', added.has(item.name) ? 'font-medium text-brand-700' : 'text-[#3d3a35]')}
                     title={item.name}
@@ -234,11 +234,11 @@ function CandidateCard({ candidate, active, onSelect }: { candidate: CandidatePl
           {price ? (
             <>
               <div className="tnum text-[16px] font-semibold leading-none text-[#111827]">
-                <span className="mr-0.5 text-[11px] font-normal text-[#8a877f]">¥</span>
+                <span className="mr-0.5 text-[11px] font-normal text-[#6f6a62]">¥</span>
                 {yuan(price.priceCents)}
               </div>
               {price.originalPriceCents > price.priceCents ? (
-                <div className="tnum mt-0.5 text-[10px] text-[#a8a49c] line-through">¥{yuan(price.originalPriceCents)}</div>
+                <div className="tnum mt-0.5 text-[10px] text-[#6f6a62] line-through">¥{yuan(price.originalPriceCents)}</div>
               ) : null}
             </>
           ) : (
@@ -251,7 +251,7 @@ function CandidateCard({ candidate, active, onSelect }: { candidate: CandidatePl
         {candidate.items.map((item, i) => (
           <div key={`${item.productCode}-${i}`}>
             <div className="flex items-baseline gap-1.5">
-              <span className="tnum w-4 shrink-0 text-right text-[10px] text-[#a8a49c]">{item.quantity}</span>
+              <span className="tnum w-4 shrink-0 text-right text-[10px] text-[#6f6a62]">{item.quantity}</span>
               <span className="truncate text-[12px] text-[#4b4945]">{item.name}</span>
             </div>
             {item.children.length > 0 ? (
@@ -261,7 +261,7 @@ function CandidateCard({ candidate, active, onSelect }: { candidate: CandidatePl
                     key={j}
                     className={cx(
                       'text-[10px]',
-                      changedNames.has(c.name) || (c.aliasNames && c.aliasNames.length > 0) ? 'text-[#8a5a00]' : 'text-[#a8a49c]',
+                      changedNames.has(c.name) || (c.aliasNames && c.aliasNames.length > 0) ? 'text-[#8a5a00]' : 'text-[#6f6a62]',
                     )}
                   >
                     {c.roundName ? `${c.roundName}·` : ''}
@@ -289,7 +289,7 @@ function CandidateCard({ candidate, active, onSelect }: { candidate: CandidatePl
             </p>
           ))}
           {notes.map((e, i) => (
-            <p key={i} className="text-[11px] leading-relaxed text-[#8a877f]">
+            <p key={i} className="text-[11px] leading-relaxed text-[#6f6a62]">
               · {e}
             </p>
           ))}
@@ -297,7 +297,7 @@ function CandidateCard({ candidate, active, onSelect }: { candidate: CandidatePl
       ) : null}
 
       {price ? (
-        <div className="mt-2 flex items-center justify-between gap-2 text-[10px] text-[#a8a49c]">
+        <div className="mt-2 flex items-center justify-between gap-2 text-[10px] text-[#6f6a62]">
           <span className="flex items-center gap-1">
             <IconReceipt size={11} />
             官方核价 · 共 {price.lines.reduce((n, l) => n + l.quantity, 0)} 件
@@ -331,7 +331,7 @@ export function AdjustResultView({
     <div className="space-y-3">
       {/* 用户原话 + 解析出的修改点：先让用户确认「我理解对了没有」 */}
       <div className="rounded-lg border border-line bg-white p-3.5">
-        <p className="text-[11px] text-[#8a877f]">你刚才说</p>
+        <p className="text-[11px] text-[#6f6a62]">你刚才说</p>
         <p className="mt-1 text-[13px] leading-relaxed text-[#111827]">「{result.intent.raw}」</p>
         <ChangeTags result={result} />
       </div>
@@ -353,7 +353,7 @@ export function AdjustResultView({
       <section>
         <div className="mb-2 flex items-baseline justify-between">
           <h2 className="text-[13px] font-semibold tracking-tight text-[#111827]">改了什么</h2>
-          <span className="text-[11px] text-[#a8a49c]">前后对照</span>
+          <span className="text-[11px] text-[#6f6a62]">前后对照</span>
         </div>
         <Compare matched={result.matched} candidate={selected} />
       </section>
@@ -361,7 +361,7 @@ export function AdjustResultView({
       <section>
         <div className="mb-2 flex items-baseline justify-between">
           <h2 className="text-[13px] font-semibold tracking-tight text-[#111827]">候选方案</h2>
-          <span className="tnum text-[11px] text-[#a8a49c]">{result.candidates.length} 个</span>
+          <span className="tnum text-[11px] text-[#6f6a62]">{result.candidates.length} 个</span>
         </div>
         <div className="space-y-2" role="radiogroup" aria-label="候选方案">
           {result.candidates.map((c) => (
@@ -380,7 +380,7 @@ export function AdjustResultView({
           存成常用方案
           <IconArrow size={11} />
         </button>
-        <span className="text-[11px] text-[#a8a49c]">下次说「还是老样子」就能调出来</span>
+        <span className="text-[11px] text-[#6f6a62]">下次说「还是老样子」就能调出来</span>
       </div>
     </div>
   );

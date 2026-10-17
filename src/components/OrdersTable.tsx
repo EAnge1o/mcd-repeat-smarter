@@ -49,7 +49,7 @@ export function OrdersTable({ orders, loading, onUse, limit, emptyAction }: Orde
                 key={h || i}
                 scope="col"
                 className={cx(
-                  'whitespace-nowrap px-4 py-2 text-[11px] font-medium text-[#8a877f] md:px-5',
+                  'whitespace-nowrap px-4 py-2 text-[11px] font-medium text-[#6f6a62] md:px-5',
                   i === 3 ? 'text-right' : '',
                 )}
               >
@@ -72,25 +72,25 @@ export function OrdersTable({ orders, loading, onUse, limit, emptyAction }: Orde
                   <span className="block truncate text-[#111827]" title={o.storeName}>
                     {o.storeName || o.storeCode}
                   </span>
-                  <span className="tnum block text-[10px] text-[#a8a49c]">#{o.orderId.slice(-8)}</span>
+                  <span className="tnum block text-[10px] text-[#6f6a62]">#{o.orderId.slice(-8)}</span>
                 </td>
 
                 <td className="max-w-[280px] px-4 py-2.5 text-[12px] md:px-5">
                   <span className="block truncate text-[#4b4945]" title={o.items.map((i) => `${i.quantity}×${i.name}`).join('、')}>
                     {o.items.length === 0 ? '（无明细）' : o.items.map((i) => `${i.quantity}×${i.name}`).join('、')}
                   </span>
-                  <span className="text-[10px] text-[#a8a49c]">共 {o.items.reduce((n, i) => n + i.quantity, 0)} 件</span>
+                  <span className="text-[10px] text-[#6f6a62]">共 {o.items.reduce((n, i) => n + i.quantity, 0)} 件</span>
                 </td>
 
-                <td className={cx('tnum whitespace-nowrap px-4 py-2.5 text-right text-[12px] md:px-5', zero ? 'text-[#a8a49c]' : 'text-[#111827]')}>
+                <td className={cx('tnum whitespace-nowrap px-4 py-2.5 text-right text-[12px] md:px-5', zero ? 'text-[#6f6a62]' : 'text-[#111827]')}>
                   {c === null ? (
-                    <span className="text-[#a8a49c]" title="接口未返回实付金额">
+                    <span className="text-[#6f6a62]" title="接口未返回实付金额">
                       —
                     </span>
                   ) : (
                     <>
                       ¥{yuan(c)}
-                      {zero ? <span className="ml-1 text-[10px] text-[#a8a49c]">券抵扣</span> : null}
+                      {zero ? <span className="ml-1 text-[10px] text-[#6f6a62]">券抵扣</span> : null}
                     </>
                   )}
                 </td>
@@ -104,7 +104,7 @@ export function OrdersTable({ orders, loading, onUse, limit, emptyAction }: Orde
                     <button
                       type="button"
                       onClick={() => onUse(o)}
-                      className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-[11px] font-medium text-[#6b6862] opacity-0 transition-all duration-150 hover:bg-[#f2f0ec] hover:text-brand-600 focus-visible:opacity-100 group-hover:opacity-100"
+                      className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-[11px] font-medium text-[#57534c] opacity-0 transition-all duration-150 hover:bg-[#f2f0ec] hover:text-brand-600 focus-visible:opacity-100 group-hover:opacity-100"
                     >
                       再来一单
                       <IconArrow size={11} />

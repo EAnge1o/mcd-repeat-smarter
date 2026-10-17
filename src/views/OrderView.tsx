@@ -140,7 +140,7 @@ export function OrderView({
           <CardHead title="当前门店" desc="决定菜单、价格与可选优惠" />
           <div className="px-4 py-3 md:px-5">
             <p className="truncate text-[12.5px] font-medium text-[#111827]">{storeName || '未选择门店'}</p>
-            <p className="mt-0.5 text-[11px] text-[#8a877f]">到店自取 · {mode === 'live' ? '麦当劳 MCP 实时' : '演示数据'}</p>
+            <p className="mt-0.5 text-[11px] text-[#6f6a62]">到店自取 · {mode === 'live' ? '麦当劳 MCP 实时' : '演示数据'}</p>
             <Button size="sm" className="mt-2.5 w-full" onClick={onPickStore}>
               <IconStore size={12} />
               切换门店
@@ -171,7 +171,7 @@ export function OrderView({
                   >
                     <span className="min-w-0 flex-1">
                       <span className="block truncate text-[12px] text-[#111827]">{p.name}</span>
-                      <span className="block truncate text-[10px] text-[#a8a49c]">
+                      <span className="block truncate text-[10px] text-[#6f6a62]">
                         {p.tag ?? '未分类'} · {p.items.length} 项
                       </span>
                     </span>
@@ -196,7 +196,7 @@ export function OrderView({
                 >
                   <span className="min-w-0 flex-1">
                     <span className="block truncate text-[12px] text-[#111827]">「{e.text}」</span>
-                    <span className="block truncate text-[10px] text-[#a8a49c]">{e.hint}</span>
+                    <span className="block truncate text-[10px] text-[#6f6a62]">{e.hint}</span>
                   </span>
                 </button>
               </li>

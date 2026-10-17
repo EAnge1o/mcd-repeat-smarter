@@ -81,7 +81,7 @@ export function Sidebar({
           </span>
           <span className="min-w-0 flex-1">
             <span className="block truncate text-[13px] font-semibold tracking-tight text-white">麦麦老样子</span>
-            <span className="block truncate text-[10px] tracking-[0.16em] text-white/35">REPEAT SMARTER</span>
+            <span className="block truncate text-[10px] tracking-[0.16em] text-white/55">REPEAT SMARTER</span>
           </span>
           <button
             type="button"
@@ -95,7 +95,7 @@ export function Sidebar({
 
         {/* 菜单 */}
         <nav className="flex-1 overflow-y-auto px-2.5 py-3">
-          <p className="px-2 pb-1.5 text-[11px] text-white/30">工作台</p>
+          <p className="px-2 pb-1.5 text-[11px] text-white/55">工作台</p>
           <ul className="space-y-0.5">
             {NAV.map((item) => {
               const active = item.key === view;
@@ -117,7 +117,7 @@ export function Sidebar({
                     <item.icon size={16} className={cx('shrink-0', active ? 'text-white' : 'text-white/45 group-hover:text-white/80')} />
                     <span className="flex-1 text-left">{item.label}</span>
                     {count !== undefined && count > 0 ? (
-                      <span className={cx('tnum text-[11px]', active ? 'text-white/55' : 'text-white/30')}>{count}</span>
+                      <span className={cx('tnum text-[11px]', active ? 'text-white/70' : 'text-white/55')}>{count}</span>
                     ) : null}
                   </button>
                 </li>
@@ -141,7 +141,7 @@ export function Sidebar({
             </span>
             <span className="min-w-0 flex-1">
               <span className="block truncate text-[12px] text-white/85">{storeName || '选择门店'}</span>
-              <span className="flex items-center gap-1 text-[11px] text-white/40">
+              <span className="flex items-center gap-1 text-[11px] text-white/60">
                 <span
                   className={cx('inline-block h-1.5 w-1.5 rounded-full', mode === 'live' ? 'bg-[#4ade80]' : 'bg-[#fbbf24]')}
                   aria-hidden="true"
@@ -149,7 +149,7 @@ export function Sidebar({
                 {mode === 'live' ? '真实 MCP 数据' : '演示数据'}
               </span>
             </span>
-            <IconChevronRight size={12} className="shrink-0 text-white/25" />
+            <IconChevronRight size={12} className="shrink-0 text-white/45" />
           </button>
         </div>
       </aside>

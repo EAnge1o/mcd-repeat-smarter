@@ -111,7 +111,7 @@ export function SpendTrend({ points, skipped }: { points: SpendPoint[]; skipped:
         {ticks.map((t, i) => (
           <g key={i}>
             <line x1={PAD.l} y1={t.y} x2={W - PAD.r} y2={t.y} stroke="#efedea" strokeWidth="1" />
-            <text x={PAD.l - 10} y={t.y + 4} textAnchor="end" fontSize="11.5" fill="#a8a49c" className="tnum">
+            <text x={PAD.l - 10} y={t.y + 4} textAnchor="end" fontSize="11.5" fill="#6f6a62" className="tnum">
               {axisLabel(t.v)}
             </text>
           </g>
@@ -130,7 +130,7 @@ export function SpendTrend({ points, skipped }: { points: SpendPoint[]; skipped:
             i === Math.floor((nodes.length - 1) / 2) ||
             i % every === 0;
           return show ? (
-            <text key={`l-${i}`} x={p.x} y={H - 10} textAnchor="middle" fontSize="11.5" fill="#a8a49c">
+            <text key={`l-${i}`} x={p.x} y={H - 10} textAnchor="middle" fontSize="11.5" fill="#6f6a62">
               {p.label}
             </text>
           ) : null;
@@ -183,12 +183,12 @@ export function SpendTrend({ points, skipped }: { points: SpendPoint[]; skipped:
           style={{ left: `${(hot.x / W) * 100}%`, top: `${(hot.y / H) * 100}%`, marginTop: -52 }}
         >
           <p className="tnum text-[13px] font-semibold text-[#111827]">¥{yuan(hot.cents)}</p>
-          <p className="whitespace-nowrap text-[10px] text-[#8a877f]">{fmtDateTime(hot.time)}</p>
+          <p className="whitespace-nowrap text-[10px] text-[#6f6a62]">{fmtDateTime(hot.time)}</p>
         </div>
       ) : null}
 
       {skipped > 0 || zeroCount > 0 ? (
-        <p className="mt-1 px-2 text-[11px] leading-relaxed text-[#a8a49c]">
+        <p className="mt-1 px-2 text-[11px] leading-relaxed text-[#6f6a62]">
           {skipped > 0 ? `另有 ${skipped} 笔订单接口未返回金额，未计入趋势线。` : ''}
           {zeroCount > 0 ? `${skipped > 0 ? ' ' : ''}其中 ${zeroCount} 笔为券/积分全额抵扣，实付 ¥0。` : ''}
         </p>

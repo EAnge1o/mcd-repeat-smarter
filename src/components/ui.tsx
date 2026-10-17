@@ -26,7 +26,7 @@ export function CardHead({
     <div className={cx('flex items-start justify-between gap-3 border-b border-line px-4 py-3 md:px-5', className)}>
       <div className="min-w-0">
         <h2 className="truncate text-sm font-semibold tracking-tight text-[#111827] md:text-[15px]">{title}</h2>
-        {desc ? <p className="mt-0.5 truncate text-xs text-[#8a877f]">{desc}</p> : null}
+        {desc ? <p className="mt-0.5 truncate text-xs text-[#6f6a62]">{desc}</p> : null}
       </div>
       {action ? <div className="shrink-0">{action}</div> : null}
     </div>
@@ -153,12 +153,12 @@ export function EmptyState({
   return (
     <div className={cx('flex flex-col items-center justify-center text-center', compact ? 'px-4 py-8' : 'px-6 py-14')}>
       <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-[#f2f0ec]" aria-hidden="true">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8a877f" strokeWidth="1.6" strokeLinecap="round">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6f6a62" strokeWidth="1.6" strokeLinecap="round">
           <path d="M4 7h16M4 12h10M4 17h7" />
         </svg>
       </div>
       <p className="text-sm font-medium text-[#3d3a35]">{title}</p>
-      {desc ? <p className="mt-1 max-w-sm text-xs leading-relaxed text-[#8a877f]">{desc}</p> : null}
+      {desc ? <p className="mt-1 max-w-sm text-xs leading-relaxed text-[#6f6a62]">{desc}</p> : null}
       {action ? <div className="mt-4">{action}</div> : null}
     </div>
   );

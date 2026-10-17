@@ -42,7 +42,7 @@ export function StoreSearch({ defaultCity, beType, currentStoreCode, onPick }: S
     <div className="space-y-3">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-end">
         <div className="sm:w-28">
-          <label htmlFor="city" className="mb-1 block text-[11px] text-[#6b6862]">
+          <label htmlFor="city" className="mb-1 block text-[11px] text-[#57534c]">
             城市
           </label>
           <input
@@ -54,7 +54,7 @@ export function StoreSearch({ defaultCity, beType, currentStoreCode, onPick }: S
         </div>
 
         <div className="sm:flex-1">
-          <label htmlFor="kw" className="mb-1 block text-[11px] text-[#6b6862]">
+          <label htmlFor="kw" className="mb-1 block text-[11px] text-[#57534c]">
             商圈 / 地标
           </label>
           <input
@@ -65,7 +65,7 @@ export function StoreSearch({ defaultCity, beType, currentStoreCode, onPick }: S
             onKeyDown={(e) => {
               if (e.key === 'Enter') void search();
             }}
-            className="h-9 w-full rounded-lg border border-line bg-[#faf9f7] px-2.5 text-sm text-[#111827] transition-all duration-150 placeholder:text-[#a8a49c] focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+            className="h-9 w-full rounded-lg border border-line bg-[#faf9f7] px-2.5 text-sm text-[#111827] transition-all duration-150 placeholder:text-[#7a756c] focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
           />
         </div>
 
@@ -107,14 +107,14 @@ export function StoreSearch({ defaultCity, beType, currentStoreCode, onPick }: S
                       : 'border-line bg-white hover:border-[#d8d4cd] hover:bg-[#faf9f7]',
                   )}
                 >
-                  <span className={cx('grid h-8 w-8 shrink-0 place-items-center rounded-lg', active ? 'bg-brand-100 text-brand-700' : 'bg-[#f2f0ec] text-[#8a877f]')}>
+                  <span className={cx('grid h-8 w-8 shrink-0 place-items-center rounded-lg', active ? 'bg-brand-100 text-brand-700' : 'bg-[#f2f0ec] text-[#6f6a62]')}>
                     <IconStore size={15} />
                   </span>
                   <span className="min-w-0 flex-1">
                     <span className="block truncate text-[12.5px] font-medium text-[#111827]">{s.storeName}</span>
-                    <span className="block truncate text-[11px] text-[#8a877f]">{s.address}</span>
+                    <span className="block truncate text-[11px] text-[#6f6a62]">{s.address}</span>
                   </span>
-                  {s.distance !== undefined ? <span className="tnum shrink-0 text-[11px] text-[#a8a49c]">{s.distance}m</span> : null}
+                  {s.distance !== undefined ? <span className="tnum shrink-0 text-[11px] text-[#6f6a62]">{s.distance}m</span> : null}
                   <IconArrow size={12} className="shrink-0 text-[#c0bcb4]" />
                 </button>
               </li>
@@ -165,13 +165,13 @@ export function StorePicker({
           </span>
           <div className="min-w-0 flex-1">
             <h2 className="text-sm font-semibold tracking-tight text-[#111827]">选择门店</h2>
-            <p className="text-[11px] text-[#8a877f]">门店会决定菜单、价格和可选优惠</p>
+            <p className="text-[11px] text-[#6f6a62]">门店会决定菜单、价格和可选优惠</p>
           </div>
           <button
             type="button"
             onClick={onClose}
             aria-label="关闭"
-            className="grid h-8 w-8 place-items-center rounded-lg text-[#8a877f] transition-colors duration-150 hover:bg-[#f2f0ec] hover:text-[#3d3a35]"
+            className="grid h-8 w-8 place-items-center rounded-lg text-[#6f6a62] transition-colors duration-150 hover:bg-[#f2f0ec] hover:text-[#3d3a35]"
           >
             <IconClose size={16} />
           </button>

@@ -79,7 +79,7 @@ export function HourDonut({ buckets }: { buckets: Bucket[] }) {
 
         <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
           <span className="tnum text-[23px] font-semibold leading-none tracking-tight text-[#111827]">{total}</span>
-          <span className="mt-1 text-[10px] text-[#8a877f]">单</span>
+          <span className="mt-1 text-[10px] text-[#6f6a62]">单</span>
         </div>
       </div>
 
@@ -100,7 +100,7 @@ export function HourDonut({ buckets }: { buckets: Bucket[] }) {
               <span className="min-w-0 flex-1 truncate text-[#4b4945]">{b.label}</span>
               <span className="tnum w-10 shrink-0 text-right text-[10px] text-[#b3afa7]">{b.range}</span>
               <span className="tnum w-5 shrink-0 text-right text-[#111827]">{b.count}</span>
-              <span className="tnum w-8 shrink-0 text-right text-[10px] text-[#8a877f]">{pct}%</span>
+              <span className="tnum w-8 shrink-0 text-right text-[10px] text-[#6f6a62]">{pct}%</span>
             </li>
           );
         })}

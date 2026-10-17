@@ -440,13 +440,13 @@ export default function App() {
             <div className="flex items-start gap-3 border-b border-line px-4 py-3 md:px-5">
               <div className="min-w-0 flex-1">
                 <h2 className="text-sm font-semibold tracking-tight text-[#111827]">存成常用方案</h2>
-                <p className="text-[11px] text-[#8a877f]">下次说「还是老样子」就能整单调出来</p>
+                <p className="text-[11px] text-[#6f6a62]">下次说「还是老样子」就能整单调出来</p>
               </div>
               <button
                 type="button"
                 onClick={() => setSaveOpen(false)}
                 aria-label="关闭"
-                className="grid h-8 w-8 place-items-center rounded-lg text-[#8a877f] transition-colors duration-150 hover:bg-[#f2f0ec]"
+                className="grid h-8 w-8 place-items-center rounded-lg text-[#6f6a62] transition-colors duration-150 hover:bg-[#f2f0ec]"
               >
                 <IconClose size={16} />
               </button>
@@ -454,7 +454,7 @@ export default function App() {
 
             <div className="space-y-3 px-4 py-4 md:px-5">
               <div>
-                <label htmlFor="pname" className="mb-1 block text-[11px] text-[#6b6862]">
+                <label htmlFor="pname" className="mb-1 block text-[11px] text-[#57534c]">
                   方案名称
                 </label>
                 <input
@@ -462,12 +462,12 @@ export default function App() {
                   value={saveName}
                   onChange={(e) => setSaveName(e.target.value)}
                   placeholder="例如 我的日常午餐"
-                  className="h-9 w-full rounded-lg border border-line bg-[#faf9f7] px-2.5 text-sm text-[#111827] transition-all duration-150 placeholder:text-[#a8a49c] focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                  className="h-9 w-full rounded-lg border border-line bg-[#faf9f7] px-2.5 text-sm text-[#111827] transition-all duration-150 placeholder:text-[#7a756c] focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
                 />
               </div>
 
               <div>
-                <p className="mb-1.5 text-[11px] text-[#6b6862]">分类</p>
+                <p className="mb-1.5 text-[11px] text-[#57534c]">分类</p>
                 <div className="flex flex-wrap gap-1.5">
                   {TAGS.map((t) => (
                     <button
@@ -488,16 +488,16 @@ export default function App() {
               </div>
 
               <div>
-                <p className="mb-1.5 text-[11px] text-[#6b6862]">
+                <p className="mb-1.5 text-[11px] text-[#57534c]">
                   将保存以下 {selectedCandidate.items.length} 项（结构化编码，不是一句话）
                 </p>
                 <ul className="divide-y divide-line rounded-lg border border-line">
                   {selectedCandidate.items.map((it, i) => (
                     <li key={i} className="flex items-baseline gap-2 px-2.5 py-1.5">
-                      <span className="tnum shrink-0 text-[11px] text-[#8a877f]">{it.quantity}×</span>
+                      <span className="tnum shrink-0 text-[11px] text-[#6f6a62]">{it.quantity}×</span>
                       <span className="min-w-0 flex-1 truncate text-[12px] text-[#111827]">{it.name}</span>
                       {it.children.length > 0 ? (
-                        <span className="shrink-0 truncate text-[10px] text-[#a8a49c]">{it.children.map((c) => c.name).join(' / ')}</span>
+                        <span className="shrink-0 truncate text-[10px] text-[#6f6a62]">{it.children.map((c) => c.name).join(' / ')}</span>
                       ) : null}
                     </li>
                   ))}

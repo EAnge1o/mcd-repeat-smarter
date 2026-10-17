@@ -10,7 +10,7 @@
     "dev:web": "vite",
     "build": "tsc --noEmit && vite build",
     "start": "cross-env NODE_ENV=production tsx server/index.ts",
-    "test": "vitest run",
+    "test": "vitest run --no-file-parallelism",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
     "mcp:probe": "tsx scripts/probe-mcp.ts",

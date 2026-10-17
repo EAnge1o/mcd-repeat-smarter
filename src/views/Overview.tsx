@@ -58,7 +58,7 @@ function TopItems({ items, total }: { items: TopItem[]; total: number }) {
                 {it.name}
               </span>
             </span>
-            <span className="tnum shrink-0 text-[11px] text-[#8a877f]">
+            <span className="tnum shrink-0 text-[11px] text-[#6f6a62]">
               {it.count} 次
               <span className="ml-1 text-[10px] text-[#c0bcb4]">{Math.round((it.count / Math.max(total, 1)) * 100)}%</span>
             </span>
@@ -103,14 +103,14 @@ export function Overview(props: OverviewProps) {
       {/* 页头 */}
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div className="min-w-0">
-          <p className="truncate text-[11px] text-[#8a877f]">
+          <p className="truncate text-[11px] text-[#6f6a62]">
             {dateLabel}
             {storeName ? <span className="text-[#c0bcb4]"> · {storeName}</span> : null}
           </p>
           <h1 className="mt-1 text-xl font-semibold tracking-tight text-[#111827] md:text-2xl">
             今天，还是<span className="text-brand-600">老样子</span>吗？
           </h1>
-          <p className="mt-1 text-xs text-[#6b6862]">记得你的习惯，也听得懂你今天的小变化。</p>
+          <p className="mt-1 text-xs text-[#57534c]">记得你的习惯，也听得懂你今天的小变化。</p>
         </div>
 
         <div className="flex flex-wrap gap-2">
@@ -193,7 +193,7 @@ export function Overview(props: OverviewProps) {
         </Card>
 
         <Card>
-          <CardHead title="常点单品" desc="按出现次数排序" action={<span className="tnum text-[11px] text-[#a8a49c]">{orders.length} 单样本</span>} />
+          <CardHead title="常点单品" desc="按出现次数排序" action={<span className="tnum text-[11px] text-[#6f6a62]">{orders.length} 单样本</span>} />
           <TopItems items={tops} total={orders.length} />
         </Card>
       </div>

@@ -27,7 +27,7 @@ export function AboutView({
           </span>
           <div>
             <h1 className="text-xl font-semibold tracking-tight text-[#111827] md:text-2xl">麦麦老样子</h1>
-            <p className="mt-1 max-w-xl text-xs leading-relaxed text-[#6b6862]">
+            <p className="mt-1 max-w-xl text-xs leading-relaxed text-[#57534c]">
               记住你常点的，听懂你这次改的，确认好再帮你点。基于麦当劳官方 MCP 的个性化点单助手。
             </p>
           </div>
@@ -49,7 +49,7 @@ export function AboutView({
               <li key={f.step} className="rounded-lg border border-line p-3">
                 <span className="tnum text-[11px] text-[#c0bcb4]">{f.step}</span>
                 <p className="mt-1 text-[13px] font-medium text-[#111827]">{f.title}</p>
-                <p className="mt-1 text-[11.5px] leading-relaxed text-[#6b6862]">{f.body}</p>
+                <p className="mt-1 text-[11.5px] leading-relaxed text-[#57534c]">{f.body}</p>
               </li>
             ))}
           </ol>
@@ -66,7 +66,7 @@ export function AboutView({
               ['访问 Token', '只存在服务端 .env，浏览器拿不到'],
             ].map(([k, v]) => (
               <div key={k} className="flex items-start justify-between gap-3 px-4 py-2.5 md:px-5">
-                <dt className="shrink-0 text-[#8a877f]">{k}</dt>
+                <dt className="shrink-0 text-[#6f6a62]">{k}</dt>
                 <dd className="min-w-0 text-right text-[#3d3a35]">{v}</dd>
               </div>
             ))}

@@ -30,7 +30,7 @@ export function PlansView({
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="text-xl font-semibold tracking-tight text-[#111827] md:text-2xl">常用方案</h1>
-          <p className="mt-1 text-xs text-[#6b6862]">
+          <p className="mt-1 text-xs text-[#57534c]">
             方案存的是商品编码，不是一句话。价格每次下单前都会按门店重新核。
           </p>
         </div>
@@ -48,7 +48,7 @@ export function PlansView({
           { label: '数据来源', value: mode === 'live' ? 'MCP' : '演示' },
         ].map((s) => (
           <div key={s.label} className="rounded-xl border border-line bg-white px-4 py-3 shadow-card">
-            <p className="text-[11px] text-[#8a877f]">{s.label}</p>
+            <p className="text-[11px] text-[#6f6a62]">{s.label}</p>
             <p className="tnum mt-1 text-[18px] font-semibold leading-none text-[#111827]">{s.value}</p>
           </div>
         ))}
@@ -58,7 +58,7 @@ export function PlansView({
         <CardHead
           title="全部方案"
           desc="点「用它」直接整单复用，或在此基础上继续改"
-          action={<span className="tnum text-[11px] text-[#a8a49c]">{plans.length} 个</span>}
+          action={<span className="tnum text-[11px] text-[#6f6a62]">{plans.length} 个</span>}
         />
         {loading ? (
           <PlansGrid plans={[]} loading onUse={onUse} onDelete={onDelete} onDuplicate={onDuplicate} onRename={onRename} />

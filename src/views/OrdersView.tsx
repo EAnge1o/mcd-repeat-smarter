@@ -28,7 +28,7 @@ export function OrdersView({
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="text-xl font-semibold tracking-tight text-[#111827] md:text-2xl">订单记录</h1>
-          <p className="mt-1 text-xs text-[#6b6862]">
+          <p className="mt-1 text-xs text-[#57534c]">
             {mode === 'live' ? '读取自你的麦当劳账号，只在你本机与服务端之间流转。' : '当前为内置演示数据，非真实账号。'}
           </p>
         </div>
@@ -52,10 +52,10 @@ export function OrdersView({
           { label: '券抵扣订单', value: String(zeroCount), unit: '笔' },
         ].map((s) => (
           <div key={s.label} className="rounded-xl border border-line bg-white px-4 py-3 shadow-card">
-            <p className="text-[11px] text-[#8a877f]">{s.label}</p>
+            <p className="text-[11px] text-[#6f6a62]">{s.label}</p>
             <p className="mt-1 flex items-baseline gap-1">
               <span className="tnum text-[18px] font-semibold leading-none text-[#111827]">{s.value}</span>
-              {s.unit ? <span className="text-[11px] text-[#8a877f]">{s.unit}</span> : null}
+              {s.unit ? <span className="text-[11px] text-[#6f6a62]">{s.unit}</span> : null}
             </p>
           </div>
         ))}

@@ -29,6 +29,7 @@ Thumbs.db
 # 测试/构建临时产物
 coverage/
 test-results/
+.vitest-tmp/
 .tmp/
 .tmp-*
 .tmp*.png

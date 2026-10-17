@@ -109,7 +109,7 @@ export function Topbar({ plans, orders, storeName, mode, lastSync, onNavigate, o
 
       {/* 搜索 */}
       <div ref={boxRef} className="relative w-full max-w-sm">
-        <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#8a877f]">
+        <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#6f6a62]">
           <IconSearch size={15} />
         </div>
         <input
@@ -127,13 +127,13 @@ export function Topbar({ plans, orders, storeName, mode, lastSync, onNavigate, o
           }}
           placeholder="搜索方案、订单或餐品"
           aria-label="搜索方案、订单或餐品"
-          className="h-9 w-full rounded-lg border border-line bg-[#faf9f7] pl-9 pr-3 text-sm text-[#111827] transition-all duration-150 placeholder:text-[#a8a49c] focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+          className="h-9 w-full rounded-lg border border-line bg-[#faf9f7] pl-9 pr-3 text-sm text-[#111827] transition-all duration-150 placeholder:text-[#7a756c] focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
         />
 
         {open && q.trim() ? (
           <div className="absolute left-0 right-0 top-11 z-40 overflow-hidden rounded-xl border border-line bg-white shadow-lift">
             {hits.length === 0 ? (
-              <p className="px-3.5 py-4 text-xs text-[#8a877f]">没有匹配的方案或订单。换个关键词，或者直接去「开始点单」。</p>
+              <p className="px-3.5 py-4 text-xs text-[#6f6a62]">没有匹配的方案或订单。换个关键词，或者直接去「开始点单」。</p>
             ) : (
               <ul className="max-h-80 overflow-y-auto py-1">
                 {hits.map((h) => (
@@ -147,10 +147,10 @@ export function Topbar({ plans, orders, storeName, mode, lastSync, onNavigate, o
                       }}
                       className="flex w-full items-start gap-2.5 px-3 py-2 text-left transition-colors duration-150 hover:bg-[#faf9f7]"
                     >
-                      <span className="mt-0.5 rounded-md bg-[#f2f0ec] px-1.5 py-0.5 text-[10px] text-[#6b6862]">{h.kind}</span>
+                      <span className="mt-0.5 rounded-md bg-[#f2f0ec] px-1.5 py-0.5 text-[10px] text-[#57534c]">{h.kind}</span>
                       <span className="min-w-0 flex-1">
                         <span className="block truncate text-[13px] text-[#111827]">{h.title}</span>
-                        <span className="block truncate text-[11px] text-[#8a877f]">{h.sub}</span>
+                        <span className="block truncate text-[11px] text-[#6f6a62]">{h.sub}</span>
                       </span>
                     </button>
                   </li>
@@ -167,7 +167,7 @@ export function Topbar({ plans, orders, storeName, mode, lastSync, onNavigate, o
           onClick={onPickStore}
           className="hidden h-9 items-center gap-1.5 rounded-lg px-2.5 text-[13px] text-[#4b4945] transition-colors duration-150 hover:bg-[#f2f0ec] sm:flex"
         >
-          <IconStore size={14} className="text-[#8a877f]" />
+          <IconStore size={14} className="text-[#6f6a62]" />
           <span className="max-w-[150px] truncate">{storeName || '选择门店'}</span>
         </button>
 
@@ -209,7 +209,7 @@ export function Topbar({ plans, orders, storeName, mode, lastSync, onNavigate, o
                       />
                       {n.title}
                     </p>
-                    <p className="mt-0.5 pl-3 text-[11px] leading-relaxed text-[#8a877f]">{n.body}</p>
+                    <p className="mt-0.5 pl-3 text-[11px] leading-relaxed text-[#6f6a62]">{n.body}</p>
                   </li>
                 ))}
               </ul>
@@ -231,7 +231,7 @@ export function Topbar({ plans, orders, storeName, mode, lastSync, onNavigate, o
           </span>
           <span className="hidden text-left md:block">
             <span className="block text-[12px] leading-tight text-[#111827]">我的账号</span>
-            <span className="block text-[10px] leading-tight text-[#8a877f]">参赛演示</span>
+            <span className="block text-[10px] leading-tight text-[#6f6a62]">参赛演示</span>
           </span>
         </button>
       </div>

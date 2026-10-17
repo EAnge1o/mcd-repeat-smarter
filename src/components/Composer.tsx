@@ -74,7 +74,7 @@ export function Composer({
           }
         }}
         className={cx(
-          'block w-full resize-none bg-transparent px-4 text-sm leading-relaxed text-[#111827] outline-none placeholder:text-[#a8a49c] disabled:text-[#a8a49c]',
+          'block w-full resize-none bg-transparent px-4 text-sm leading-relaxed text-[#111827] outline-none placeholder:text-[#7a756c] disabled:text-[#8a877f]',
           compact ? 'pt-3 pb-2' : 'pt-3.5 pb-2.5',
         )}
       />
@@ -82,7 +82,7 @@ export function Composer({
       <div className="flex items-center gap-2 border-t border-line px-2 py-2">
         {quickPrompts.length > 0 ? (
           <div className="flex min-w-0 flex-1 items-center gap-1.5 overflow-x-auto">
-            <span className="shrink-0 pl-1 text-[11px] text-[#a8a49c]">试着说</span>
+            <span className="shrink-0 pl-1 text-[11px] text-[#6f6a62]">试着说</span>
             {quickPrompts.map((p) => (
               <button
                 key={p}
@@ -99,7 +99,7 @@ export function Composer({
             ))}
           </div>
         ) : (
-          <span className="flex-1 pl-2 text-[11px] text-[#a8a49c]">Enter 发送 · Shift + Enter 换行</span>
+          <span className="flex-1 pl-2 text-[11px] text-[#6f6a62]">Enter 发送 · Shift + Enter 换行</span>
         )}
 
         <button

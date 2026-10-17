@@ -11,9 +11,9 @@ export function KpiCard({ kpi, icon }: { kpi: Kpi; icon?: ReactNode }) {
   return (
     <article className="group rounded-xl border border-line bg-white p-3.5 shadow-card transition-all duration-150 ease-out hover:-translate-y-0.5 hover:border-[#e2dfd9] hover:shadow-lift md:p-5">
       <div className="flex items-center justify-between gap-2">
-        <p className="truncate text-xs text-[#6b6862]">{kpi.label}</p>
+        <p className="truncate text-xs text-[#57534c]">{kpi.label}</p>
         {icon ? (
-          <span className="shrink-0 text-[#c0bcb4] transition-colors duration-150 group-hover:text-[#8a877f]" aria-hidden="true">
+          <span className="shrink-0 text-[#c0bcb4] transition-colors duration-150 group-hover:text-[#6f6a62]" aria-hidden="true">
             {icon}
           </span>
         ) : null}
@@ -23,10 +23,10 @@ export function KpiCard({ kpi, icon }: { kpi: Kpi; icon?: ReactNode }) {
         <span className="tnum origin-left text-[26px] font-semibold leading-none tracking-tight text-[#111827] transition-transform duration-150 ease-out group-hover:scale-[1.03] md:text-[28px]">
           {kpi.value}
         </span>
-        {kpi.unit ? <span className="text-xs text-[#8a877f]">{kpi.unit}</span> : null}
+        {kpi.unit ? <span className="text-xs text-[#6f6a62]">{kpi.unit}</span> : null}
       </p>
 
-      <p className="mt-1 truncate text-[11px] text-[#8a877f]" title={kpi.hint}>
+      <p className="mt-1 truncate text-[11px] text-[#6f6a62]" title={kpi.hint}>
         {kpi.hint}
       </p>
 

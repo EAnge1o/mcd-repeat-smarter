@@ -112,13 +112,13 @@ export function ConfirmSheet({
           </span>
           <div className="min-w-0 flex-1">
             <h2 className="text-sm font-semibold tracking-tight text-[#111827]">确认这一单</h2>
-            <p className="text-[11px] text-[#8a877f]">提交前请核对门店、餐品与金额</p>
+            <p className="text-[11px] text-[#6f6a62]">提交前请核对门店、餐品与金额</p>
           </div>
           <button
             type="button"
             onClick={onClose}
             aria-label="关闭"
-            className="grid h-8 w-8 place-items-center rounded-lg text-[#8a877f] transition-colors duration-150 hover:bg-[#f2f0ec] hover:text-[#3d3a35]"
+            className="grid h-8 w-8 place-items-center rounded-lg text-[#6f6a62] transition-colors duration-150 hover:bg-[#f2f0ec] hover:text-[#3d3a35]"
           >
             <IconClose size={16} />
           </button>
@@ -167,10 +167,10 @@ export function ConfirmSheet({
             <>
               {/* 门店与来源：用户必须能确认「下到哪家店」 */}
               <div className="flex items-center gap-2.5 rounded-lg border border-line bg-[#faf9f7] px-3 py-2.5">
-                <IconStore size={15} className="shrink-0 text-[#8a877f]" />
+                <IconStore size={15} className="shrink-0 text-[#6f6a62]" />
                 <div className="min-w-0">
                   <p className="truncate text-[13px] font-medium text-[#111827]">{storeName || `门店 ${storeCode}`}</p>
-                  <p className="truncate text-[11px] text-[#8a877f]">
+                  <p className="truncate text-[11px] text-[#6f6a62]">
                     {BE_TYPE_LABEL[beType]} · {mode === 'demo' ? '演示数据，不会产生真实订单' : '麦当劳 MCP 实时'}
                   </p>
                 </div>
@@ -184,11 +184,11 @@ export function ConfirmSheet({
                     const line = preview.price.lines.find((l) => l.productCode === item.productCode);
                     return (
                       <li key={`${item.productCode}-${i}`} className="flex items-baseline gap-2 px-3 py-2">
-                        <span className="tnum shrink-0 text-[11px] text-[#8a877f]">{item.quantity}×</span>
+                        <span className="tnum shrink-0 text-[11px] text-[#6f6a62]">{item.quantity}×</span>
                         <span className="min-w-0 flex-1">
                           <span className="block truncate text-[12.5px] text-[#111827]">{item.name}</span>
                           {item.children.length > 0 ? (
-                            <span className="mt-0.5 block truncate text-[10px] text-[#a8a49c]">
+                            <span className="mt-0.5 block truncate text-[10px] text-[#6f6a62]">
                               {item.children.map((c) => `${c.roundName ? `${c.roundName}·` : ''}${c.name}`).join(' / ')}
                             </span>
                           ) : null}
@@ -203,7 +203,7 @@ export function ConfirmSheet({
                     否则它会和底部的「应付」变成两个一样的数字 */}
                 {preview.price.discountCents > 0 ? (
                   <div className="space-y-1 border-t border-line bg-[#faf9f7] px-3 py-2 text-[12px]">
-                    <div className="flex justify-between text-[#6b6862]">
+                    <div className="flex justify-between text-[#57534c]">
                       <span>商品原价</span>
                       <span className="tnum">¥{yuan(preview.price.originalPriceCents)}</span>
                     </div>
@@ -217,7 +217,7 @@ export function ConfirmSheet({
 
               {changeNotes.length > 0 ? (
                 <div>
-                  <p className="mb-1.5 text-[11px] font-medium text-[#6b6862]">这次改的</p>
+                  <p className="mb-1.5 text-[11px] font-medium text-[#57534c]">这次改的</p>
                   <ul className="space-y-1">
                     {changeNotes.map((n, i) => (
                       <li key={i} className="flex items-start gap-1.5 text-[11px] leading-relaxed text-[#4b4945]">
@@ -230,7 +230,7 @@ export function ConfirmSheet({
               ) : null}
 
               <div>
-                <p className="mb-1.5 text-[11px] font-medium text-[#6b6862]">取餐方式</p>
+                <p className="mb-1.5 text-[11px] font-medium text-[#57534c]">取餐方式</p>
                 <div className="grid grid-cols-2 gap-2">
                   {preview.takeWayList.map((t) => (
                     <button
@@ -246,7 +246,7 @@ export function ConfirmSheet({
                       )}
                     >
                       <span className="block truncate text-[12px] font-medium text-[#111827]">{t.title}</span>
-                      <span className="mt-0.5 block truncate text-[10px] text-[#8a877f]">{t.subtitle}</span>
+                      <span className="mt-0.5 block truncate text-[10px] text-[#6f6a62]">{t.subtitle}</span>
                     </button>
                   ))}
                 </div>
@@ -270,17 +270,17 @@ export function ConfirmSheet({
         {preview && !result ? (
           <div className="shrink-0 border-t border-line bg-white px-4 py-3 md:px-5">
             <div className="flex items-baseline justify-between">
-              <span className="text-xs text-[#6b6862]">
+              <span className="text-xs text-[#57534c]">
                 应付
                 {mode === 'demo' ? <Badge tone="warn" className="ml-1.5">演示</Badge> : null}
               </span>
               <span className="tnum text-[22px] font-semibold leading-none tracking-tight text-[#111827]">
-                <span className="mr-0.5 text-[13px] font-normal text-[#8a877f]">¥</span>
+                <span className="mr-0.5 text-[13px] font-normal text-[#6f6a62]">¥</span>
                 {yuan(preview.price.priceCents)}
               </span>
             </div>
 
-            <p className="mt-2 text-[11px] leading-relaxed text-[#a8a49c]">
+            <p className="mt-2 text-[11px] leading-relaxed text-[#6f6a62]">
               金额为官方接口实时核价，提交时可能因门店库存或活动变化产生微小差异，实际以门店出餐为准。
               {mode === 'demo' ? ' 当前为演示数据，不会产生真实订单。' : ''}
             </p>
@@ -294,7 +294,7 @@ export function ConfirmSheet({
               />
               <span className="text-[11.5px] leading-relaxed text-[#4b4945]">
                 我已核对门店、餐品与金额，确认提交这一单。
-                <span className="text-[#a8a49c]">（系统不会在你确认前下单）</span>
+                <span className="text-[#6f6a62]">（系统不会在你确认前下单）</span>
               </span>
             </label>
 

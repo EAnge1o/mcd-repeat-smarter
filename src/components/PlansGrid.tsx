@@ -70,7 +70,7 @@ export function PlansGrid({ plans, loading, onUse, onDuplicate, onRename, onDele
                 <div className="mt-1 flex flex-wrap items-center gap-1.5">
                   {p.tag ? <Badge tone="neutral">{p.tag}</Badge> : null}
                   {p.source === 'history' ? <Badge tone="neutral">来自历史</Badge> : null}
-                  <span className="tnum text-[10px] text-[#a8a49c]">{pieces} 件</span>
+                  <span className="tnum text-[10px] text-[#6f6a62]">{pieces} 件</span>
                 </div>
               </div>
 
@@ -80,7 +80,7 @@ export function PlansGrid({ plans, loading, onUse, onDuplicate, onRename, onDele
                   type="button"
                   onClick={() => onDuplicate(p)}
                   aria-label={`复制 ${p.name}`}
-                  className="grid h-7 w-7 place-items-center rounded-md text-[#a8a49c] transition-colors duration-150 hover:bg-[#f2f0ec] hover:text-[#4b4945]"
+                  className="grid h-7 w-7 place-items-center rounded-md text-[#6f6a62] transition-colors duration-150 hover:bg-[#f2f0ec] hover:text-[#4b4945]"
                 >
                   <IconCopy size={13} />
                 </button>
@@ -88,7 +88,7 @@ export function PlansGrid({ plans, loading, onUse, onDuplicate, onRename, onDele
                   type="button"
                   onClick={() => onRename(p)}
                   aria-label={`重命名 ${p.name}`}
-                  className="grid h-7 w-7 place-items-center rounded-md text-[#a8a49c] transition-colors duration-150 hover:bg-[#f2f0ec] hover:text-[#4b4945]"
+                  className="grid h-7 w-7 place-items-center rounded-md text-[#6f6a62] transition-colors duration-150 hover:bg-[#f2f0ec] hover:text-[#4b4945]"
                 >
                   <IconEdit size={13} />
                 </button>
@@ -96,7 +96,7 @@ export function PlansGrid({ plans, loading, onUse, onDuplicate, onRename, onDele
                   type="button"
                   onClick={() => onDelete(p)}
                   aria-label={`删除 ${p.name}`}
-                  className="grid h-7 w-7 place-items-center rounded-md text-[#a8a49c] transition-colors duration-150 hover:bg-[#fdecea] hover:text-[#a4231a]"
+                  className="grid h-7 w-7 place-items-center rounded-md text-[#6f6a62] transition-colors duration-150 hover:bg-[#fdecea] hover:text-[#a4231a]"
                 >
                   <IconTrash size={13} />
                 </button>
@@ -106,17 +106,17 @@ export function PlansGrid({ plans, loading, onUse, onDuplicate, onRename, onDele
             <ul className="mt-2.5 flex-1 space-y-1">
               {shown.map((it, i) => (
                 <li key={`${it.productCode}-${i}`} className="flex items-baseline gap-1.5 text-[12px] text-[#4b4945]">
-                  <span className="tnum w-5 shrink-0 text-right text-[10px] text-[#a8a49c]">{it.quantity}×</span>
+                  <span className="tnum w-5 shrink-0 text-right text-[10px] text-[#6f6a62]">{it.quantity}×</span>
                   <span className="truncate" title={it.name}>
                     {it.name}
                   </span>
                 </li>
               ))}
-              {rest > 0 ? <li className="pl-[26px] text-[11px] text-[#a8a49c]">还有 {rest} 项</li> : null}
+              {rest > 0 ? <li className="pl-[26px] text-[11px] text-[#6f6a62]">还有 {rest} 项</li> : null}
             </ul>
 
             <div className="mt-3 flex items-center justify-between gap-2 border-t border-line pt-2.5">
-              <span className="flex min-w-0 items-center gap-1 text-[10px] text-[#a8a49c]">
+              <span className="flex min-w-0 items-center gap-1 text-[10px] text-[#6f6a62]">
                 <IconStore size={11} />
                 <span className="truncate" title={p.storeName}>
                   {p.storeName || p.storeCode}
@@ -138,11 +138,11 @@ export function PlansGrid({ plans, loading, onUse, onDuplicate, onRename, onDele
 
       {plans.length % 2 === 1 ? (
         <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-[#e2dfd9] p-4 text-center">
-          <span className="flex items-center gap-1 text-[12px] text-[#8a877f]">
+          <span className="flex items-center gap-1 text-[12px] text-[#6f6a62]">
             <IconPlus size={12} />
             还能再存一个
           </span>
-          <span className="mt-1 text-[11px] leading-relaxed text-[#a8a49c]">下次调好之后点「存成常用方案」</span>
+          <span className="mt-1 text-[11px] leading-relaxed text-[#6f6a62]">下次调好之后点「存成常用方案」</span>
         </div>
       ) : null}
     </div>
