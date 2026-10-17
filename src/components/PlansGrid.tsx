@@ -17,6 +17,9 @@ interface PlansGridProps {
 
 const MAX_SHOWN = 3;
 
+/** 四块极淡的彩底轮着用。同一页里的方案卡不应该长得一模一样，但也不该抢戏 */
+const TINTS = ['bg-cream', 'bg-blush', 'bg-sage', 'bg-butter'];
+
 /**
  * 常用方案卡片。
  *
@@ -26,14 +29,14 @@ const MAX_SHOWN = 3;
 export function PlansGrid({ plans, loading, onUse, onDuplicate, onRename, onDelete, emptyAction, className }: PlansGridProps) {
   if (loading) {
     return (
-      <div className={cx('grid grid-cols-1 gap-3 p-4 sm:grid-cols-2 md:p-5', className)}>
+      <div className={cx('grid grid-cols-1 gap-3 sm:grid-cols-2', className)}>
         {[0, 1].map((i) => (
-          <div key={i} className="rounded-lg border border-line p-4">
+          <div key={i} className="rounded-2xl bg-[#fbf7f3] p-4">
             <Skeleton className="h-3 w-14" />
             <Skeleton className="mt-2.5 h-4 w-32" />
             <Skeleton className="mt-4 h-3 w-full" />
             <Skeleton className="mt-2 h-3 w-4/5" />
-            <Skeleton className="mt-4 h-8 w-full" />
+            <Skeleton className="mt-4 h-8 w-full rounded-full" />
           </div>
         ))}
       </div>
@@ -51,8 +54,8 @@ export function PlansGrid({ plans, loading, onUse, onDuplicate, onRename, onDele
   }
 
   return (
-    <div className={cx('grid grid-cols-1 gap-3 p-4 sm:grid-cols-2 md:p-5', className)}>
-      {plans.map((p) => {
+    <div className={cx('grid grid-cols-1 gap-3 sm:grid-cols-2', className)}>
+      {plans.map((p, idx) => {
         const shown = p.items.slice(0, MAX_SHOWN);
         const rest = p.items.length - shown.length;
         const pieces = p.items.reduce((n, i) => n + i.quantity, 0);
@@ -60,75 +63,78 @@ export function PlansGrid({ plans, loading, onUse, onDuplicate, onRename, onDele
         return (
           <article
             key={p.id}
-            className="group flex flex-col rounded-lg bg-[#faf9f7] p-3.5 transition-colors duration-150 ease-out hover:bg-[#f4f2ee]"
+            className={cx(
+              'group flex flex-col rounded-2xl p-4 ring-1 ring-inset ring-white/70 transition-[background-color,box-shadow] duration-200 ease-out hover:shadow-panel',
+              TINTS[idx % TINTS.length],
+            )}
           >
             <div className="flex items-start justify-between gap-2">
               <div className="min-w-0">
-                <h3 className="truncate text-[13px] font-semibold tracking-tight text-[#111827]" title={p.name}>
+                <h3 className="truncate text-[13.5px] text-ink" title={p.name}>
                   {p.name}
                 </h3>
-                <div className="mt-1 flex flex-wrap items-center gap-1.5">
+                <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
                   {p.tag ? <Badge tone="neutral">{p.tag}</Badge> : null}
                   {p.source === 'history' ? <Badge tone="neutral">来自历史</Badge> : null}
-                  <span className="tnum text-[10px] text-[#6f6a62]">{pieces} 件</span>
+                  <span className="tnum font-mono text-[9.5px] text-ink-faint">{pieces} 件</span>
                 </div>
               </div>
 
               {/* 操作平时收起，hover / 聚焦才出现；触屏常驻 */}
-              <div className="flex shrink-0 items-center gap-0.5 opacity-100 transition-opacity duration-150 md:opacity-0 md:group-hover:opacity-100 md:group-focus-within:opacity-100">
+              <div className="flex shrink-0 items-center gap-0.5 opacity-100 transition-opacity duration-200 md:opacity-0 md:group-hover:opacity-100 md:group-focus-within:opacity-100">
                 <button
                   type="button"
                   onClick={() => onDuplicate(p)}
                   aria-label={`复制 ${p.name}`}
-                  className="grid h-7 w-7 place-items-center rounded-md text-[#6f6a62] transition-colors duration-150 hover:bg-[#f2f0ec] hover:text-[#4b4945]"
+                  className="grid h-7 w-7 place-items-center rounded-full text-ink-faint transition-colors duration-200 hover:bg-white/80 hover:text-ink-soft"
                 >
-                  <IconCopy size={13} />
+                  <IconCopy size={12} />
                 </button>
                 <button
                   type="button"
                   onClick={() => onRename(p)}
                   aria-label={`重命名 ${p.name}`}
-                  className="grid h-7 w-7 place-items-center rounded-md text-[#6f6a62] transition-colors duration-150 hover:bg-[#f2f0ec] hover:text-[#4b4945]"
+                  className="grid h-7 w-7 place-items-center rounded-full text-ink-faint transition-colors duration-200 hover:bg-white/80 hover:text-ink-soft"
                 >
-                  <IconEdit size={13} />
+                  <IconEdit size={12} />
                 </button>
                 <button
                   type="button"
                   onClick={() => onDelete(p)}
                   aria-label={`删除 ${p.name}`}
-                  className="grid h-7 w-7 place-items-center rounded-md text-[#6f6a62] transition-colors duration-150 hover:bg-[#fdecea] hover:text-[#a4231a]"
+                  className="grid h-7 w-7 place-items-center rounded-full text-ink-faint transition-colors duration-200 hover:bg-white/80 hover:text-brand-700"
                 >
-                  <IconTrash size={13} />
+                  <IconTrash size={12} />
                 </button>
               </div>
             </div>
 
-            <ul className="mt-2.5 flex-1 space-y-1">
+            <ul className="mt-3 flex-1 space-y-1">
               {shown.map((it, i) => (
-                <li key={`${it.productCode}-${i}`} className="flex items-baseline gap-1.5 text-[12px] text-[#4b4945]">
-                  <span className="tnum w-5 shrink-0 text-right text-[10px] text-[#6f6a62]">{it.quantity}×</span>
+                <li key={`${it.productCode}-${i}`} className="flex items-baseline gap-2 text-[12px] text-ink-soft">
+                  <span className="tnum w-5 shrink-0 text-right font-mono text-[9.5px] text-ink-faint">{it.quantity}×</span>
                   <span className="truncate" title={it.name}>
                     {it.name}
                   </span>
                 </li>
               ))}
-              {rest > 0 ? <li className="pl-[26px] text-[11px] text-[#6f6a62]">还有 {rest} 项</li> : null}
+              {rest > 0 ? <li className="pl-[28px] text-[10.5px] text-ink-faint">还有 {rest} 项</li> : null}
             </ul>
 
-            <div className="mt-3 flex items-center justify-between gap-2 border-t border-line pt-2.5">
-              <span className="flex min-w-0 items-center gap-1 text-[10px] text-[#6f6a62]">
+            <div className="mt-3.5 flex items-center justify-between gap-2 border-t border-white/70 pt-3">
+              <span className="flex min-w-0 items-center gap-1.5 text-[10px] text-ink-faint">
                 <IconStore size={11} />
                 <span className="truncate" title={p.storeName}>
                   {p.storeName || p.storeCode}
                 </span>
-                <span className="shrink-0">· {fmtDate(p.updatedAt)}</span>
+                <span className="shrink-0 font-mono text-[9px]">· {fmtDate(p.updatedAt)}</span>
               </span>
               <button
                 type="button"
                 onClick={() => onUse(p)}
-                className="inline-flex h-7 shrink-0 items-center gap-1 rounded-md bg-[#f2f0ec] px-2 text-[11px] font-medium text-[#3d3a35] transition-colors duration-150 hover:bg-brand-500 hover:text-white active:scale-[0.97]"
+                className="inline-flex h-7 shrink-0 items-center gap-1 rounded-full bg-white px-3 text-[11px] font-medium text-ink-soft ring-1 ring-inset ring-white transition-[background-color,color] duration-200 hover:bg-ink hover:text-white active:scale-[0.97]"
               >
-                <IconSparkle size={11} />
+                <IconSparkle size={10} />
                 用它
               </button>
             </div>
@@ -137,12 +143,12 @@ export function PlansGrid({ plans, loading, onUse, onDuplicate, onRename, onDele
       })}
 
       {plans.length % 2 === 1 ? (
-        <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-[#e2dfd9] p-4 text-center">
-          <span className="flex items-center gap-1 text-[12px] text-[#6f6a62]">
-            <IconPlus size={12} />
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-[#ddd5cd] p-5 text-center">
+          <span className="flex items-center gap-1.5 text-[11.5px] text-ink-mute">
+            <IconPlus size={11} />
             还能再存一个
           </span>
-          <span className="mt-1 text-[11px] leading-relaxed text-[#6f6a62]">下次调好之后点「存成常用方案」</span>
+          <span className="mt-1.5 text-[10.5px] leading-relaxed text-ink-faint">下次调好之后点「存成常用方案」</span>
         </div>
       ) : null}
     </div>

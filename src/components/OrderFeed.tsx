@@ -24,15 +24,15 @@ function Amount({ order, className }: { order: HistoryOrder; className?: string 
   const c = paidCents(order);
   if (c === null) {
     return (
-      <span className={cx('tnum text-[#6f6a62]', className)} title="接口未返回实付金额">
+      <span className={cx('tnum text-ink-faint', className)} title="接口未返回实付金额">
         —
       </span>
     );
   }
   return (
-    <span className={cx('tnum', c === 0 ? 'text-[#57534c]' : 'text-[#111827]', className)}>
+    <span className={cx('tnum display', c === 0 ? 'text-ink-mute' : 'text-ink', className)}>
       ¥{yuan(c)}
-      {c === 0 ? <span className="ml-1 text-[10px] font-normal text-[#6f6a62]">券</span> : null}
+      {c === 0 ? <span className="ml-1 font-sans text-[9px] font-normal tracking-[0.1em] text-ink-faint">券</span> : null}
     </span>
   );
 }
@@ -58,20 +58,20 @@ export function OrderFeed({
   emptyAction,
 }: OrderFeedProps) {
   return (
-    <section aria-labelledby="feed-title" className="border-t border-line pt-6 md:pt-7">
-      <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2">
-        <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1.5">
-          <h2 id="feed-title" className="text-[15px] font-semibold tracking-tight text-[#111827]">
+    <section aria-labelledby="feed-title">
+      <div className="flex flex-wrap items-end justify-between gap-x-5 gap-y-3">
+        <div className="flex flex-wrap items-baseline gap-x-3 gap-y-2">
+          <h2 id="feed-title" className="display text-[24px] leading-none text-ink md:text-[29px]">
             最近订单
           </h2>
           {filterLabel ? (
-            <span className="inline-flex items-center gap-1.5 rounded-md bg-brand-50 px-2 py-0.5 text-[11px] text-brand-700">
+            <span className="inline-flex items-center gap-2 rounded-full bg-brand-50 py-1 pl-3 pr-1.5 text-[10.5px] text-brand-700">
               {filterLabel}
-              <span className="tnum text-brand-600/80">{matchCount} 单</span>
+              <span className="tnum font-mono text-[9.5px] text-brand-600/80">{matchCount} 单</span>
               <button
                 type="button"
                 onClick={onClearFilter}
-                className="-mr-0.5 rounded px-0.5 text-[11px] font-medium text-brand-700 transition-colors duration-150 hover:text-brand-800"
+                className="rounded-full bg-white/70 px-2 py-0.5 text-[10px] font-medium text-brand-700 transition-colors duration-200 hover:bg-white"
                 aria-label="清除时段筛选"
               >
                 清除
@@ -83,23 +83,23 @@ export function OrderFeed({
         <button
           type="button"
           onClick={onViewAll}
-          className="group inline-flex items-center gap-1 rounded-md py-0.5 text-[11.5px] font-medium text-[#57534c] transition-colors duration-150 hover:text-brand-600"
+          className="group inline-flex items-center gap-1.5 pb-1 text-[11px] font-medium text-ink-mute transition-colors duration-200 hover:text-brand-600"
         >
           全部 {total} 单
-          <IconArrow size={11} className="transition-transform duration-150 group-hover:translate-x-0.5" />
+          <IconArrow size={10} className="transition-transform duration-200 group-hover:translate-x-0.5" />
         </button>
       </div>
 
       {loading ? (
-        <ul className="mt-2 divide-y divide-line/70">
+        <ul className="mt-4 divide-y divide-hair">
           {[0, 1, 2, 3].map((i) => (
-            <li key={i} className="flex items-center gap-4 py-3.5">
+            <li key={i} className="flex items-center gap-4 py-4">
               <Skeleton className="h-6 w-12" />
               <div className="min-w-0 flex-1">
                 <Skeleton className="h-3.5 w-2/3" />
-                <Skeleton className="mt-1.5 h-3 w-1/3" />
+                <Skeleton className="mt-2 h-3 w-1/3" />
               </div>
-              <Skeleton className="h-3.5 w-14" />
+              <Skeleton className="h-4 w-14" />
             </li>
           ))}
         </ul>
@@ -111,45 +111,49 @@ export function OrderFeed({
           action={filterLabel ? undefined : emptyAction}
         />
       ) : (
-        <ul className="mt-1.5">
+        <ul className="mt-3">
           {orders.map((o) => {
             const open = openId === o.orderId;
             const pieces = o.items.reduce((n, i) => n + i.quantity, 0);
             const brief = o.items.map((i) => `${i.quantity}×${i.name}`).join('、');
 
             return (
-              <li key={o.orderId} className="border-b border-line/70 last:border-0">
+              <li key={o.orderId} className="border-b border-hair last:border-0">
                 <button
                   type="button"
                   onClick={() => onToggle(o.orderId)}
                   aria-expanded={open}
                   aria-controls={`detail-${o.orderId}`}
-                  className="group grid w-full grid-cols-[3.5rem_minmax(0,1fr)_auto] items-center gap-x-3 rounded-md px-1.5 py-3 text-left transition-colors duration-150 ease-out hover:bg-[#faf9f7] md:grid-cols-[4.5rem_minmax(0,1fr)_auto] md:gap-x-5 md:py-3.5"
+                  className={cx(
+                    'group grid w-full grid-cols-[3.25rem_minmax(0,1fr)_auto] items-center gap-x-3 rounded-2xl px-2 py-3.5 text-left',
+                    'transition-colors duration-200 ease-out md:grid-cols-[4.25rem_minmax(0,1fr)_auto] md:gap-x-5',
+                    open ? 'bg-[#fbf7f3]' : 'hover:bg-[#fbf7f3]',
+                  )}
                 >
-                  <span className="tnum text-[10.5px] leading-tight text-[#6f6a62]">
-                    <span className="block text-[11.5px] text-[#57534c]">{fmtDateTime(o.createTime).split(' ')[0]}</span>
+                  <span className="tnum font-mono text-[9.5px] leading-[1.6] tracking-[0.02em] text-ink-faint">
+                    <span className="block text-ink-mute">{fmtDateTime(o.createTime).split(' ')[0]}</span>
                     <span className="block">{fmtDateTime(o.createTime).split(' ')[1]}</span>
                   </span>
 
                   <span className="min-w-0">
-                    <span className={cx('block truncate text-[13px]', open ? 'text-[#111827]' : 'text-[#111827]')} title={brief}>
+                    <span className="block truncate text-[13px] text-ink" title={brief}>
                       {brief || '（无明细）'}
                     </span>
-                    <span className="mt-0.5 block truncate text-[11px] text-[#6f6a62]">
+                    <span className="mt-1 block truncate text-[10.5px] text-ink-faint">
                       {o.storeName || o.storeCode}
-                      <span className="px-1.5">·</span>
+                      <span className="px-1.5 text-[#d5cec6]">·</span>
                       <span className="tnum">共 {pieces} 件</span>
                       <span className="hidden sm:inline">
-                        <span className="px-1.5">·</span>
+                        <span className="px-1.5 text-[#d5cec6]">·</span>
                         {o.orderStatus || '状态未知'}
                       </span>
                     </span>
                   </span>
 
                   <span className="flex items-center gap-2 md:gap-3">
-                    <Amount order={o} className="text-[13px] font-medium" />
+                    <Amount order={o} className="text-[15px]" />
                     <span
-                      className={cx('text-[#6f6a62] transition-transform duration-150 ease-out group-hover:text-[#4b4945]', open ? 'rotate-180' : '')}
+                      className={cx('text-ink-faint transition-transform duration-200 ease-out group-hover:text-ink-mute', open ? 'rotate-180' : '')}
                       aria-hidden="true"
                     >
                       <IconChevronDown size={14} />
@@ -160,18 +164,18 @@ export function OrderFeed({
                 {open ? (
                   <div
                     id={`detail-${o.orderId}`}
-                    className="animate-fade-up rounded-md bg-[#faf9f7] px-3.5 py-3.5 md:px-4"
+                    className="animate-fade-up mb-1 mt-1 rounded-2xl bg-[#fbf7f3] px-4 py-4 md:px-5"
                   >
-                    <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_auto] md:gap-8">
-                      <ul className="min-w-0 space-y-1.5">
+                    <div className="grid gap-5 md:grid-cols-[minmax(0,1fr)_auto] md:gap-10">
+                      <ul className="min-w-0 space-y-2">
                         {o.items.map((it, i) => (
                           <li key={`${it.productCode}-${i}`}>
-                            <p className="flex items-baseline gap-2 text-[12.5px] text-[#111827]">
-                              <span className="tnum w-6 shrink-0 text-right text-[11px] text-[#6f6a62]">{it.quantity}×</span>
+                            <p className="flex items-baseline gap-2.5 text-[12.5px] text-ink">
+                              <span className="tnum w-6 shrink-0 text-right font-mono text-[10px] text-ink-faint">{it.quantity}×</span>
                               <span className="min-w-0 flex-1">{it.name}</span>
                             </p>
                             {it.children.length > 0 ? (
-                              <p className="mt-0.5 pl-8 text-[10.5px] leading-relaxed text-[#6f6a62]">
+                              <p className="mt-1 pl-[34px] text-[10.5px] leading-relaxed text-ink-faint">
                                 {it.children.map((c) => `${c.roundName ? `${c.roundName} · ` : ''}${c.name}`).join(' / ')}
                               </p>
                             ) : null}
@@ -180,24 +184,24 @@ export function OrderFeed({
                       </ul>
 
                       <div className="shrink-0 md:text-right">
-                        <dl className="grid grid-cols-2 gap-x-6 gap-y-1 text-[11px] md:grid-cols-1 md:space-y-1">
+                        <dl className="grid grid-cols-2 gap-x-6 gap-y-1.5 text-[10.5px] md:grid-cols-1 md:space-y-1.5">
                           <div className="flex gap-1.5 md:justify-end">
-                            <dt className="text-[#6f6a62]">订单号</dt>
-                            <dd className="tnum text-[#3d3a35]">#{o.orderId.slice(-8)}</dd>
+                            <dt className="text-ink-faint">订单号</dt>
+                            <dd className="tnum font-mono text-ink-soft">#{o.orderId.slice(-8)}</dd>
                           </div>
                           <div className="flex gap-1.5 md:justify-end">
-                            <dt className="text-[#6f6a62]">实付</dt>
+                            <dt className="text-ink-faint">实付</dt>
                             <dd>
                               <Amount order={o} className="text-[11px]" />
                             </dd>
                           </div>
                           <div className="flex gap-1.5 md:justify-end">
-                            <dt className="text-[#6f6a62]">状态</dt>
-                            <dd className="text-[#3d3a35]">{o.orderStatus || '未知'}</dd>
+                            <dt className="text-ink-faint">状态</dt>
+                            <dd className="text-ink-soft">{o.orderStatus || '未知'}</dd>
                           </div>
                           <div className="flex gap-1.5 md:justify-end">
-                            <dt className="text-[#6f6a62]">门店</dt>
-                            <dd className="truncate text-[#3d3a35] md:max-w-[220px]" title={o.storeName}>
+                            <dt className="text-ink-faint">门店</dt>
+                            <dd className="truncate text-ink-soft md:max-w-[200px]" title={o.storeName}>
                               {o.storeName || o.storeCode}
                             </dd>
                           </div>
@@ -206,9 +210,9 @@ export function OrderFeed({
                         <button
                           type="button"
                           onClick={() => onUse(o)}
-                          className="mt-2.5 inline-flex h-7 items-center gap-1.5 rounded-md bg-white px-2.5 text-[11.5px] font-medium text-[#3d3a35] ring-1 ring-inset ring-line transition-colors duration-150 ease-out hover:bg-brand-500 hover:text-white hover:ring-brand-500 active:scale-[0.97]"
+                          className="mt-3 inline-flex h-8 items-center gap-1.5 rounded-full bg-white px-3.5 text-[11px] font-medium text-ink-soft ring-1 ring-inset ring-line transition-[background-color,color] duration-200 ease-out hover:bg-ink hover:text-white active:scale-[0.97]"
                         >
-                          <IconRefresh size={12} />
+                          <IconRefresh size={11} />
                           再来一单
                         </button>
                       </div>

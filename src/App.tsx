@@ -245,8 +245,10 @@ export default function App() {
   // ---------- 渲染 ----------
   if (healthError) {
     return (
-      <div className="grid min-h-screen place-items-center bg-canvas px-4">
+      <div className="grid min-h-screen place-items-center px-5">
         <div className="w-full max-w-md">
+          <p className="eyebrow mb-4 text-center">REPEAT SMARTER</p>
+          <h1 className="display mb-5 text-center text-[28px] text-ink">服务没有起来</h1>
           <Alert kind="error" title="连不上本地服务" hint="请确认已执行 npm run dev，并且前端与 API 两个进程都正常启动。">
             {healthError}
           </Alert>
@@ -256,7 +258,7 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-canvas">
+    <div className="min-h-screen">
       <Sidebar
         view={view}
         onNavigate={setView}
@@ -267,22 +269,26 @@ export default function App() {
         mobileOpen={mobileNav}
         onCloseMobile={() => setMobileNav(false)}
         onPickStore={() => setStorePickerOpen(true)}
+        recentPlans={plans}
+        onUsePlan={handleUsePlan}
       />
 
-      <div className="lg:pl-64">
+      <div className="lg:pl-[248px]">
         <Topbar
+          view={view}
           plans={plans}
           orders={orders}
           storeName={store?.storeName || (store ? `门店 ${store.storeCode}` : '')}
           mode={mode}
           lastSync={lastSync}
+          dateLabel={todayLabel()}
           onNavigate={setView}
           onOpenMobile={() => setMobileNav(true)}
           onPickStore={() => setStorePickerOpen(true)}
         />
 
-        <main className="px-4 py-4 pb-24 md:px-6 md:py-6 md:pb-24">
-          <div className="mx-auto max-w-[1400px]">
+        <main className="px-4 pb-32 pt-7 md:px-8 md:pt-10">
+          <div className="mx-auto max-w-[1180px]">
             {view === 'overview' ? (
               <Overview
                 dateLabel={todayLabel()}
@@ -377,20 +383,24 @@ export default function App() {
 
       {/* 吸底操作栏：只在结果页出现，落到内容区右侧，不盖住侧边栏 */}
       {view === 'order' && result && selectedCandidate ? (
-        <div data-region="actionbar" className="fixed bottom-0 left-0 right-0 z-30 border-t border-line bg-white/95 backdrop-blur lg:left-64">
-          <div className="mx-auto flex max-w-[1400px] items-center justify-between gap-3 px-4 py-2.5 md:px-6">
+        <div
+          data-region="actionbar"
+          className="fixed bottom-0 left-0 right-0 z-30 border-t border-hair bg-[#faf8f6]/80 backdrop-blur-xl lg:left-[248px]"
+        >
+          <div className="mx-auto flex max-w-[1180px] items-center justify-between gap-4 px-4 py-3 md:px-8">
             <div className="min-w-0">
-              <p className="truncate text-[12px] font-medium text-[#111827]">
-                {selectedCandidate.label}
-                {selectedCandidate.price ? ` · 共 ${selectedCandidate.price.lines.reduce((n, l) => n + l.quantity, 0)} 件` : ''}
-              </p>
-              <p className="tnum text-[16px] font-semibold leading-tight text-[#111827]">
-                {selectedCandidate.price ? `¥${(selectedCandidate.price.priceCents / 100).toFixed(2)}` : '核价失败'}
+              <p className="eyebrow truncate">已选 · {selectedCandidate.items.reduce((n, i) => n + i.quantity, 0)} 件</p>
+              <p className="mt-1 flex items-baseline gap-2">
+                <span className="tnum display text-[19px] leading-none text-ink">
+                  {selectedCandidate.price ? `¥${(selectedCandidate.price.priceCents / 100).toFixed(2)}` : '核价失败'}
+                </span>
+                <span className="truncate text-[11px] text-ink-faint">{selectedCandidate.label}</span>
               </p>
             </div>
             <Button
               variant="primary"
               size="lg"
+              arrow
               onClick={() => setSheetOpen(true)}
               disabled={!selectedCandidate.price || selectedCandidate.price.priceCents === 0}
             >
@@ -430,32 +440,37 @@ export default function App() {
 
       {/* 存成常用方案 */}
       {saveOpen && result && selectedCandidate ? (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/45 p-0 backdrop-blur-[2px] sm:items-center sm:p-6" onClick={() => setSaveOpen(false)} role="presentation">
+        <div
+          className="fixed inset-0 z-50 flex items-end justify-center bg-[#2b201b]/30 p-0 backdrop-blur-[3px] sm:items-center sm:p-6"
+          onClick={() => setSaveOpen(false)}
+          role="presentation"
+        >
           <div
             onClick={(e) => e.stopPropagation()}
             role="dialog"
             aria-modal="true"
             aria-label="存成常用方案"
-            className="w-full max-w-md overflow-hidden rounded-t-2xl bg-white shadow-lift sm:rounded-2xl"
+            className="animate-fade-up w-full max-w-md overflow-hidden rounded-t-[28px] bg-white shadow-float sm:rounded-[28px]"
           >
-            <div className="flex items-start gap-3 border-b border-line px-4 py-3 md:px-5">
+            <div className="flex items-start gap-3 border-b border-hair px-6 py-5">
               <div className="min-w-0 flex-1">
-                <h2 className="text-sm font-semibold tracking-tight text-[#111827]">存成常用方案</h2>
-                <p className="text-[11px] text-[#6f6a62]">下次说「还是老样子」就能整单调出来</p>
+                <p className="eyebrow">保存方案</p>
+                <h2 className="display mt-2 text-[20px] text-ink">存成常用方案</h2>
+                <p className="mt-1 text-[11.5px] text-ink-mute">下次说「还是老样子」就能整单调出来</p>
               </div>
               <button
                 type="button"
                 onClick={() => setSaveOpen(false)}
                 aria-label="关闭"
-                className="grid h-8 w-8 place-items-center rounded-lg text-[#6f6a62] transition-colors duration-150 hover:bg-[#f2f0ec]"
+                className="grid h-8 w-8 shrink-0 place-items-center rounded-full text-ink-faint transition-colors duration-200 hover:bg-[#f6f1ec] hover:text-ink"
               >
-                <IconClose size={16} />
+                <IconClose size={15} />
               </button>
             </div>
 
-            <div className="space-y-3 px-4 py-4 md:px-5">
+            <div className="space-y-5 px-6 py-5">
               <div>
-                <label htmlFor="pname" className="mb-1 block text-[11px] text-[#57534c]">
+                <label htmlFor="pname" className="eyebrow mb-2 block">
                   方案名称
                 </label>
                 <input
@@ -463,12 +478,12 @@ export default function App() {
                   value={saveName}
                   onChange={(e) => setSaveName(e.target.value)}
                   placeholder="例如 我的日常午餐"
-                  className="h-9 w-full rounded-lg border border-line bg-[#faf9f7] px-2.5 text-sm text-[#111827] transition-all duration-150 placeholder:text-[#7a756c] focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                  className="h-10 w-full rounded-xl bg-[#f8f4f0] px-3.5 text-[13px] text-ink outline-none ring-1 ring-inset ring-transparent transition-all duration-200 placeholder:text-ink-faint focus:bg-white focus:ring-brand-300"
                 />
               </div>
 
               <div>
-                <p className="mb-1.5 text-[11px] text-[#57534c]">分类</p>
+                <p className="eyebrow mb-2">分类</p>
                 <div className="flex flex-wrap gap-1.5">
                   {TAGS.map((t) => (
                     <button
@@ -478,8 +493,8 @@ export default function App() {
                       aria-pressed={saveTag === t}
                       className={
                         saveTag === t
-                          ? 'rounded-md bg-brand-500 px-2.5 py-1 text-[11px] font-medium text-white transition-colors duration-150'
-                          : 'rounded-md bg-[#f2f0ec] px-2.5 py-1 text-[11px] text-[#5c5850] transition-colors duration-150 hover:bg-[#e8e5df]'
+                          ? 'rounded-full bg-ink px-3 py-1 text-[11px] font-medium text-white transition-colors duration-200'
+                          : 'rounded-full bg-[#f6f1ec] px-3 py-1 text-[11px] text-ink-soft transition-colors duration-200 hover:bg-white hover:ring-1 hover:ring-line'
                       }
                     >
                       {t}
@@ -489,16 +504,14 @@ export default function App() {
               </div>
 
               <div>
-                <p className="mb-1.5 text-[11px] text-[#57534c]">
-                  将保存以下 {selectedCandidate.items.length} 项（结构化编码，不是一句话）
-                </p>
-                <ul className="divide-y divide-[#f0eee9] overflow-hidden rounded-lg bg-[#faf9f7]">
+                <p className="eyebrow mb-2">将保存 {selectedCandidate.items.length} 项（结构化编码，不是一句话）</p>
+                <ul className="divide-y divide-hair overflow-hidden rounded-2xl bg-[#fbf7f3]">
                   {selectedCandidate.items.map((it, i) => (
-                    <li key={i} className="flex items-baseline gap-2 px-2.5 py-1.5">
-                      <span className="tnum shrink-0 text-[11px] text-[#6f6a62]">{it.quantity}×</span>
-                      <span className="min-w-0 flex-1 truncate text-[12px] text-[#111827]">{it.name}</span>
+                    <li key={i} className="flex items-baseline gap-2.5 px-3.5 py-2">
+                      <span className="tnum shrink-0 font-mono text-[10px] text-ink-faint">{it.quantity}×</span>
+                      <span className="min-w-0 flex-1 truncate text-[12px] text-ink">{it.name}</span>
                       {it.children.length > 0 ? (
-                        <span className="shrink-0 truncate text-[10px] text-[#6f6a62]">{it.children.map((c) => c.name).join(' / ')}</span>
+                        <span className="shrink-0 truncate text-[10px] text-ink-faint">{it.children.map((c) => c.name).join(' / ')}</span>
                       ) : null}
                     </li>
                   ))}
@@ -506,9 +519,9 @@ export default function App() {
               </div>
             </div>
 
-            <div className="border-t border-line px-4 py-3 md:px-5">
-              <Button variant="primary" size="lg" className="w-full" onClick={() => void handleSavePlan()} disabled={saving}>
-                {saving ? <span className="h-3.5 w-3.5 animate-spin-slow rounded-full border-2 border-white/35 border-t-white" /> : '保存'}
+            <div className="border-t border-hair px-6 py-4">
+              <Button variant="primary" size="lg" arrow className="w-full" onClick={() => void handleSavePlan()} disabled={saving}>
+                {saving ? <span className="h-3.5 w-3.5 animate-spin-slow rounded-full border-2 border-white/30 border-t-white" /> : '保存'}
               </Button>
             </div>
           </div>

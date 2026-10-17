@@ -42,19 +42,19 @@ export function StoreSearch({ defaultCity, beType, currentStoreCode, onPick }: S
     <div className="space-y-3">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-end">
         <div className="sm:w-28">
-          <label htmlFor="city" className="mb-1 block text-[11px] text-[#57534c]">
+          <label htmlFor="city" className="eyebrow mb-1.5 block">
             城市
           </label>
           <input
             id="city"
             value={city}
             onChange={(e) => setCity(e.target.value)}
-            className="h-9 w-full rounded-lg border border-line bg-[#faf9f7] px-2.5 text-sm text-[#111827] transition-all duration-150 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+            className="h-10 w-full rounded-xl bg-[#f8f4f0] px-3 text-[13px] text-ink outline-none ring-1 ring-inset ring-transparent transition-all duration-200 focus:bg-white focus:ring-brand-300"
           />
         </div>
 
         <div className="sm:flex-1">
-          <label htmlFor="kw" className="mb-1 block text-[11px] text-[#57534c]">
+          <label htmlFor="kw" className="eyebrow mb-1.5 block">
             商圈 / 地标
           </label>
           <input
@@ -65,12 +65,12 @@ export function StoreSearch({ defaultCity, beType, currentStoreCode, onPick }: S
             onKeyDown={(e) => {
               if (e.key === 'Enter') void search();
             }}
-            className="h-9 w-full rounded-lg border border-line bg-[#faf9f7] px-2.5 text-sm text-[#111827] transition-all duration-150 placeholder:text-[#7a756c] focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+            className="h-10 w-full rounded-xl bg-[#f8f4f0] px-3 text-[13px] text-ink outline-none ring-1 ring-inset ring-transparent transition-all duration-200 placeholder:text-ink-faint focus:bg-white focus:ring-brand-300"
           />
         </div>
 
-        <Button variant="primary" onClick={() => void search()} disabled={loading} className="shrink-0">
-          {loading ? <span className="h-3.5 w-3.5 animate-spin-slow rounded-full border-2 border-white/35 border-t-white" /> : <IconSearch size={14} />}
+        <Button variant="primary" onClick={() => void search()} disabled={loading} className="h-10 shrink-0">
+          {loading ? <span className="h-3.5 w-3.5 animate-spin-slow rounded-full border-2 border-white/30 border-t-white" /> : <IconSearch size={13} />}
           搜索
         </Button>
       </div>
@@ -80,8 +80,8 @@ export function StoreSearch({ defaultCity, beType, currentStoreCode, onPick }: S
       {loading ? (
         <div className="space-y-2">
           {[0, 1, 2].map((i) => (
-            <div key={i} className="flex items-center gap-2.5 rounded-lg border border-line p-3">
-              <Skeleton className="h-8 w-8 rounded-lg" />
+            <div key={i} className="flex items-center gap-2.5 rounded-2xl bg-[#fbf7f3] p-3">
+              <Skeleton className="h-8 w-8 rounded-full" />
               <div className="flex-1">
                 <Skeleton className="h-3 w-32" />
                 <Skeleton className="mt-1.5 h-2.5 w-48" />
@@ -101,21 +101,38 @@ export function StoreSearch({ defaultCity, beType, currentStoreCode, onPick }: S
                   type="button"
                   onClick={() => onPick(s)}
                   className={cx(
-                    'flex w-full items-center gap-2.5 rounded-lg border p-2.5 text-left transition-colors duration-150 ease-out',
+                    'flex w-full items-center gap-3 rounded-2xl px-3 py-2.5 text-left transition-[background-color,box-shadow] duration-200 ease-out',
                     active
-                      ? 'border-brand-500 bg-brand-50/50'
-                      : 'border-line bg-[#faf9f7] hover:bg-[#f4f2ee]',
+                      ? 'bg-blush ring-1 ring-inset ring-brand-200'
+                      : 'bg-[#fbf7f3] ring-1 ring-inset ring-transparent hover:bg-[#f8f2ec]',
                   )}
                 >
-                  <span className={cx('grid h-8 w-8 shrink-0 place-items-center rounded-lg', active ? 'bg-brand-100 text-brand-700' : 'bg-[#f2f0ec] text-[#6f6a62]')}>
-                    <IconStore size={15} />
+                  <span className={cx('grid h-8 w-8 shrink-0 place-items-center rounded-full', active ? 'bg-white text-brand-600' : 'bg-white/80 text-ink-mute')}>
+                    <IconStore size={14} />
                   </span>
                   <span className="min-w-0 flex-1">
-                    <span className="block truncate text-[12.5px] font-medium text-[#111827]">{s.storeName}</span>
-                    <span className="block truncate text-[11px] text-[#6f6a62]">{s.address}</span>
+                    <span className="block truncate text-[12.5px] text-ink">{s.storeName}</span>
+                    <span className="block truncate text-[10.5px] text-ink-faint">{s.address}</span>
                   </span>
-                  {s.distance !== undefined ? <span className="tnum shrink-0 text-[11px] text-[#6f6a62]">{s.distance}m</span> : null}
-                  <IconArrow size={12} className="shrink-0 text-[#c0bcb4]" />
+                  {/* 营业状态决定这家店能不能核价，必须在列表里就写清楚，
+                      否则用户只能靠「下单失败」反推自己选了一家休息的店 */}
+                  <span className="shrink-0 text-right">
+                    {s.businessStatus ? (
+                      <span className="block font-mono text-[9px] leading-[1.5] tracking-[0.08em] text-[#3f6b52]">
+                        营业中
+                        {s.businessEndTime ? <span className="block text-ink-faint">至 {s.businessEndTime}</span> : null}
+                      </span>
+                    ) : (
+                      <span className="block font-mono text-[9px] leading-[1.5] tracking-[0.08em] text-ink-faint">
+                        休息中
+                        {s.businessStartTime ? <span className="block text-ink-faint">{s.businessStartTime} 起</span> : null}
+                      </span>
+                    )}
+                  </span>
+                  {s.distance !== undefined ? (
+                    <span className="tnum shrink-0 font-mono text-[9.5px] text-ink-faint">{s.distance}m</span>
+                  ) : null}
+                  <IconArrow size={11} className="shrink-0 text-ink-faint" />
                 </button>
               </li>
             );
@@ -125,6 +142,7 @@ export function StoreSearch({ defaultCity, beType, currentStoreCode, onPick }: S
 
       {!loading && stores === null ? (
         <EmptyState
+          compact
           title="先搜索一家门店"
           desc="MCP 的门店查询需要「城市 + 关键词」，这样才能拿到这家店真实的在售菜单和价格。"
         />
@@ -151,33 +169,38 @@ export function StorePicker({
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/45 p-0 backdrop-blur-[2px] sm:items-center sm:p-6" onClick={onClose} role="presentation">
+    <div
+      className="fixed inset-0 z-50 flex items-end justify-center bg-[#2b201b]/30 p-0 backdrop-blur-[3px] sm:items-center sm:p-6"
+      onClick={onClose}
+      role="presentation"
+    >
       <div
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
         aria-label="选择门店"
-        className="flex max-h-[88vh] w-full max-w-[560px] flex-col overflow-hidden rounded-t-2xl bg-white shadow-lift sm:rounded-2xl"
+        className="animate-fade-up flex max-h-[88vh] w-full max-w-[580px] flex-col overflow-hidden rounded-t-[28px] bg-white shadow-float sm:rounded-[28px]"
       >
-        <div className="flex shrink-0 items-center gap-2.5 border-b border-line px-4 py-3 md:px-5">
-          <span className="grid h-8 w-8 place-items-center rounded-lg bg-brand-50 text-brand-600" aria-hidden="true">
+        <div className="flex shrink-0 items-start gap-3 border-b border-hair px-6 py-5">
+          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-brand-50 text-brand-600" aria-hidden="true">
             <IconStore size={16} />
           </span>
           <div className="min-w-0 flex-1">
-            <h2 className="text-sm font-semibold tracking-tight text-[#111827]">选择门店</h2>
-            <p className="text-[11px] text-[#6f6a62]">门店会决定菜单、价格和可选优惠</p>
+            <p className="eyebrow">切换门店</p>
+            <h2 className="display mt-1.5 text-[19px] text-ink">在哪家店取</h2>
+            <p className="mt-0.5 text-[11px] text-ink-mute">门店会决定菜单、价格和可选优惠</p>
           </div>
           <button
             type="button"
             onClick={onClose}
             aria-label="关闭"
-            className="grid h-8 w-8 place-items-center rounded-lg text-[#6f6a62] transition-colors duration-150 hover:bg-[#f2f0ec] hover:text-[#3d3a35]"
+            className="grid h-8 w-8 place-items-center rounded-full text-ink-faint transition-colors duration-200 hover:bg-[#f6f1ec] hover:text-ink"
           >
-            <IconClose size={16} />
+            <IconClose size={15} />
           </button>
         </div>
 
-        <div className="overflow-y-auto px-4 py-4 md:px-5">
+        <div className="overflow-y-auto px-6 py-5">
           <StoreSearch
             defaultCity={defaultCity}
             beType={beType}

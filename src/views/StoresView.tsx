@@ -1,5 +1,5 @@
 import type { BeType, Store } from '../../server/domain/types';
-import { Badge, Card, CardHead } from '../components/ui';
+import { Badge, Panel } from '../components/ui';
 import { StoreSearch } from '../components/StorePicker';
 
 export function StoresView({
@@ -16,39 +16,48 @@ export function StoresView({
   onPick: (s: Store) => void;
 }) {
   return (
-    <div className="space-y-4 md:space-y-5">
-      <div>
-        <h1 className="text-xl font-semibold tracking-tight text-[#111827] md:text-2xl">门店</h1>
-        <p className="mt-1 text-xs text-[#57534c]">门店决定菜单、价格与可选优惠。切换后方案与核价都会按新门店重算。</p>
-      </div>
+    <div>
+      <header className="max-w-[600px]">
+        <p className="eyebrow">门店 · 菜单与价格的基础</p>
+        <h1 className="display mt-3 text-[27px] leading-[1.15] text-ink md:text-[34px]">在哪家店取</h1>
+        <p className="mt-2.5 max-w-[34rem] text-pretty text-[12.5px] leading-[1.9] text-ink-mute">
+          门店决定菜单、价格与可选优惠。切换后方案与核价都会按新门店重算 —— 同一份餐在不同门店的价格本来就不一样。
+        </p>
+      </header>
 
-      <div className="grid grid-cols-1 gap-3 md:gap-4 xl:grid-cols-3">
-        <Card className="xl:col-span-2">
-          <CardHead title="搜索门店" desc="MCP 需要「城市 + 关键词」才能返回真实在售菜单" />
-          <div className="p-3.5 md:p-4">
+      <div className="mt-9 grid grid-cols-1 items-start gap-5 xl:grid-cols-[minmax(0,1fr)_288px]">
+        <Panel className="px-5 py-6 md:px-7 md:py-7">
+          <p className="eyebrow">搜索门店</p>
+          <h2 className="display mt-2 text-[20px] text-ink">城市 + 关键词</h2>
+          <p className="mt-1.5 text-[11px] leading-relaxed text-ink-faint">
+            官方接口需要「城市 + 关键词」才会返回真实在售菜单，只给关键词可能查不到。
+          </p>
+          <div className="mt-5">
             <StoreSearch defaultCity={defaultCity} beType={beType} currentStoreCode={currentStoreCode} onPick={onPick} />
           </div>
-        </Card>
+        </Panel>
 
-        <Card>
-          <CardHead title="当前门店" desc="这一单会下到这家店" />
-          <div className="space-y-2.5 px-4 py-3.5 md:px-5">
+        <Panel className="px-5 py-6 md:px-6">
+          <p className="eyebrow">当前门店</p>
+          <p className="mt-3 text-[14px] leading-snug text-ink">{currentStoreName || '未选择'}</p>
+
+          <dl className="mt-5 space-y-3.5">
             <div>
-              <p className="text-[11px] text-[#6f6a62]">门店名称</p>
-              <p className="mt-0.5 truncate text-[13px] font-medium text-[#111827]">{currentStoreName || '未选择'}</p>
+              <dt className="eyebrow">门店编码</dt>
+              <dd className="tnum mt-1 font-mono text-[12px] text-ink-soft">{currentStoreCode ?? '—'}</dd>
             </div>
             <div>
-              <p className="text-[11px] text-[#6f6a62]">门店编码</p>
-              <p className="tnum mt-0.5 font-mono text-[12px] text-[#4b4945]">{currentStoreCode ?? '—'}</p>
-            </div>
-            <div>
-              <p className="text-[11px] text-[#6f6a62]">取餐方式</p>
-              <div className="mt-1">
+              <dt className="eyebrow">取餐方式</dt>
+              <dd className="mt-1.5">
                 <Badge tone="brand">到店自取</Badge>
-              </div>
+              </dd>
             </div>
-          </div>
-        </Card>
+          </dl>
+
+          <p className="mt-6 border-t border-hair pt-4 text-[10.5px] leading-relaxed text-ink-faint">
+            这一单会下到这家店。改店之后，之前核过的价格作废，需要重新核一次。
+          </p>
+        </Panel>
       </div>
     </div>
   );

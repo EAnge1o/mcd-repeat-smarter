@@ -382,6 +382,17 @@ export function createApiRouter(gateway: McdGateway): Router {
 
       let candidates = buildCandidates(planRequest).map((c) => ({ ...c, items: ensureRounds(c.items, combos) }));
 
+      /*
+       * 历史订单里的名字可能已经改过（随心配1+1 → 人气经典随心配）。
+       * 这类重命名不算「按你说的改」，但如果候选还叫「原样不变」，
+       * 界面上就会出现「原样不变 + 换了商品」的自相矛盾，所以这里把话说全。
+       */
+      if (matched.some((m) => m.status === 'renamed')) {
+        candidates = candidates.map((c) =>
+          c.strategy === 'minimal' && c.label === '原样不变' ? { ...c, label: '照旧 · 按当前菜单对齐' } : c,
+        );
+      }
+
       // 真实核价（逐候选调用官方 calculate-price）
       const priced = await Promise.all(
         candidates.map(async (c) => {

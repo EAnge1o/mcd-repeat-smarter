@@ -15,21 +15,21 @@ interface PlanListProps {
 /**
  * 常用方案的紧凑清单。
  *
- * 概览页不放方案卡片网格：方案在这个页面上的角色是「快捷入口」，不是需要浏览的资产。
- * 一行一条、左侧内容右侧动作，比三张等宽卡省一半高度，也把卡片留给真正需要强调的东西。
- * 完整的信息（明细、分类、编辑/复制/删除）在「常用方案」页。
+ * 概览页不放方案卡片网格：方案在这里是「快捷入口」，不是需要浏览的资产。
+ * 一行一条、左侧内容右侧动作，比三张等宽卡省一半高度。
  */
 export function PlanList({ plans, loading, limit = 3, onUse, onManage, emptyAction }: PlanListProps) {
   if (loading) {
     return (
-      <ul className="mt-1 divide-y divide-line/70">
+      <ul className="divide-y divide-hair">
         {[0, 1, 2].map((i) => (
-          <li key={i} className="flex items-center gap-3 py-3">
+          <li key={i} className="flex items-center gap-4 py-4">
+            <Skeleton className="h-7 w-7 rounded-full" />
             <div className="min-w-0 flex-1">
               <Skeleton className="h-3.5 w-32" />
-              <Skeleton className="mt-1.5 h-3 w-48" />
+              <Skeleton className="mt-2 h-3 w-48" />
             </div>
-            <Skeleton className="h-6 w-14" />
+            <Skeleton className="h-7 w-16 rounded-full" />
           </li>
         ))}
       </ul>
@@ -37,7 +37,14 @@ export function PlanList({ plans, loading, limit = 3, onUse, onManage, emptyActi
   }
 
   if (plans.length === 0) {
-    return <EmptyState compact title="还没有保存的常用方案" desc="调好一单后点「存成常用方案」，下次说一句「还是老样子」就能整单调出来。" action={emptyAction} />;
+    return (
+      <EmptyState
+        compact
+        title="还没有保存的常用方案"
+        desc="调好一单后点「存成常用方案」，下次说一句「还是老样子」就能整单调出来。"
+        action={emptyAction}
+      />
+    );
   }
 
   const shown = plans.slice(0, limit);
@@ -45,32 +52,38 @@ export function PlanList({ plans, loading, limit = 3, onUse, onManage, emptyActi
 
   return (
     <>
-      <ul className="mt-1 divide-y divide-line/70">
-        {shown.map((p) => {
-          const pieces = p.items.reduce((n, i) => n + i.quantity, 0);
-          const detail = p.items.map((i) => `${i.quantity}×${i.name}`).join('、');
+      <ul className="divide-y divide-hair">
+        {shown.map((p, i) => {
+          const pieces = p.items.reduce((n, it) => n + it.quantity, 0);
+          const detail = p.items.map((it) => `${it.quantity}×${it.name}`).join('、');
           return (
-            <li key={p.id} className="group flex items-center gap-3 py-2.5">
+            <li key={p.id} className="group flex items-center gap-3.5 py-3.5">
+              <span className="tnum grid h-6 w-6 shrink-0 place-items-center rounded-full bg-[#f6f1ec] font-mono text-[9px] leading-none text-ink-faint" aria-hidden="true">
+                {String(i + 1).padStart(2, '0')}
+              </span>
               <div className="min-w-0 flex-1">
                 <div className="flex items-baseline gap-2">
-                  <span className="truncate text-[13px] font-medium text-[#111827]" title={p.name}>
+                  <span className="truncate text-[13px] text-ink" title={p.name}>
                     {p.name}
                   </span>
-                  {p.tag ? <span className="shrink-0 text-[10.5px] text-[#6f6a62]">{p.tag}</span> : null}
+                  {p.tag ? <span className="shrink-0 font-mono text-[9px] tracking-[0.08em] text-ink-faint">{p.tag}</span> : null}
                 </div>
-                <p className="mt-0.5 truncate text-[11px] text-[#6f6a62]" title={`${detail} · ${p.storeName || p.storeCode}`}>
+                <p className="mt-1 truncate text-[11px] text-ink-faint" title={`${detail} · ${p.storeName || p.storeCode}`}>
                   <span className="tnum">{pieces} 件</span>
-                  <span className="px-1.5">·</span>
+                  <span className="px-1.5 text-[#d5cec6]">·</span>
                   {detail}
                 </p>
               </div>
+              {/* 动作常驻，不藏在 hover 里 —— 这一列是整页唯一能复用的入口，
+                  而触屏设备根本没有 hover；右侧留白也随之收掉 */}
               <button
                 type="button"
                 onClick={() => onUse(p)}
                 aria-label={`用「${p.name}」下一单`}
                 className={cx(
-                  'inline-flex h-7 shrink-0 items-center gap-1 rounded-md px-2 text-[11.5px] font-medium transition-colors duration-150 ease-out active:scale-[0.97]',
-                  'bg-[#f2f0ec] text-[#3d3a35] hover:bg-brand-500 hover:text-white',
+                  'inline-flex h-7 shrink-0 items-center gap-1 rounded-full px-3 text-[11px] font-medium',
+                  'bg-white text-ink-soft ring-1 ring-inset ring-line transition-[background-color,color,box-shadow] duration-200 ease-out',
+                  'hover:bg-ink hover:text-white hover:ring-ink active:scale-[0.97]',
                 )}
               >
                 用它
@@ -85,10 +98,10 @@ export function PlanList({ plans, loading, limit = 3, onUse, onManage, emptyActi
         <button
           type="button"
           onClick={onManage}
-          className="mt-1 inline-flex items-center gap-1 rounded-md py-1 text-[11.5px] text-[#57534c] transition-colors duration-150 hover:text-brand-600"
+          className="group mt-3 inline-flex items-center gap-1.5 text-[11px] text-ink-mute transition-colors duration-200 hover:text-brand-600"
         >
           还有 {rest} 个方案
-          <IconArrow size={11} />
+          <IconArrow size={10} className="transition-transform duration-200 group-hover:translate-x-0.5" />
         </button>
       ) : null}
     </>

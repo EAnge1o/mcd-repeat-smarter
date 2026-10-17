@@ -17,8 +17,9 @@ interface ComposerProps {
 /**
  * 一句话输入区 —— 全站唯一的主入口。
  *
- * 用 focus-within 给整个面板描边，而不是只给 textarea：输入时用户感知的是「我在这个框里」，
- * 边框只画在文本框上会让底部那行快捷短语看起来是独立控件。
+ * 用 focus-within 给整个浮层描边，而不是只给 textarea：输入时用户感知的是「我在这一层里」，
+ * 边框只画在文本框上会让底部那排快捷短语看起来是独立控件。
+ * 发送键是一个墨色圆钮，不用方块 —— 圆钮在这么空的版式里才不像按钮贴纸。
  */
 export function Composer({
   onSubmit,
@@ -31,6 +32,7 @@ export function Composer({
   className,
 }: ComposerProps) {
   const [value, setValue] = useState(initialValue);
+  const [focused, setFocused] = useState(false);
   const ref = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
@@ -51,11 +53,13 @@ export function Composer({
     onSubmit(text);
   };
 
+  const active = Boolean(value.trim()) && !loading && !disabled;
+
   return (
     <div
       className={cx(
-        'rounded-xl border border-line bg-white shadow-card transition-all duration-150 ease-out',
-        'focus-within:border-brand-500 focus-within:ring-2 focus-within:ring-brand-500/15',
+        'float rounded-[26px] transition-[box-shadow,ring] duration-300 ease-out',
+        focused && 'ring-1 ring-brand-400/80',
         className,
       )}
     >
@@ -63,6 +67,8 @@ export function Composer({
         ref={ref}
         value={value}
         onChange={(e) => setValue(e.target.value)}
+        onFocus={() => setFocused(true)}
+        onBlur={() => setFocused(false)}
         placeholder={placeholder}
         disabled={disabled}
         rows={1}
@@ -74,15 +80,16 @@ export function Composer({
           }
         }}
         className={cx(
-          'block w-full resize-none bg-transparent px-4 text-sm leading-relaxed text-[#111827] outline-none placeholder:text-[#7a756c] disabled:text-[#8a877f]',
-          compact ? 'pt-3 pb-2' : 'pt-3.5 pb-2.5',
+          'block w-full resize-none bg-transparent text-[13.5px] leading-[1.85] text-ink outline-none',
+          'placeholder:text-ink-faint disabled:text-ink-faint',
+          compact ? 'px-5 pt-3.5 pb-1' : 'px-6 pt-5 pb-1.5 md:text-[14.5px]',
         )}
       />
 
-      <div className="flex items-center gap-2 border-t border-line px-2 py-2">
+      <div className={cx('flex items-end justify-between gap-3', compact ? 'px-2.5 pb-2.5' : 'px-2.5 pb-2.5 md:px-3.5 md:pb-3.5')}>
         {quickPrompts.length > 0 ? (
-          <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-1.5 gap-y-1">
-            <span className="shrink-0 pl-1 text-[11px] text-[#6f6a62]">试着说</span>
+          <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-1.5 gap-y-1.5">
+            <span className="eyebrow shrink-0 pl-2">试着说</span>
             {quickPrompts.map((p) => (
               <button
                 key={p}
@@ -92,33 +99,31 @@ export function Composer({
                   ref.current?.focus();
                 }}
                 disabled={disabled || loading}
-                className="shrink-0 whitespace-nowrap rounded-md bg-[#f7f6f3] px-2 py-1 text-[11px] text-[#5c5850] transition-colors duration-150 hover:bg-[#eeece8] hover:text-[#111827] active:scale-[0.97] disabled:opacity-40"
+                className="shrink-0 whitespace-nowrap rounded-full bg-[#f6f1ec] px-3 py-1 text-[11px] text-ink-soft transition-[background-color,color,transform] duration-200 ease-out hover:bg-white hover:text-ink active:scale-[0.97] disabled:opacity-40"
               >
                 {p}
               </button>
             ))}
           </div>
         ) : (
-          <span className="flex-1 pl-2 text-[11px] text-[#6f6a62]">Enter 发送 · Shift + Enter 换行</span>
+          <span className="eyebrow shrink-0 pb-2.5 pl-2">Enter 发送 · Shift 换行</span>
         )}
 
         <button
           type="button"
           onClick={submit}
-          disabled={!value.trim() || loading || disabled}
+          disabled={!active}
           aria-label="开始调整"
           className={cx(
-            'grid shrink-0 place-items-center rounded-lg transition-all duration-150 ease-out active:scale-[0.94]',
-            compact ? 'h-8 w-8' : 'h-9 w-9',
-            value.trim() && !loading && !disabled
-              ? 'bg-brand-500 text-white hover:bg-brand-600'
-              : 'cursor-not-allowed bg-[#f2f0ec] text-[#c0bcb4]',
+            'grid shrink-0 place-items-center rounded-full transition-[background-color,color,transform] duration-200 ease-out active:scale-[0.94]',
+            compact ? 'h-9 w-9' : 'h-10 w-10',
+            active ? 'bg-ink text-white hover:bg-[#3a312c]' : 'cursor-not-allowed bg-[#e9e3dd] text-[#b6ada4]',
           )}
         >
           {loading ? (
-            <span className="h-3.5 w-3.5 animate-spin-slow rounded-full border-2 border-white/35 border-t-white" aria-hidden="true" />
+            <span className="h-3.5 w-3.5 animate-spin-slow rounded-full border-2 border-white/30 border-t-white" aria-hidden="true" />
           ) : (
-            <IconSend size={compact ? 15 : 16} />
+            <IconSend size={compact ? 14 : 15} />
           )}
         </button>
       </div>

@@ -3,7 +3,7 @@ import type { SpendPoint } from '../lib/metrics';
 import { fmtDateTime, yuan } from '../lib/metrics';
 import { EmptyState, cx } from './ui';
 
-const PAD = { l: 46, r: 8, t: 16, b: 22 };
+const PAD = { l: 44, r: 10, t: 18, b: 26 };
 
 /** y 轴刻度文案。入参是「分」，必须先换算成元，否则 25 元会被写成 ¥2.5k。 */
 function axisLabel(cents: number): string {
@@ -66,7 +66,7 @@ interface SpendTrendProps {
  * 金额缺失（接口没返回 paidYuan）的订单不会画成 0 元 —— 那等于伪造了一笔免费订单，
  * 而是在图下方注明排除了几笔。
  */
-export function SpendTrend({ points, skipped, selectedId, onPick, height = 168 }: SpendTrendProps) {
+export function SpendTrend({ points, skipped, selectedId, onPick, height = 176 }: SpendTrendProps) {
   const [active, setActive] = useState<number | null>(null);
   const [w, setW] = useState(0);
   const boxRef = useRef<HTMLDivElement>(null);
@@ -147,7 +147,7 @@ export function SpendTrend({ points, skipped, selectedId, onPick, height = 168 }
             >
               <defs>
                 <linearGradient id="spendBand" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#da291c" stopOpacity="0.13" />
+                  <stop offset="0%" stopColor="#da291c" stopOpacity="0.1" />
                   <stop offset="100%" stopColor="#da291c" stopOpacity="0" />
                 </linearGradient>
               </defs>
@@ -159,17 +159,25 @@ export function SpendTrend({ points, skipped, selectedId, onPick, height = 168 }
                     y1={t.y}
                     x2={w - PAD.r}
                     y2={t.y}
-                    stroke={i === 0 ? '#ddd9d2' : '#efedea'}
+                    stroke={i === 0 ? 'rgba(40,32,28,.16)' : 'rgba(40,32,28,.07)'}
                     strokeWidth="1"
+                    strokeDasharray={i === 0 ? undefined : '1 5'}
                   />
-                  <text x={PAD.l - 10} y={t.y + 4} textAnchor="end" fontSize="10.5" fill="#6f6a62" className="tnum">
+                  <text
+                    x={PAD.l - 12}
+                    y={t.y + 3.5}
+                    textAnchor="end"
+                    fontSize="9.5"
+                    fill="#736a61"
+                    style={{ fontFamily: '"DM Mono", monospace', letterSpacing: '0.04em' }}
+                  >
                     {axisLabel(t.v)}
                   </text>
                 </g>
               ))}
 
               <path d={area} fill="url(#spendBand)" />
-              <path d={line} fill="none" stroke="#da291c" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
+              <path d={line} fill="none" stroke="#da291c" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
 
               {nodes.map((p, i) => {
                 const show = nodes.length <= maxLabels || i === 0 || i === nodes.length - 1 || i === Math.floor((nodes.length - 1) / 2);
@@ -181,11 +189,11 @@ export function SpendTrend({ points, skipped, selectedId, onPick, height = 168 }
                   <text
                     key={`l-${i}`}
                     x={first ? PAD.l : last ? w - PAD.r : p.x}
-                    y={H - 6}
+                    y={H - 7}
                     textAnchor={first ? 'start' : last ? 'end' : 'middle'}
-                    fontSize="10.5"
-                    fill="#6f6a62"
-                    className="tnum"
+                    fontSize="9.5"
+                    fill="#736a61"
+                    style={{ fontFamily: '"DM Mono", monospace', letterSpacing: '0.04em' }}
                   >
                     {p.label}
                   </text>
@@ -193,7 +201,7 @@ export function SpendTrend({ points, skipped, selectedId, onPick, height = 168 }
               })}
 
               {hot ? (
-                <line x1={hot.x} y1={PAD.t} x2={hot.x} y2={PAD.t + PH} stroke="#da291c" strokeWidth="1" strokeDasharray="3 3" opacity="0.4" />
+                <line x1={hot.x} y1={PAD.t - 4} x2={hot.x} y2={PAD.t + PH} stroke="#da291c" strokeWidth="1" strokeDasharray="2 4" opacity="0.32" />
               ) : null}
 
               {nodes.map((p, i) => {
@@ -203,11 +211,11 @@ export function SpendTrend({ points, skipped, selectedId, onPick, height = 168 }
                     key={`c-${i}`}
                     cx={p.x}
                     cy={p.y}
-                    r={on ? 4 : 2.5}
-                    fill="#fff"
+                    r={on ? 4.4 : 2.6}
+                    fill={on ? '#da291c' : '#faf8f6'}
                     stroke="#da291c"
-                    strokeWidth={on ? 2.5 : 1.75}
-                    className="transition-all duration-150"
+                    strokeWidth={on ? 2 : 1.5}
+                    className="transition-all duration-200"
                   />
                 );
               })}
@@ -247,17 +255,17 @@ export function SpendTrend({ points, skipped, selectedId, onPick, height = 168 }
 
             {hot ? (
               <div
-                className="pointer-events-none absolute z-10 -translate-x-1/2 rounded-lg border border-line bg-white px-2.5 py-1.5 shadow-lift"
-                style={{ left: `${(hot.x / w) * 100}%`, top: `${(hot.y / H) * 100}%`, marginTop: -50 }}
+                className="float pointer-events-none absolute z-10 -translate-x-1/2 rounded-xl px-3 py-2"
+                style={{ left: `${(hot.x / w) * 100}%`, top: `${(hot.y / H) * 100}%`, marginTop: -56 }}
               >
-                <p className="tnum text-[12.5px] font-semibold leading-tight text-[#111827]">¥{yuan(hot.cents)}</p>
-                <p className="whitespace-nowrap text-[10px] text-[#6f6a62]">{fmtDateTime(hot.time)}</p>
+                <p className="tnum display text-[14px] leading-none text-ink">¥{yuan(hot.cents)}</p>
+                <p className="mt-1 whitespace-nowrap font-mono text-[9px] tracking-[0.04em] text-ink-faint">{fmtDateTime(hot.time)}</p>
               </div>
             ) : null}
           </div>
 
           {skipped > 0 || zeroCount > 0 ? (
-            <p className="mt-1.5 text-[10.5px] leading-relaxed text-[#6f6a62]">
+            <p className="mt-2 text-[10px] leading-relaxed text-ink-faint">
               {skipped > 0 ? `另有 ${skipped} 笔订单接口未返回金额，未计入趋势线。` : ''}
               {zeroCount > 0 ? `${skipped > 0 ? ' ' : ''}其中 ${zeroCount} 笔为券/积分全额抵扣，实付 ¥0。` : ''}
             </p>

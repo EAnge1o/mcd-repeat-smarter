@@ -9,7 +9,7 @@ interface HeroProps {
   lastOrder: HistoryOrder | null;
   loading?: boolean;
   quickPrompts: string[];
-  /** 从右栏/其他位置点「按这个点一单」时填进输入框的话 */
+  /** 从注解栏/其他位置点「按这个点一单」时填进输入框的话 */
   prefill: string;
   demoReason?: string;
   onSubmit: (text: string) => void;
@@ -31,59 +31,62 @@ function orderSummary(o: HistoryOrder): string {
 /**
  * 首屏主舞台 —— 这一屏的全部意义是「用一句话开始下一单」。
  *
- * 所以这里不包卡片：标题、说明、输入框直接落在页面底上，用字号和留白建立层级。
- * 数据统计移到右侧注解栏，别让「回看」型信息抢走「下一步做什么」的位置。
+ * 所以它是居中的单栏，像一页扉页：一行 mono 元信息、一句衬线大字、一层浮起的输入框。
+ * 不包卡片、不放图表、不在左右塞侧栏 —— 首屏只允许存在一个动作。
  */
 export function Hero({ lastOrder, loading, quickPrompts, prefill, demoReason, onSubmit, onUseLatest }: HeroProps) {
   return (
-    <section aria-labelledby="hero-title">
+    <section aria-labelledby="hero-title" className="mx-auto max-w-[720px] px-1 text-center">
+      <p className="eyebrow">记住你常点的 · 听懂你这次改的</p>
+
       <h1
         id="hero-title"
-        className="text-[26px] font-semibold leading-[1.2] tracking-tight text-[#111827] md:text-[34px] md:leading-[1.15]"
+        className="display mx-auto mt-5 text-[clamp(34px,5.2vw,62px)] leading-[1.12] tracking-[-0.04em] text-ink"
       >
-        今天，还是<span className="text-brand-600">老样子</span>吗？
+        {/* 全角逗号自带一个字宽的空白，不收一下会在 62px 下断成「两个空格」。写成一行，避免 JSX 换行变成行内空格 */}
+        今天<span className="mr-[-0.14em]">，</span>还是<span className="whitespace-nowrap text-brand-600">老样子</span>吗？
       </h1>
 
-      <p className="mt-2.5 max-w-[46ch] text-[13px] leading-relaxed text-[#57534c] md:text-[13.5px]">
-        说一句你想怎么改就行 —— 记得你的习惯，也听得懂今天的小变化。
+      <p className="mx-auto mt-6 max-w-[30rem] text-pretty text-[12.5px] font-light leading-[1.95] text-ink-mute md:text-[13px]">
+        {/* 断行写死：让「20 元以内」不被拆开，破折号落在行首 */}
+        整单照旧、去掉一样、换个饮料，或者压到 20 元以内
+        <br />
+        —— 说一句就行，其余交给它。
       </p>
 
-      <div className="mt-5 md:mt-6">
+      <div className="mt-8 text-left">
         <Composer onSubmit={onSubmit} quickPrompts={quickPrompts} initialValue={prefill} />
       </div>
 
       {loading ? (
-        <div className="mt-3.5">
-          <Skeleton className="h-3 w-72 max-w-full" />
+        <div className="mt-4 flex justify-center">
+          <Skeleton className="h-3 w-64" />
         </div>
       ) : lastOrder ? (
-        <div className="mt-3 flex flex-wrap items-baseline gap-x-3 gap-y-1">
-          <p className="min-w-0 flex-1 truncate text-[11.5px] text-[#6f6a62]" title={orderSummary(lastOrder)}>
-            <span className="text-[#57534c]">最近一单</span>
-            <span className="px-1.5">·</span>
-            <span className="tnum">{fmtDateTime(lastOrder.createTime)}</span>
-            <span className="px-1.5">·</span>
+        <div className="mt-5 flex flex-wrap items-baseline justify-center gap-x-2 gap-y-1 text-[11px] text-ink-faint">
+          <span className="eyebrow">最近一单</span>
+          <span className="tnum">{fmtDateTime(lastOrder.createTime)}</span>
+          <span className="text-[#d5cec6]">·</span>
+          <span className="max-w-[280px] truncate" title={orderSummary(lastOrder)}>
             {orderSummary(lastOrder)}
-          </p>
+          </span>
           <button
             type="button"
             onClick={onUseLatest}
-            className="group inline-flex shrink-0 items-center gap-1 rounded-md px-1.5 py-0.5 text-[11.5px] font-medium text-brand-600 transition-colors duration-150 hover:bg-brand-50"
+            className="group inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 font-medium text-brand-600 transition-colors duration-200 hover:bg-brand-50"
           >
-            照这份再来一单
-            <IconArrow size={11} className="transition-transform duration-150 group-hover:translate-x-0.5" />
+            照这份再来
+            <IconArrow size={10} className="transition-transform duration-200 group-hover:translate-x-0.5" />
           </button>
         </div>
       ) : null}
 
       {demoReason ? (
-        <p className="mt-3 flex items-start gap-1.5 text-[11.5px] leading-relaxed text-[#6d4c11]">
-          <span className="mt-[3px] shrink-0 text-[#a17317]">
-            <IconAlert size={12} />
+        <p className="mx-auto mt-5 flex max-w-[34rem] items-start justify-center gap-1.5 text-[10.5px] leading-relaxed text-[#7a5a1c]">
+          <span className="mt-[3px] shrink-0">
+            <IconAlert size={11} />
           </span>
-          <span>
-            当前展示内置示例数据，门店、餐品与价格不代表真实供应情况（{demoReason}）。
-          </span>
+          <span>当前展示内置示例数据，门店、餐品与价格不代表真实供应情况（{demoReason}）。</span>
         </p>
       ) : null}
     </section>

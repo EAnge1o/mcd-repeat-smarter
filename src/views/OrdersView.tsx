@@ -1,5 +1,5 @@
 import type { HistoryOrder } from '../../server/domain/types';
-import { Badge, Button, Card, CardHead } from '../components/ui';
+import { Badge, Button, Panel, Stat } from '../components/ui';
 import { OrdersTable } from '../components/OrdersTable';
 import { IconRefresh, IconSparkle } from '../components/Icons';
 import { paidCents, yuan } from '../lib/metrics';
@@ -24,51 +24,58 @@ export function OrdersView({
   const zeroCount = orders.filter((o) => paidCents(o) === 0).length;
 
   return (
-    <div className="space-y-4 md:space-y-5">
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="text-xl font-semibold tracking-tight text-[#111827] md:text-2xl">订单记录</h1>
-          <p className="mt-1 text-xs text-[#57534c]">
-            {mode === 'live' ? '读取自你的麦当劳账号，只在你本机与服务端之间流转。' : '当前为内置演示数据，非真实账号。'}
+    <div>
+      <header className="flex flex-wrap items-end justify-between gap-x-6 gap-y-4">
+        <div className="max-w-[560px]">
+          <p className="eyebrow">订单记录 · 全部来自真实接口</p>
+          <h1 className="display mt-3 text-[27px] leading-[1.15] text-ink md:text-[34px]">每一单都记得</h1>
+          <p className="mt-2.5 max-w-[34rem] text-pretty text-[12.5px] leading-[1.9] text-ink-mute">
+            {mode === 'live'
+              ? '读取自你的麦当劳账号，按下单时间倒序。金额取接口返回的实付值，未返回的显示为「—」而不是 0。'
+              : '当前为内置演示数据，不是真实账号。切到真实 MCP 后会读取你自己的历史订单。'}
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
           <Button onClick={onRefresh}>
-            <IconRefresh size={13} />
+            <IconRefresh size={12} />
             重新读取
           </Button>
-          <Button variant="primary" onClick={onUseLatest} disabled={orders.length === 0}>
-            <IconSparkle size={14} />
+          <Button variant="primary" arrow onClick={onUseLatest} disabled={orders.length === 0}>
+            <IconSparkle size={13} />
             还是老样子
           </Button>
         </div>
-      </div>
+      </header>
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 md:gap-4">
-        {[
-          { label: '订单总数', value: String(orders.length), unit: '单' },
-          { label: '合计消费', value: priced.length > 0 ? `¥${yuan(total)}` : '—', unit: '' },
-          { label: '有金额的订单', value: String(priced.length), unit: '笔' },
-          { label: '券抵扣订单', value: String(zeroCount), unit: '笔' },
-        ].map((s) => (
-          <div key={s.label} className="rounded-xl border border-line bg-white px-4 py-3 shadow-card">
-            <p className="text-[11px] text-[#6f6a62]">{s.label}</p>
-            <p className="mt-1 flex items-baseline gap-1">
-              <span className="tnum text-[18px] font-semibold leading-none text-[#111827]">{s.value}</span>
-              {s.unit ? <span className="text-[11px] text-[#6f6a62]">{s.unit}</span> : null}
-            </p>
+      <section aria-label="订单概况" className="mt-9 border-y border-hair">
+        <dl className="grid grid-cols-2 md:grid-cols-4">
+          <div className="py-6 md:pl-0 md:pr-7">
+            <Stat label="订单总数" value={String(orders.length)} unit="单" />
           </div>
-        ))}
-      </div>
+          <div className="border-l border-hair px-4 py-6 md:px-7">
+            <Stat label="合计消费" value={priced.length > 0 ? `¥${yuan(total)}` : '—'} tone="brand" />
+          </div>
+          <div className="border-t border-hair py-6 md:border-l md:border-t-0 md:pl-7 md:pr-0">
+            <Stat label="有金额的订单" value={String(priced.length)} unit="笔" />
+          </div>
+          <div className="border-l border-t border-hair px-4 py-6 md:border-t-0 md:pl-7 md:pr-0">
+            <Stat label="券抵扣订单" value={String(zeroCount)} unit="笔" hint={zeroCount > 0 ? '实付 ¥0' : '没有全额抵扣的单'} />
+          </div>
+        </dl>
+      </section>
 
-      <Card>
-        <CardHead
-          title="全部订单"
-          desc="按下单时间倒序，金额取接口返回的实付值"
-          action={<Badge tone={mode === 'live' ? 'ok' : 'warn'}>{mode === 'live' ? 'MCP 实时' : '演示数据'}</Badge>}
-        />
-        <OrdersTable orders={orders} loading={loading} onUse={onUse} />
-      </Card>
+      <Panel className="mt-6 px-5 py-6 md:px-8 md:py-8">
+        <div className="flex flex-wrap items-baseline justify-between gap-3">
+          <div>
+            <p className="eyebrow">全部订单</p>
+            <h2 className="display mt-2 text-[20px] text-ink md:text-[23px]">按下单时间倒序</h2>
+          </div>
+          <Badge tone={mode === 'live' ? 'ok' : 'warn'}>{mode === 'live' ? 'MCP 实时' : '演示数据'}</Badge>
+        </div>
+        <div className="mt-4">
+          <OrdersTable orders={orders} loading={loading} onUse={onUse} />
+        </div>
+      </Panel>
     </div>
   );
 }

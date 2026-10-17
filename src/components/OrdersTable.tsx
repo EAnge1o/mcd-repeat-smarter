@@ -23,7 +23,7 @@ export function OrdersTable({ orders, loading, onUse, limit, emptyAction }: Orde
 
   if (loading) {
     return (
-      <div className="space-y-2 p-4 md:p-5">
+      <div className="space-y-3 py-2">
         {[0, 1, 2].map((i) => (
           <div key={i} className="flex items-center gap-3">
             <Skeleton className="h-3 w-16" />
@@ -49,7 +49,7 @@ export function OrdersTable({ orders, loading, onUse, limit, emptyAction }: Orde
                 key={h || i}
                 scope="col"
                 className={cx(
-                  'whitespace-nowrap px-4 py-2 text-[11px] font-medium text-[#6f6a62] md:px-5',
+                  'whitespace-nowrap px-3 py-2.5 font-mono text-[9.5px] font-normal uppercase tracking-[0.14em] text-ink-faint md:px-4',
                   i === 3 ? 'text-right' : '',
                 )}
               >
@@ -63,51 +63,53 @@ export function OrdersTable({ orders, loading, onUse, limit, emptyAction }: Orde
             const c = paidCents(o);
             const zero = c === 0;
             return (
-              <tr key={o.orderId} className="group border-b border-line/70 transition-colors duration-150 last:border-0 hover:bg-[#faf9f7]">
-                <td className="whitespace-nowrap px-4 py-2.5 text-[12px] text-[#4b4945] md:px-5">
-                  <span className="tnum">{fmtDateTime(o.createTime)}</span>
+              <tr key={o.orderId} className="group border-b border-hair transition-colors duration-200 last:border-0 hover:bg-[#fbf7f3]">
+                <td className="whitespace-nowrap px-3 py-3 md:px-4">
+                  <span className="tnum block font-mono text-[10px] tracking-[0.02em] text-ink-mute">{fmtDateTime(o.createTime)}</span>
                 </td>
 
-                <td className="max-w-[190px] px-4 py-2.5 text-[12px] md:px-5">
-                  <span className="block truncate text-[#111827]" title={o.storeName}>
+                <td className="max-w-[190px] px-3 py-3 md:px-4">
+                  <span className="block truncate text-[12px] text-ink" title={o.storeName}>
                     {o.storeName || o.storeCode}
                   </span>
-                  <span className="tnum block text-[10px] text-[#6f6a62]">#{o.orderId.slice(-8)}</span>
+                  <span className="tnum block font-mono text-[9.5px] text-ink-faint">#{o.orderId.slice(-8)}</span>
                 </td>
 
-                <td className="max-w-[280px] px-4 py-2.5 text-[12px] md:px-5">
-                  <span className="block truncate text-[#4b4945]" title={o.items.map((i) => `${i.quantity}×${i.name}`).join('、')}>
+                <td className="max-w-[280px] px-3 py-3 md:px-4">
+                  <span className="block truncate text-[12px] text-ink-soft" title={o.items.map((i) => `${i.quantity}×${i.name}`).join('、')}>
                     {o.items.length === 0 ? '（无明细）' : o.items.map((i) => `${i.quantity}×${i.name}`).join('、')}
                   </span>
-                  <span className="text-[10px] text-[#6f6a62]">共 {o.items.reduce((n, i) => n + i.quantity, 0)} 件</span>
+                  <span className="text-[10px] text-ink-faint">共 {o.items.reduce((n, i) => n + i.quantity, 0)} 件</span>
                 </td>
 
-                <td className={cx('tnum whitespace-nowrap px-4 py-2.5 text-right text-[12px] md:px-5', zero ? 'text-[#6f6a62]' : 'text-[#111827]')}>
-                  {c === null ? (
-                    <span className="text-[#6f6a62]" title="接口未返回实付金额">
-                      —
-                    </span>
-                  ) : (
-                    <>
-                      ¥{yuan(c)}
-                      {zero ? <span className="ml-1 text-[10px] text-[#6f6a62]">券抵扣</span> : null}
-                    </>
-                  )}
+                <td className="whitespace-nowrap px-3 py-3 text-right md:px-4">
+                  <span className={cx('tnum display text-[13px]', zero ? 'text-ink-mute' : 'text-ink')}>
+                    {c === null ? (
+                      <span className="text-ink-faint" title="接口未返回实付金额">
+                        —
+                      </span>
+                    ) : (
+                      <>
+                        ¥{yuan(c)}
+                        {zero ? <span className="ml-1 font-sans text-[9px] tracking-[0.08em] text-ink-faint">券抵扣</span> : null}
+                      </>
+                    )}
+                  </span>
                 </td>
 
-                <td className="whitespace-nowrap px-4 py-2.5 md:px-5">
+                <td className="whitespace-nowrap px-3 py-3 md:px-4">
                   <Badge tone="neutral">{o.orderStatus || '未知'}</Badge>
                 </td>
 
-                <td className="whitespace-nowrap px-4 py-2.5 text-right md:px-5">
+                <td className="whitespace-nowrap px-3 py-3 text-right md:px-4">
                   {onUse ? (
                     <button
                       type="button"
                       onClick={() => onUse(o)}
-                      className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-[11px] font-medium text-[#57534c] opacity-0 transition-all duration-150 hover:bg-[#f2f0ec] hover:text-brand-600 focus-visible:opacity-100 group-hover:opacity-100"
+                      className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10.5px] font-medium text-ink-mute opacity-0 transition-all duration-200 hover:bg-white hover:text-brand-600 focus-visible:opacity-100 group-hover:opacity-100"
                     >
                       再来一单
-                      <IconArrow size={11} />
+                      <IconArrow size={10} />
                     </button>
                   ) : null}
                 </td>

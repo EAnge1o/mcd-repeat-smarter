@@ -48,7 +48,7 @@ function ChangeTags({ result }: { result: AdjustResult }) {
     k === 'remove' || k === 'budget' ? 'danger' : k === 'add' ? 'ok' : k === 'replace' ? 'warn' : 'neutral';
 
   return (
-    <div className="mt-2.5 flex flex-wrap gap-1.5">
+    <div className="mt-3 flex flex-wrap gap-1.5">
       {tags.map((t, i) => (
         <Badge key={i} tone={toneOf(t.kind) as 'neutral' | 'ok' | 'warn' | 'danger'}>
           {t.text}
@@ -62,8 +62,8 @@ function ChangeTags({ result }: { result: AdjustResult }) {
 function MatchNotice({ matched, summary }: { matched: MatchedView[]; summary: AdjustResult['matchSummary'] }) {
   if (!summary.hasRisk) {
     return (
-      <p className="flex items-center gap-1.5 text-xs text-[#1d7a45]">
-        <IconCheck size={13} />
+      <p className="flex items-center gap-1.5 text-[11.5px] text-[#3f6b52]">
+        <IconCheck size={12} />
         原方案里的商品当前都还能点到
       </p>
     );
@@ -87,7 +87,7 @@ function MatchNotice({ matched, summary }: { matched: MatchedView[]; summary: Ad
                 <div key={j} className="mt-1">
                   子项「{c.name}」{c.status === 'substituted' ? '已下架，替换为' : '编码变更，对应'}「{c.currentName}」
                   {c.alternatives.length > 0 ? (
-                    <span className="opacity-75">（也可选：{c.alternatives.map((a) => `${a.name} ${a.diffPrice ?? ''}`).join('、')}）</span>
+                    <span className="opacity-80">（也可选：{c.alternatives.map((a) => `${a.name} ${a.diffPrice ?? ''}`).join('、')}）</span>
                   ) : null}
                 </div>
               ))}
@@ -107,9 +107,9 @@ function MatchNotice({ matched, summary }: { matched: MatchedView[]; summary: Ad
 function ChildTags({ tags }: { tags: { name: string; changed?: boolean }[] }) {
   if (tags.length === 0) return null;
   return (
-    <div className="mt-0.5 flex flex-wrap gap-1 pl-7">
+    <div className="mt-1 flex flex-wrap gap-x-2 gap-y-0.5 pl-7">
       {tags.map((t, i) => (
-        <span key={i} className={cx('text-[10px]', t.changed ? 'text-[#8a5a00]' : 'text-[#6f6a62]')}>
+        <span key={i} className={cx('text-[10px] leading-relaxed', t.changed ? 'text-[#7a5a1c]' : 'text-ink-faint')}>
           {t.name}
         </span>
       ))}
@@ -124,20 +124,20 @@ function Compare({ matched, candidate }: { matched: MatchedView[]; candidate: Ca
   const count = (items: PlanItem[]) => items.reduce((n, i) => n + i.quantity, 0);
 
   return (
-    <div className="grid grid-cols-1 gap-2 sm:grid-cols-[1fr_auto_1fr] sm:items-center">
-      <div className="rounded-lg border border-line bg-[#faf9f7] p-3">
+    <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-[1fr_auto_1fr] sm:items-center">
+      <div className="rounded-2xl bg-[#f6f1ec] p-4">
         <div className="flex items-baseline justify-between">
-          <span className="text-[11px] font-medium text-[#57534c]">原方案</span>
-          <span className="tnum text-[10px] text-[#6f6a62]">共 {matched.reduce((n, m) => n + m.quantity, 0)} 件</span>
+          <span className="eyebrow">原方案</span>
+          <span className="tnum font-mono text-[9.5px] text-ink-faint">共 {matched.reduce((n, m) => n + m.quantity, 0)} 件</span>
         </div>
-        <div className="mt-2 space-y-1">
+        <div className="mt-3 space-y-1.5">
           {matched.map((m, i) => {
             const gone = m.status === 'unavailable' || removed.has(m.name);
             return (
               <div key={i}>
-                <div className="flex items-baseline gap-1.5">
-                  <span className="tnum w-5 shrink-0 text-right text-[10px] text-[#6f6a62]">{m.quantity}×</span>
-                  <span className={cx('truncate text-[12px]', gone ? 'text-[#6f6a62] line-through' : 'text-[#4b4945]')} title={m.name}>
+                <div className="flex items-baseline gap-2">
+                  <span className="tnum w-5 shrink-0 text-right font-mono text-[9.5px] text-ink-faint">{m.quantity}×</span>
+                  <span className={cx('truncate text-[12px]', gone ? 'text-ink-faint line-through' : 'text-ink-soft')} title={m.name}>
                     {m.name}
                   </span>
                 </div>
@@ -149,26 +149,26 @@ function Compare({ matched, candidate }: { matched: MatchedView[]; candidate: Ca
       </div>
 
       <div className="hidden justify-center sm:flex" aria-hidden="true">
-        <span className="grid h-6 w-6 place-items-center rounded-full border border-line bg-white text-[#6f6a62]">
+        <span className="grid h-7 w-7 place-items-center rounded-full bg-white text-ink-faint shadow-pill ring-1 ring-line">
           <IconArrow size={12} />
         </span>
       </div>
 
-      <div className="rounded-lg border border-brand-100 bg-brand-50/40 p-3">
+      <div className="rounded-2xl bg-blush p-4 ring-1 ring-inset ring-[#f6dcd6]">
         <div className="flex items-baseline justify-between">
-          <span className="text-[11px] font-medium text-brand-700">调整后</span>
-          <span className="tnum text-[10px] text-[#6f6a62]">共 {count(candidate.items)} 件</span>
+          <span className="eyebrow text-brand-700">调整后</span>
+          <span className="tnum font-mono text-[9.5px] text-ink-faint">共 {count(candidate.items)} 件</span>
         </div>
-        <div className="mt-2 space-y-1">
+        <div className="mt-3 space-y-1.5">
           {candidate.items.length === 0 ? (
-            <p className="text-[11px] text-[#6f6a62]">这一版没有任何餐品</p>
+            <p className="text-[11px] text-ink-faint">这一版没有任何餐品</p>
           ) : (
             candidate.items.map((item, i) => (
               <div key={`${item.productCode}-${i}`}>
-                <div className="flex items-baseline gap-1.5">
-                  <span className="tnum w-5 shrink-0 text-right text-[10px] text-[#6f6a62]">{item.quantity}×</span>
+                <div className="flex items-baseline gap-2">
+                  <span className="tnum w-5 shrink-0 text-right font-mono text-[9.5px] text-ink-faint">{item.quantity}×</span>
                   <span
-                    className={cx('truncate text-[12px]', added.has(item.name) ? 'font-medium text-brand-700' : 'text-[#3d3a35]')}
+                    className={cx('truncate text-[12px]', added.has(item.name) ? 'font-medium text-brand-700' : 'text-ink')}
                     title={item.name}
                   >
                     {item.name}
@@ -204,15 +204,17 @@ function CandidateCard({ candidate, active, onSelect }: { candidate: CandidatePl
         }
       }}
       className={cx(
-        'cursor-pointer rounded-lg border p-3 transition-colors duration-150 ease-out',
-        active ? 'border-brand-500 bg-brand-50/50' : 'border-line bg-[#faf9f7] hover:bg-[#f4f2ee]',
+        'cursor-pointer rounded-2xl p-4 transition-[background-color,box-shadow] duration-200 ease-out',
+        active
+          ? 'bg-white shadow-panel ring-1 ring-inset ring-brand-300'
+          : 'bg-[#fbf7f3] ring-1 ring-inset ring-transparent hover:bg-[#f8f2ec]',
       )}
     >
-      <div className="flex items-start gap-2">
+      <div className="flex items-start gap-2.5">
         <span
           className={cx(
-            'mt-0.5 grid h-4 w-4 shrink-0 place-items-center rounded-full border transition-colors duration-150',
-            active ? 'border-brand-500 bg-brand-500' : 'border-[#d8d4cd] bg-white',
+            'mt-1 grid h-4 w-4 shrink-0 place-items-center rounded-full border transition-colors duration-200',
+            active ? 'border-brand-500 bg-brand-500' : 'border-[#d8d0c8] bg-white',
           )}
           aria-hidden="true"
         >
@@ -220,8 +222,8 @@ function CandidateCard({ candidate, active, onSelect }: { candidate: CandidatePl
         </span>
 
         <div className="min-w-0 flex-1">
-          <p className="truncate text-[13px] font-medium text-[#111827]">{candidate.label}</p>
-          <div className="mt-1 flex flex-wrap items-center gap-1">
+          <p className="truncate text-[13px] text-ink">{candidate.label}</p>
+          <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
             {candidate.withinBudget === true ? <Badge tone="ok">在预算内</Badge> : null}
             {candidate.withinBudget === false ? <Badge tone="danger">超预算</Badge> : null}
             {price && price.discountCents > 0 ? <Badge tone="warn">已省 ¥{yuan(price.discountCents)}</Badge> : null}
@@ -231,35 +233,35 @@ function CandidateCard({ candidate, active, onSelect }: { candidate: CandidatePl
         <div className="shrink-0 text-right">
           {price ? (
             <>
-              <div className="tnum text-[16px] font-semibold leading-none text-[#111827]">
-                <span className="mr-0.5 text-[11px] font-normal text-[#6f6a62]">¥</span>
+              <div className="tnum display text-[19px] leading-none text-ink">
+                <span className="mr-0.5 font-sans text-[11px] font-normal text-ink-faint">¥</span>
                 {yuan(price.priceCents)}
               </div>
               {price.originalPriceCents > price.priceCents ? (
-                <div className="tnum mt-0.5 text-[10px] text-[#6f6a62] line-through">¥{yuan(price.originalPriceCents)}</div>
+                <div className="tnum mt-1 font-mono text-[9.5px] text-ink-faint line-through">¥{yuan(price.originalPriceCents)}</div>
               ) : null}
             </>
           ) : (
-            <div className="text-[11px] font-medium text-[#b3261e]">核价失败</div>
+            <div className="text-[11px] text-brand-700">核价失败</div>
           )}
         </div>
       </div>
 
-      <div className="mt-2.5 space-y-0.5 border-t border-line pt-2">
+      <div className="mt-3 space-y-1 border-t border-white/70 pt-3">
         {candidate.items.map((item, i) => (
           <div key={`${item.productCode}-${i}`}>
-            <div className="flex items-baseline gap-1.5">
-              <span className="tnum w-4 shrink-0 text-right text-[10px] text-[#6f6a62]">{item.quantity}</span>
-              <span className="truncate text-[12px] text-[#4b4945]">{item.name}</span>
+            <div className="flex items-baseline gap-2">
+              <span className="tnum w-4 shrink-0 text-right font-mono text-[9.5px] text-ink-faint">{item.quantity}</span>
+              <span className="truncate text-[12px] text-ink-soft">{item.name}</span>
             </div>
             {item.children.length > 0 ? (
-              <div className="flex flex-wrap gap-1 pl-[22px]">
+              <div className="flex flex-wrap gap-x-2 gap-y-0.5 pl-[24px]">
                 {item.children.map((c, j) => (
                   <span
                     key={j}
                     className={cx(
-                      'text-[10px]',
-                      changedNames.has(c.name) || (c.aliasNames && c.aliasNames.length > 0) ? 'text-[#8a5a00]' : 'text-[#6f6a62]',
+                      'text-[10px] leading-relaxed',
+                      changedNames.has(c.name) || (c.aliasNames && c.aliasNames.length > 0) ? 'text-[#7a5a1c]' : 'text-ink-faint',
                     )}
                   >
                     {c.roundName ? `${c.roundName}·` : ''}
@@ -273,34 +275,34 @@ function CandidateCard({ candidate, active, onSelect }: { candidate: CandidatePl
       </div>
 
       {candidate.budgetNote || (candidate.priceChecks && candidate.priceChecks.length > 0) || notes.length > 0 ? (
-        <div className="mt-2 space-y-1 border-t border-line pt-2">
+        <div className="mt-2.5 space-y-1 border-t border-white/70 pt-2.5">
           {candidate.budgetNote ? (
-            <p className="flex items-start gap-1 text-[11px] leading-relaxed text-[#8a5a00]">
+            <p className="flex items-start gap-1.5 text-[10.5px] leading-relaxed text-[#7a5a1c]">
               <IconAlert size={11} className="mt-0.5 shrink-0" />
               <span>{candidate.budgetNote}。系统不会为了凑预算偷偷换掉你要的东西。</span>
             </p>
           ) : null}
           {(candidate.priceChecks ?? []).map((n, i) => (
-            <p key={i} className="flex items-start gap-1 text-[11px] leading-relaxed text-[#8a5a00]">
+            <p key={i} className="flex items-start gap-1.5 text-[10.5px] leading-relaxed text-[#7a5a1c]">
               <IconAlert size={11} className="mt-0.5 shrink-0" />
               <span>{n}</span>
             </p>
           ))}
           {notes.map((e, i) => (
-            <p key={i} className="text-[11px] leading-relaxed text-[#6f6a62]">
-              · {e}
+            <p key={i} className="text-[10.5px] leading-relaxed text-ink-faint">
+              {e}
             </p>
           ))}
         </div>
       ) : null}
 
       {price ? (
-        <div className="mt-2 flex items-center justify-between gap-2 text-[10px] text-[#6f6a62]">
-          <span className="flex items-center gap-1">
-            <IconReceipt size={11} />
+        <div className="mt-2.5 flex items-center justify-between gap-2 text-[9.5px] text-ink-faint">
+          <span className="flex items-center gap-1.5">
+            <IconReceipt size={10} />
             官方核价 · 共 {price.lines.reduce((n, l) => n + l.quantity, 0)} 件
           </span>
-          {price.traceId ? <span className="tnum">trace {price.traceId.slice(0, 8)}</span> : null}
+          {price.traceId ? <span className="tnum font-mono">trace {price.traceId.slice(0, 8)}</span> : null}
         </div>
       ) : null}
     </div>
@@ -326,11 +328,11 @@ export function AdjustResultView({
     result.candidates.every((c) => c.withinBudget === false);
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-5">
       {/* 用户原话 + 解析出的修改点：先让用户确认「我理解对了没有」 */}
-      <div className="rounded-lg bg-[#faf9f7] p-3.5">
-        <p className="text-[11px] text-[#6f6a62]">你刚才说</p>
-        <p className="mt-1 text-[13px] leading-relaxed text-[#111827]">「{result.intent.raw}」</p>
+      <div className="rounded-2xl bg-cream px-5 py-4">
+        <p className="eyebrow">你刚才说</p>
+        <p className="display mt-2 text-[16px] leading-[1.6] text-ink md:text-[17px]">「{result.intent.raw}」</p>
         <ChangeTags result={result} />
       </div>
 
@@ -349,36 +351,36 @@ export function AdjustResultView({
       ) : null}
 
       <section>
-        <div className="mb-2 flex items-baseline justify-between">
-          <h2 className="text-[13px] font-semibold tracking-tight text-[#111827]">改了什么</h2>
-          <span className="text-[11px] text-[#6f6a62]">前后对照</span>
+        <div className="mb-3 flex items-baseline justify-between gap-3">
+          <h3 className="display text-[17px] text-ink">改了什么</h3>
+          <span className="eyebrow">前后对照</span>
         </div>
         <Compare matched={result.matched} candidate={selected} />
       </section>
 
       <section>
-        <div className="mb-2 flex items-baseline justify-between">
-          <h2 className="text-[13px] font-semibold tracking-tight text-[#111827]">候选方案</h2>
-          <span className="tnum text-[11px] text-[#6f6a62]">{result.candidates.length} 个</span>
+        <div className="mb-3 flex items-baseline justify-between gap-3">
+          <h3 className="display text-[17px] text-ink">候选方案</h3>
+          <span className="tnum font-mono text-[9.5px] text-ink-faint">{result.candidates.length} 个</span>
         </div>
-        <div className="space-y-2" role="radiogroup" aria-label="候选方案">
+        <div className="space-y-2.5" role="radiogroup" aria-label="候选方案">
           {result.candidates.map((c) => (
             <CandidateCard key={c.id} candidate={c} active={c.id === selected.id} onSelect={() => onSelect(c.id)} />
           ))}
         </div>
       </section>
 
-      <div className="flex flex-wrap items-center gap-2">
+      <div className="flex flex-wrap items-center gap-3 border-t border-hair pt-4">
         <button
           type="button"
           onClick={onSave}
           disabled={!selected.price}
-          className="inline-flex h-8 items-center gap-1 rounded-lg border border-line bg-white px-3 text-xs font-medium text-[#3d3a35] transition-colors duration-150 hover:bg-[#faf9f7] active:scale-[0.97] disabled:opacity-40"
+          className="inline-flex h-8 items-center gap-1.5 rounded-full bg-white px-3.5 text-[11.5px] font-medium text-ink-soft ring-1 ring-inset ring-line transition-colors duration-200 hover:bg-ink hover:text-white active:scale-[0.97] disabled:opacity-35"
         >
           存成常用方案
-          <IconArrow size={11} />
+          <IconArrow size={10} />
         </button>
-        <span className="text-[11px] text-[#6f6a62]">下次说「还是老样子」就能调出来</span>
+        <span className="text-[10.5px] text-ink-faint">下次说「还是老样子」就能调出来</span>
       </div>
     </div>
   );
