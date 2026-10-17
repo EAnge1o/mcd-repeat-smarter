@@ -9,10 +9,14 @@
  *    这时用 --keyword 先切到一家营业中的门店再拍。
  *
  * 用法：
- *   node scripts/screenshots.mjs
- *   node scripts/screenshots.mjs --base http://127.0.0.1:8787 --out docs/screenshots
- *   node scripts/screenshots.mjs --keyword 南京东路
+ *   npm run build && node scripts/screenshots.mjs   # 拍的是 dist/ 里的生产构建
+ *   node scripts/screenshots.mjs --base http://127.0.0.1:5173  # 拍 dev 服务（HMR 实时）
+ *   node scripts/screenshots.mjs --keyword 人民广场
  *   CHROME_PATH="C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe" node scripts/screenshots.mjs
+ *
+ * ⚠ 改完前端代码直接跑本脚本会拍到**旧界面**。默认 BASE 是 8787，那里服务的是 dist/
+ * 静态产物，不 build 不会更新（这个坑已经踩过一次：拍完发现截图里的候选卡还是黄底，
+ * 而源码早就改成黑底反白了）。要么先 build，要么显式 --base 指向 5173。
  */
 
 import { existsSync, mkdirSync, readdirSync } from 'node:fs';

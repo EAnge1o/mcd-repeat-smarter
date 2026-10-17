@@ -211,27 +211,32 @@ function CandidateCard({ candidate, active, onSelect }: { candidate: CandidatePl
       }}
       className={cx(
         'cursor-pointer rounded-2xl p-4 transition-colors duration-100 ease-out',
-        // 选中 = 黄底黑框（麦当劳的「已选中」就是这个反白），未选 = 白底灰框
+        // 选中态是**黑底白字反白**，不是黄底黑字。
+        // 卡内还有深色标签、深色正文和分隔线，黄底一铺满整张卡，所有深色元素都会糊在
+        // 黄底上读不出来（实测截图里就是这个效果）。黑底反白才是麦当劳菜单「已选中」的做法，
+        // 而且能同时容纳白字、红标签与黄标签三种对比。
         active
-          ? 'bg-gold-400 ring-[3px] ring-ink shadow-[0_4px_0_rgba(13,13,13,0.16)]'
-          : 'bg-white ring-2 ring-ink/12 hover:bg-gold-100',
+          ? 'bg-ink text-white ring-[3px] ring-ink shadow-[0_5px_0_rgba(13,13,13,0.22)]'
+          : 'bg-white ring-2 ring-ink/12 hover:bg-wash',
       )}
     >
       <div className="flex items-start gap-2.5">
         <span
           className={cx(
             'mt-1 grid h-5 w-5 shrink-0 place-items-center rounded-full border-[3px] transition-colors duration-100',
-            active ? 'border-ink bg-ink' : 'border-ink/25 bg-white',
+            active ? 'border-gold-400 bg-gold-400' : 'border-ink/25 bg-white',
           )}
           aria-hidden="true"
         >
-          {active ? <span className="h-2 w-2 rounded-full bg-gold-400" /> : null}
+          {active ? <span className="h-2 w-2 rounded-full bg-ink" /> : null}
         </span>
 
         <div className="min-w-0 flex-1">
-          <p className={cx('truncate text-[15px] font-black', active ? 'text-ink' : 'text-ink')}>{candidate.label}</p>
+          <p className={cx('truncate text-[15px] font-black', active ? 'text-white' : 'text-ink')}>
+            {candidate.label}
+          </p>
           <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
-            {candidate.withinBudget === true ? <Badge tone="ok">在预算内</Badge> : null}
+            {candidate.withinBudget === true ? <Badge tone={active ? 'brand' : 'ok'}>在预算内</Badge> : null}
             {candidate.withinBudget === false ? <Badge tone="danger">超预算</Badge> : null}
             {price && price.discountCents > 0 ? <Badge tone="warn">已省 ¥{yuan(price.discountCents)}</Badge> : null}
           </div>
@@ -240,12 +245,19 @@ function CandidateCard({ candidate, active, onSelect }: { candidate: CandidatePl
         <div className="shrink-0 text-right">
           {price ? (
             <>
-              <div className="tnum text-[24px] font-black leading-none text-ink">
+              <div className={cx('tnum text-[24px] font-black leading-none', active ? 'text-gold-400' : 'text-ink')}>
                 <span className="mr-0.5 text-[14px]">¥</span>
                 {yuan(price.priceCents)}
               </div>
               {price.originalPriceCents > price.priceCents ? (
-                <div className="tnum mt-1 text-[11.5px] text-ink-faint line-through">¥{yuan(price.originalPriceCents)}</div>
+                <div
+                  className={cx(
+                    'tnum mt-1 text-[11.5px] line-through',
+                    active ? 'text-white/50' : 'text-ink-faint',
+                  )}
+                >
+                  ¥{yuan(price.originalPriceCents)}
+                </div>
               ) : null}
             </>
           ) : (
@@ -254,14 +266,21 @@ function CandidateCard({ candidate, active, onSelect }: { candidate: CandidatePl
         </div>
       </div>
 
-      <div className="mt-3 space-y-1.5 border-t-2 border-ink/10 pt-3">
+      <div className={cx('mt-3 space-y-1.5 border-t-2 pt-3', active ? 'border-white/15' : 'border-ink/10')}>
         {candidate.items.map((item, i) => (
           <div key={`${item.productCode}-${i}`}>
             <div className="flex items-baseline gap-2">
-              <span className="tnum w-5 shrink-0 rounded-full bg-ink/10 px-1 text-center text-[11.5px] font-black text-ink-soft">
+              <span
+                className={cx(
+                  'tnum w-5 shrink-0 rounded-full px-1 text-center text-[11.5px] font-black',
+                  active ? 'bg-white/15 text-white' : 'bg-ink/10 text-ink-soft',
+                )}
+              >
                 {item.quantity}
               </span>
-              <span className="truncate text-[13.5px] font-bold text-ink-soft">{item.name}</span>
+              <span className={cx('truncate text-[13.5px] font-bold', active ? 'text-white' : 'text-ink-soft')}>
+                {item.name}
+              </span>
             </div>
             {item.children.length > 0 ? (
               <div className="mt-1.5 flex flex-wrap gap-1.5 pl-[28px]">
@@ -271,8 +290,12 @@ function CandidateCard({ candidate, active, onSelect }: { candidate: CandidatePl
                     className={cx(
                       'rounded-full px-2 py-0.5 text-[11.5px] font-bold',
                       changedNames.has(c.name) || (c.aliasNames && c.aliasNames.length > 0)
-                        ? 'bg-brand-500 text-white'
-                        : 'bg-ink/8 text-ink-faint',
+                        ? active
+                          ? 'bg-gold-400 text-ink'
+                          : 'bg-brand-500 text-white'
+                        : active
+                          ? 'bg-white/12 text-white/75'
+                          : 'bg-ink/8 text-ink-faint',
                     )}
                   >
                     {c.roundName ? `${c.roundName}·` : ''}
@@ -286,21 +309,32 @@ function CandidateCard({ candidate, active, onSelect }: { candidate: CandidatePl
       </div>
 
       {candidate.budgetNote || (candidate.priceChecks && candidate.priceChecks.length > 0) || notes.length > 0 ? (
-        <div className="mt-3 space-y-1.5 border-t-2 border-ink/10 pt-3">
+        <div className={cx('mt-3 space-y-1.5 border-t-2 pt-3', active ? 'border-white/15' : 'border-ink/10')}>
           {candidate.budgetNote ? (
-            <p className="flex items-start gap-2 text-[13px] font-medium leading-relaxed text-[#6b4a00]">
+            <p
+              className={cx(
+                'flex items-start gap-2 text-[13px] font-medium leading-relaxed',
+                active ? 'text-gold-300' : 'text-[#6b4a00]',
+              )}
+            >
               <IconAlert size={13} className="mt-0.5 shrink-0" />
               <span>{candidate.budgetNote}。系统不会为了凑预算偷偷换掉你要的东西。</span>
             </p>
           ) : null}
           {(candidate.priceChecks ?? []).map((n, i) => (
-            <p key={i} className="flex items-start gap-2 text-[13px] font-medium leading-relaxed text-[#6b4a00]">
+            <p
+              key={i}
+              className={cx(
+                'flex items-start gap-2 text-[13px] font-medium leading-relaxed',
+                active ? 'text-gold-300' : 'text-[#6b4a00]',
+              )}
+            >
               <IconAlert size={13} className="mt-0.5 shrink-0" />
               <span>{n}</span>
             </p>
           ))}
           {notes.map((e, i) => (
-            <p key={i} className="text-[13px] leading-relaxed text-ink-mute">
+            <p key={i} className={cx('text-[13px] leading-relaxed', active ? 'text-white/70' : 'text-ink-mute')}>
               {e}
             </p>
           ))}
@@ -308,12 +342,21 @@ function CandidateCard({ candidate, active, onSelect }: { candidate: CandidatePl
       ) : null}
 
       {price ? (
-        <div className="mt-3 flex items-center justify-between gap-2 rounded-full bg-ink/6 px-3 py-1.5 text-[12px] font-bold text-ink-mute">
+        <div
+          className={cx(
+            'mt-3 flex items-center justify-between gap-2 rounded-full px-3 py-1.5 text-[12px] font-bold',
+            active ? 'bg-white/12 text-white/75' : 'bg-ink/6 text-ink-mute',
+          )}
+        >
           <span className="flex items-center gap-1.5">
             <IconReceipt size={12} />
             官方核价 · 共 {price.lines.reduce((n, l) => n + l.quantity, 0)} 件
           </span>
-          {price.traceId ? <span className="code text-[11.5px] font-medium text-ink-faint">trace {price.traceId.slice(0, 8)}</span> : null}
+          {price.traceId ? (
+            <span className={cx('code text-[11.5px] font-medium', active ? 'text-white/55' : 'text-ink-faint')}>
+              trace {price.traceId.slice(0, 8)}
+            </span>
+          ) : null}
         </div>
       ) : null}
     </div>
