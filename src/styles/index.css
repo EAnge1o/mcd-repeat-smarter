@@ -37,8 +37,14 @@
     @apply outline-none ring-[3px] ring-brand-500/45 ring-offset-2 ring-offset-[#fdf6ec];
   }
 
-  /* 浮层里的输入框不再自己描一圈 —— .float 在 focus-within 时整层已经换了环 */
-  .float :where(textarea, input):focus-visible {
+  /*
+   * 输入容器内部不描边。
+   * .float（顶栏下拉、门店选择弹层）靠外层描边表达焦点；Composer 是实体卡片，
+   * 聚焦时由它自己把阴影压扁 + 描边翻红 —— 如果 textarea 再套一圈红色 focus 环，
+   * 一次聚焦会出现两道反馈。
+   */
+  .float :where(textarea, input):focus-visible,
+  .composer :where(textarea, input):focus-visible {
     @apply outline-none ring-0 ring-offset-0;
   }
 
@@ -99,6 +105,103 @@
   .panel {
     background: #ffffff;
     border: 2px solid rgba(13, 13, 13, 0.11);
+  }
+
+  /*
+   * 一句话输入卡 —— 全站主入口，唯一的「实体物」。
+   *
+   * 为什么不用 .float：.float 是白底 + 2px 淡描边 + 28px 弥散投影，那是上一版
+   * 参照日系精品店留下的玻璃语法，在麦当劳语境里整块会发「软」—— 而美式快餐的
+   * 卡片永远是硬的、纯黑边的、坐得下去的。
+   *
+   * 聚焦态写在 CSS 里而不是 Tailwind 类上：`border-ink` 与 `border-brand-500`
+   * 同为 border-color 工具类，产出顺序由 Tailwind 内部决定，写在 class 串里
+   * 并不能保证覆盖（实测聚焦时边框没翻红）。`:focus-within` 权重天然更高，
+   * 不依赖这个次序。
+   */
+  .composer {
+    background: #ffffff;
+    border: 3px solid #0d0d0d;
+    border-radius: 26px;
+    box-shadow: 0 5px 0 #0d0d0d;
+    transition:
+      border-color 100ms ease-out,
+      box-shadow 100ms ease-out,
+      transform 100ms ease-out;
+  }
+
+  /* 聚焦时整张卡「坐下去」：压扁阴影 + 下沉 2px + 描边翻红，和全站实体按键同一套反馈 */
+  .composer:focus-within {
+    border-color: #d62315;
+    box-shadow: 0 2px 0 #a51810;
+    transform: translateY(2px);
+  }
+
+  /*
+   * 发送钮。同样的理由，禁用态写进 CSS：
+   * `bg-brand-500` 和 `bg-white` 都是 background-color 工具类，谁生效取决于
+   * Tailwind 产物里的顺序，而不是 class 串的书写顺序。
+   */
+  .composer__send {
+    border: 3px solid #0d0d0d;
+    border-radius: 999px;
+    background: #d62315;
+    color: #ffffff;
+    box-shadow: 0 4px 0 #0d0d0d;
+    transition:
+      background-color 100ms ease-out,
+      box-shadow 100ms ease-out,
+      transform 100ms ease-out;
+  }
+  .composer__send:hover:not(:disabled) {
+    background: #c31f13;
+  }
+  .composer__send:active:not(:disabled) {
+    transform: translateY(4px);
+    box-shadow: 0 0 0 #0d0d0d;
+  }
+  .composer__send:disabled {
+    cursor: not-allowed;
+    border-color: rgba(13, 13, 13, 0.25);
+    background: #ffffff;
+    color: #6e6e6e;
+    box-shadow: 0 4px 0 rgba(13, 13, 13, 0.15);
+  }
+
+  /*
+   * 快捷短语与「试试说」标签共用的形状（菜单上贴分类签的做法：白底黑边 + 硬阴影）。
+   * 两者唯一的区别是标签**不带阴影** —— 在这套设计语言里，阴影就是「可按」的信号，
+   * 去掉它用户就能一眼分清哪个是提示、哪个能点。
+   */
+  .composer__chip {
+    border: 2px solid #0d0d0d;
+    border-radius: 10px;
+    background: #ffffff;
+    color: #0d0d0d;
+    box-shadow: 0 2px 0 #0d0d0d;
+    transition:
+      background-color 100ms ease-out,
+      box-shadow 100ms ease-out,
+      transform 100ms ease-out;
+  }
+  .composer__chip:hover:not(:disabled) {
+    background: #ffc72c;
+  }
+  .composer__chip:active:not(:disabled) {
+    transform: translateY(2px);
+    box-shadow: 0 0 0 #0d0d0d;
+  }
+  .composer__chip:disabled {
+    opacity: 0.4;
+    box-shadow: none;
+  }
+
+  /* 纯标签：同形状同高度，但没有那枚硬阴影，也不接受 hover */
+  .composer__label {
+    border: 2px solid #0d0d0d;
+    border-radius: 10px;
+    background: #ffc72c;
+    color: #0d0d0d;
   }
 
   /*

@@ -84,7 +84,8 @@ export function OrderView({
       <div className="mt-8 grid grid-cols-1 items-start gap-5 xl:mt-10 xl:grid-cols-[minmax(0,1fr)_288px]">
         {/* 主区 */}
         <div className="flex min-w-0 flex-col gap-5">
-          <Panel className="px-5 py-6 md:px-7 md:py-7">
+          {/* 不套 Panel —— Composer 自己是实体卡片（黑边 + 硬阴影），再套一层白卡就成了「卡中卡」 */}
+          <div>
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div className="min-w-0">
                 <p className="eyebrow">{result ? '接着说' : '开始'}</p>
@@ -109,7 +110,7 @@ export function OrderView({
                 placeholder={result ? '还想改？接着说，比如「饮料换成无糖的」' : '还是上次那份，不过今天不要香芋派，预算不超过 16 元'}
               />
             </div>
-          </Panel>
+          </div>
 
           {error ? (
             <Alert kind="error" title="没能完成这次调整" hint={error.hint}>
