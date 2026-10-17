@@ -58,7 +58,7 @@ export function Composer({
   return (
     <div
       className={cx(
-        'float rounded-[26px] transition-[box-shadow,ring] duration-300 ease-out',
+        'float rounded-2xl transition-[box-shadow,ring] duration-300 ease-out',
         focused && 'ring-1 ring-brand-400/80',
         className,
       )}

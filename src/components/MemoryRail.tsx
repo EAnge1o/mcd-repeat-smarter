@@ -86,7 +86,7 @@ export function MemoryRail({ top, choices, buckets, activeBucket, loading, onPic
                   <span className="min-w-0 truncate text-[12.5px] text-ink-soft" title={`${c.parentName} · ${c.name}`}>
                     {c.name}
                   </span>
-                  <span className="tnum shrink-0 font-mono text-[10px] text-ink-faint">{c.count} 次</span>
+                  <span className="tnum shrink-0 text-[10px] text-ink-faint">{c.count} 次</span>
                 </li>
               ))}
             </ul>
@@ -132,14 +132,14 @@ export function MemoryRail({ top, choices, buckets, activeBucket, loading, onPic
                     <span className={cx('w-8 shrink-0 text-[12px]', active ? 'font-medium text-brand-700' : 'text-ink-soft')}>
                       {b.label}
                     </span>
-                    <span className="tnum w-9 shrink-0 font-mono text-[9.5px] text-ink-faint">{b.range}</span>
+                    <span className="tnum w-9 shrink-0 text-[9.5px] text-ink-faint">{b.range}</span>
                     <span className="h-1 flex-1 overflow-hidden rounded-full bg-[#eee8e2]" aria-hidden="true">
                       <span
                         className={cx('block h-full rounded-full transition-all duration-300 ease-out', active ? 'bg-brand-500' : 'bg-[#d9a29a]')}
                         style={{ width: `${Math.max((b.count / maxCount) * 100, 8)}%` }}
                       />
                     </span>
-                    <span className="tnum w-4 shrink-0 text-right font-mono text-[10px] text-ink">{b.count}</span>
+                    <span className="tnum w-4 shrink-0 text-right text-[10px] text-ink">{b.count}</span>
                   </button>
                 </li>
               );

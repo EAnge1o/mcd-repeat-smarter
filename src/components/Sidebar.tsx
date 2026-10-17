@@ -32,7 +32,7 @@ interface SidebarProps {
   mobileOpen: boolean;
   onCloseMobile: () => void;
   onPickStore: () => void;
-  /** 侧栏底部的「最近的方案」，像刊物目录里的近期条目 */
+  /** 侧栏底部的「最近的方案」，点一下直接整单复用 */
   recentPlans: Plan[];
   onUsePlan: (p: Plan) => void;
 }
@@ -40,9 +40,8 @@ interface SidebarProps {
 /**
  * 侧边导航。
  *
- * 不是深色控制台侧栏：底色是半透明白，靠一条发丝线跟内容区分开。
- * 选中项用一枚白胶囊（+ 极轻投影）表示，不用左侧色条，也不整块反色 ——
- * 反色会把导航变成页面里最重的色块，抢走主内容的注意力。
+ * 它是工具，不是主体。所以：宽度收窄、底色与页面几乎同色、选中态只靠一条 2px 品牌红
+ * 和字重说话，不用整块反色或白卡片 —— 那两种做法都会把导航变成页面里最重的元素。
  */
 export function Sidebar({
   view,
@@ -68,7 +67,7 @@ export function Sidebar({
     <>
       <div
         className={cx(
-          'fixed inset-0 z-40 bg-[#2b201b]/25 backdrop-blur-[2px] transition-opacity duration-300 lg:hidden',
+          'fixed inset-0 z-40 bg-[#2b201b]/20 transition-opacity duration-200 lg:hidden',
           mobileOpen ? 'opacity-100' : 'pointer-events-none opacity-0',
         )}
         onClick={onCloseMobile}
@@ -77,24 +76,23 @@ export function Sidebar({
 
       <aside
         className={cx(
-          'fixed inset-y-0 left-0 z-50 flex w-[248px] flex-col border-r border-hair bg-white/70 backdrop-blur-xl',
-          'transition-transform duration-300 ease-out lg:translate-x-0',
-          mobileOpen ? 'translate-x-0' : '-translate-x-full',
+          'fixed inset-y-0 left-0 z-50 flex w-[228px] flex-col border-r border-hair',
+          'transition-transform duration-250 ease-out lg:translate-x-0',
+          mobileOpen ? 'translate-x-0 bg-canvas' : '-translate-x-full lg:bg-[#f7f4f1]',
         )}
         aria-label="主导航"
       >
         {/* 品牌 */}
-        <div className="flex shrink-0 items-center gap-2.5 px-5 pb-1 pt-5">
-          <span className="grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-brand-500" aria-hidden="true">
-            <IconArches size={15} />
+        <div className="flex shrink-0 items-center gap-2.5 px-5 pb-1 pt-6">
+          <span className="grid h-7 w-7 shrink-0 place-items-center rounded-md bg-brand-600" aria-hidden="true">
+            <IconArches size={14} />
           </span>
           <span className="min-w-0 flex-1">
-            <span className="display block truncate text-[15px] leading-tight text-ink">麦麦老样子</span>
-            <span className="eyebrow mt-1 block text-[8.5px] tracking-[0.2em]">REPEAT SMARTER</span>
+            <span className="display block truncate text-[14px] leading-tight text-ink">麦麦老样子</span>
           </span>
           <button
             type="button"
-            className="grid h-8 w-8 place-items-center rounded-full text-ink-faint transition-colors duration-200 hover:bg-white hover:text-ink lg:hidden"
+            className="grid h-8 w-8 place-items-center rounded-md text-ink-faint transition-colors duration-150 hover:bg-white hover:text-ink lg:hidden"
             onClick={onCloseMobile}
             aria-label="关闭导航"
           >
@@ -108,23 +106,20 @@ export function Sidebar({
             type="button"
             onClick={() => go('order')}
             className={cx(
-              'group flex w-full items-center gap-2 rounded-full bg-white py-2 pl-3.5 pr-2.5 text-left',
-              'shadow-pill ring-1 ring-inset transition-all duration-200 ease-out hover:shadow-float',
-              view === 'order' ? 'ring-brand-200' : 'ring-line',
+              'flex w-full items-center gap-2 rounded-md bg-brand-600 py-2 pl-3 pr-2.5 text-left text-white',
+              'transition-colors duration-150 ease-out hover:bg-brand-700 active:scale-[0.99]',
+              view === 'order' && 'ring-2 ring-brand-200 ring-offset-2 ring-offset-[#f7f4f1]',
             )}
           >
-            <IconSparkle size={13} className="shrink-0 text-brand-600" />
-            <span className="flex-1 text-[12.5px] font-medium text-ink">开始点单</span>
-            <span className="grid h-6 w-6 place-items-center rounded-full bg-[#f4f0ec] text-ink-mute transition-colors duration-200 group-hover:bg-ink group-hover:text-white">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path d="M5 12h14m-6-6 6 6-6 6" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </span>
+            <IconSparkle size={13} className="shrink-0" />
+            <span className="flex-1 text-[13px] font-medium">开始点单</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M5 12h14m-6-6 6 6-6 6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
           </button>
         </div>
 
         <nav className="flex-1 overflow-y-auto px-3.5 py-4">
-          <p className="eyebrow px-2.5 pb-2">工作台</p>
           <ul className="space-y-0.5">
             {NAV.map((item) => {
               const active = item.key === view;
@@ -136,17 +131,23 @@ export function Sidebar({
                     onClick={() => go(item.key)}
                     aria-current={active ? 'page' : undefined}
                     className={cx(
-                      'group flex w-full items-center gap-2.5 rounded-full px-3 py-2 text-[12.5px]',
-                      'transition-[background-color,color,box-shadow] duration-200 ease-out',
-                      active
-                        ? 'bg-white font-medium text-ink shadow-pill ring-1 ring-inset ring-line'
-                        : 'text-ink-mute hover:bg-white/60 hover:text-ink',
+                      'relative flex w-full items-center gap-2.5 rounded-md py-2 pl-3 pr-2.5 text-[13px]',
+                      'transition-colors duration-150 ease-out',
+                      active ? 'bg-white font-medium text-ink' : 'text-ink-mute hover:bg-white/60 hover:text-ink-soft',
                     )}
                   >
-                    <item.icon size={15} className={cx('shrink-0', active ? 'text-brand-600' : 'text-ink-faint group-hover:text-ink-mute')} />
+                    {/* 选中态：一条 2px 红杠，比整块反色安静得多 */}
+                    <span
+                      className={cx(
+                        'absolute left-0 top-1/2 h-4 w-[2px] -translate-y-1/2 rounded-full bg-brand-600 transition-opacity duration-150',
+                        active ? 'opacity-100' : 'opacity-0',
+                      )}
+                      aria-hidden="true"
+                    />
+                    <item.icon size={14} className={cx('shrink-0', active ? 'text-ink-soft' : 'text-ink-faint')} />
                     <span className="flex-1 text-left">{item.label}</span>
                     {count !== undefined && count > 0 ? (
-                      <span className="tnum font-mono text-[10px] text-ink-faint">{count}</span>
+                      <span className="tnum text-[11px] text-ink-faint">{count}</span>
                     ) : null}
                   </button>
                 </li>
@@ -154,10 +155,10 @@ export function Sidebar({
             })}
           </ul>
 
-          {/* 最近的方案：像刊物目录里的「近期条目」，点一下直接整单复用 */}
+          {/* 最近的方案：点一下直接整单复用 */}
           {recentPlans.length > 0 ? (
             <div className="mt-7">
-              <p className="eyebrow px-2.5 pb-2">最近的方案</p>
+              <p className="eyebrow px-3 pb-1.5">最近的方案</p>
               <ul>
                 {recentPlans.slice(0, 3).map((p) => (
                   <li key={p.id}>
@@ -167,14 +168,11 @@ export function Sidebar({
                         onUsePlan(p);
                         onCloseMobile();
                       }}
-                      className="group flex w-full items-start gap-2.5 rounded-2xl px-2.5 py-2 text-left transition-colors duration-200 hover:bg-white/70"
+                      className="flex w-full items-center gap-2.5 rounded-md px-3 py-1.5 text-left transition-colors duration-150 hover:bg-white/70"
                     >
-                      <span className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-lg bg-[#f4f0ec] font-mono text-[9px] text-ink-mute" aria-hidden="true">
-                        {p.tag ? p.tag.slice(0, 1) : '方'}
-                      </span>
                       <span className="min-w-0 flex-1">
-                        <span className="block truncate text-[12px] text-ink-soft group-hover:text-ink">{p.name}</span>
-                        <span className="block truncate text-[10px] text-ink-faint">
+                        <span className="block truncate text-[12.5px] text-ink-soft">{p.name}</span>
+                        <span className="block truncate text-[11px] text-ink-faint">
                           {p.tag ?? '未分类'} · {p.items.length} 项
                         </span>
                       </span>
@@ -194,19 +192,17 @@ export function Sidebar({
               onPickStore();
               onCloseMobile();
             }}
-            className="flex w-full items-center gap-2.5 rounded-2xl px-2.5 py-2 text-left transition-colors duration-200 hover:bg-white/70"
+            className="flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-left transition-colors duration-150 hover:bg-white/70"
           >
-            <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[#f4f0ec] text-ink-mute" aria-hidden="true">
-              <IconStore size={14} />
-            </span>
+            <IconStore size={14} className="shrink-0 text-ink-faint" />
             <span className="min-w-0 flex-1">
-              <span className="block truncate text-[11.5px] text-ink-soft">{storeName || '选择门店'}</span>
-              <span className="mt-0.5 flex items-center gap-1.5 text-[10px] text-ink-faint">
+              <span className="block truncate text-[12px] text-ink-soft">{storeName || '选择门店'}</span>
+              <span className="mt-0.5 flex items-center gap-1.5 text-[11px] text-ink-faint">
                 <span
                   className={cx('inline-block h-1.5 w-1.5 rounded-full', mode === 'live' ? 'bg-[#5f9d78]' : 'bg-[#d2a34a]')}
                   aria-hidden="true"
                 />
-                {mode === 'live' ? '真实 MCP 数据' : '演示数据'}
+                {mode === 'live' ? '真实数据' : '演示数据'}
               </span>
             </span>
             <IconChevronRight size={12} className="shrink-0 text-ink-faint" />

@@ -18,9 +18,8 @@ export function StoresView({
   return (
     <div>
       <header className="max-w-[600px]">
-        <p className="eyebrow">门店 · 菜单与价格的基础</p>
-        <h1 className="display mt-3 text-[27px] leading-[1.15] text-ink md:text-[34px]">在哪家店取</h1>
-        <p className="mt-2.5 max-w-[34rem] text-pretty text-[12.5px] leading-[1.9] text-ink-mute">
+        <h1 className="display text-[28px] leading-tight text-ink md:text-[36px]">选择门店</h1>
+        <p className="mt-2 max-w-[34rem] text-pretty text-[13px] leading-[1.85] text-ink-mute">
           门店决定菜单、价格与可选优惠。切换后方案与核价都会按新门店重算 —— 同一份餐在不同门店的价格本来就不一样。
         </p>
       </header>
@@ -44,7 +43,7 @@ export function StoresView({
           <dl className="mt-5 space-y-3.5">
             <div>
               <dt className="eyebrow">门店编码</dt>
-              <dd className="tnum mt-1 font-mono text-[12px] text-ink-soft">{currentStoreCode ?? '—'}</dd>
+              <dd className="tnum mt-1 text-[12px] text-ink-soft">{currentStoreCode ?? '—'}</dd>
             </div>
             <div>
               <dt className="eyebrow">取餐方式</dt>

@@ -1,8 +1,8 @@
 import type { HistoryOrder } from '../../server/domain/types';
-import { Badge, Button, Panel, Stat } from '../components/ui';
+import { Button, MetricLead, MetricPair } from '../components/ui';
 import { OrdersTable } from '../components/OrdersTable';
 import { IconRefresh, IconSparkle } from '../components/Icons';
-import { paidCents, yuan } from '../lib/metrics';
+import { fmtDateTime, paidCents, yuan } from '../lib/metrics';
 
 export function OrdersView({
   orders,
@@ -21,61 +21,70 @@ export function OrdersView({
 }) {
   const priced = orders.map(paidCents).filter((c): c is number => c !== null && c > 0);
   const total = priced.reduce((a, b) => a + b, 0);
+  const avg = priced.length > 0 ? total / priced.length : null;
   const zeroCount = orders.filter((o) => paidCents(o) === 0).length;
+  const latest = orders[0];
 
   return (
     <div>
-      <header className="flex flex-wrap items-end justify-between gap-x-6 gap-y-4">
-        <div className="max-w-[560px]">
-          <p className="eyebrow">订单记录 · 全部来自真实接口</p>
-          <h1 className="display mt-3 text-[27px] leading-[1.15] text-ink md:text-[34px]">每一单都记得</h1>
-          <p className="mt-2.5 max-w-[34rem] text-pretty text-[12.5px] leading-[1.9] text-ink-mute">
+      <header className="flex flex-wrap items-end justify-between gap-x-8 gap-y-5">
+        <div>
+          <h1 className="display text-[28px] leading-tight text-ink md:text-[36px]">订单记录</h1>
+          <p className="mt-2 max-w-[34rem] text-pretty text-[13px] leading-[1.85] text-ink-mute">
             {mode === 'live'
-              ? '读取自你的麦当劳账号，按下单时间倒序。金额取接口返回的实付值，未返回的显示为「—」而不是 0。'
+              ? '来自你的麦当劳账号，按下单时间倒序。金额取接口返回的实付值，接口没返回的显示为「—」，不按 0 算。'
               : '当前为内置演示数据，不是真实账号。切到真实 MCP 后会读取你自己的历史订单。'}
           </p>
         </div>
+
         <div className="flex flex-wrap gap-2">
-          <Button onClick={onRefresh}>
+          <Button onClick={onRefresh} disabled={loading}>
             <IconRefresh size={12} />
             重新读取
           </Button>
-          <Button variant="primary" arrow onClick={onUseLatest} disabled={orders.length === 0}>
+          <Button variant="primary" onClick={onUseLatest} disabled={orders.length === 0}>
             <IconSparkle size={13} />
             还是老样子
           </Button>
         </div>
       </header>
 
-      <section aria-label="订单概况" className="mt-9 border-y border-hair">
-        <dl className="grid grid-cols-2 md:grid-cols-4">
-          <div className="py-6 md:pl-0 md:pr-7">
-            <Stat label="订单总数" value={String(orders.length)} unit="单" />
-          </div>
-          <div className="border-l border-hair px-4 py-6 md:px-7">
-            <Stat label="合计消费" value={priced.length > 0 ? `¥${yuan(total)}` : '—'} tone="brand" />
-          </div>
-          <div className="border-t border-hair py-6 md:border-l md:border-t-0 md:pl-7 md:pr-0">
-            <Stat label="有金额的订单" value={String(priced.length)} unit="笔" />
-          </div>
-          <div className="border-l border-t border-hair px-4 py-6 md:border-t-0 md:pl-7 md:pr-0">
-            <Stat label="券抵扣订单" value={String(zeroCount)} unit="笔" hint={zeroCount > 0 ? '实付 ¥0' : '没有全额抵扣的单'} />
-          </div>
-        </dl>
+      {/*
+        概况：一个主角 + 三个配角。
+        原来这里是四个等宽、带竖分隔线的格子 —— 四个同样大小的数字等于告诉用户
+        「这四个一样重要」，于是哪个都不重要。现在累计实付放大成唯一主角，
+        其余退成一行次级数字，靠字重而非格子来分层。
+      */}
+      <section aria-label="消费概况" className="mt-9 md:mt-11">
+        <div className="flex flex-wrap items-end justify-between gap-x-12 gap-y-7">
+          <MetricLead
+            label="累计实付"
+            value={priced.length > 0 ? `¥${yuan(total)}` : '—'}
+            note={
+              priced.length > 0
+                ? `${priced.length} 笔有金额 · ${orders.length - priced.length} 笔接口未返回`
+                : '接口还没有返回过实付金额'
+            }
+            loading={loading}
+          />
+
+          <MetricPair
+            loading={loading}
+            items={[
+              { label: '订单总数', value: `${orders.length} 单` },
+              { label: '平均客单价', value: avg !== null ? `¥${yuan(avg)}` : '—' },
+              { label: '券全额抵扣', value: zeroCount > 0 ? `${zeroCount} 笔` : '无' },
+              ...(latest ? [{ label: '最近一单', value: fmtDateTime(latest.createTime) }] : []),
+            ]}
+          />
+        </div>
+
+        <div className="hair mt-7" aria-hidden="true" />
       </section>
 
-      <Panel className="mt-6 px-5 py-6 md:px-8 md:py-8">
-        <div className="flex flex-wrap items-baseline justify-between gap-3">
-          <div>
-            <p className="eyebrow">全部订单</p>
-            <h2 className="display mt-2 text-[20px] text-ink md:text-[23px]">按下单时间倒序</h2>
-          </div>
-          <Badge tone={mode === 'live' ? 'ok' : 'warn'}>{mode === 'live' ? 'MCP 实时' : '演示数据'}</Badge>
-        </div>
-        <div className="mt-4">
-          <OrdersTable orders={orders} loading={loading} onUse={onUse} />
-        </div>
-      </Panel>
+      <section className="mt-7">
+        <OrdersTable orders={orders} loading={loading} onUse={onUse} controls />
+      </section>
     </div>
   );
 }

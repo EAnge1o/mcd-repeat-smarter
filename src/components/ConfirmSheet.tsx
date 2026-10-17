@@ -107,7 +107,7 @@ export function ConfirmSheet({
         role="dialog"
         aria-modal="true"
         aria-label="订单确认"
-        className="animate-fade-up flex max-h-[92vh] w-full max-w-[560px] flex-col overflow-hidden rounded-t-[28px] bg-white shadow-float sm:rounded-[28px]"
+        className="animate-fade-up flex max-h-[92vh] w-full max-w-[560px] flex-col overflow-hidden rounded-t-2xl bg-white shadow-float sm:rounded-2xl"
       >
         {/* 头 */}
         <div className="flex shrink-0 items-start gap-3 border-b border-hair px-6 py-5">
@@ -152,7 +152,7 @@ export function ConfirmSheet({
                 {result.mode === 'demo' ? '演示下单完成' : '订单已提交'}
               </p>
               {result.orderId ? (
-                <p className="mt-1.5 break-all font-mono text-[10.5px] text-[#3f6b52]">订单号 {result.orderId}</p>
+                <p className="code mt-1.5 break-all text-[11px] text-[#3d6a52]">订单号 {result.orderId}</p>
               ) : null}
               <p className="mt-1.5 text-[11.5px] leading-relaxed text-[#3f6b52]">{result.note}</p>
               {result.payUrl ? (
@@ -171,7 +171,7 @@ export function ConfirmSheet({
           {preview && !result ? (
             <>
               {/* 门店与来源：用户必须能确认「下到哪家店」 */}
-              <div className="flex items-center gap-3 rounded-2xl bg-cream px-4 py-3">
+              <div className="flex items-center gap-3 rounded-2xl bg-wash px-4 py-3">
                 <IconStore size={15} className="shrink-0 text-ink-mute" />
                 <div className="min-w-0">
                   <p className="truncate text-[13px] text-ink">{storeName || `门店 ${storeCode}`}</p>
@@ -189,7 +189,7 @@ export function ConfirmSheet({
                     const line = preview.price.lines.find((l) => l.productCode === item.productCode);
                     return (
                       <li key={`${item.productCode}-${i}`} className="flex items-baseline gap-2.5 px-4 py-2.5">
-                        <span className="tnum shrink-0 font-mono text-[10px] text-ink-faint">{item.quantity}×</span>
+                        <span className="tnum shrink-0 text-[10px] text-ink-faint">{item.quantity}×</span>
                         <span className="min-w-0 flex-1">
                           <span className="block truncate text-[12.5px] text-ink">{item.name}</span>
                           {item.children.length > 0 ? (
@@ -246,7 +246,7 @@ export function ConfirmSheet({
                       className={cx(
                         'rounded-2xl px-3 py-2.5 text-left transition-[background-color,box-shadow] duration-200 ease-out',
                         takeWay === t.code
-                          ? 'bg-blush ring-1 ring-inset ring-brand-300'
+                          ? 'bg-wash ring-1 ring-inset ring-brand-300'
                           : 'bg-[#fbf7f3] ring-1 ring-inset ring-transparent hover:bg-[#f8f2ec]',
                       )}
                     >
@@ -306,7 +306,6 @@ export function ConfirmSheet({
             <Button
               variant="primary"
               size="lg"
-              arrow
               className="mt-3 w-full"
               disabled={!checked || submitting}
               onClick={() => void submit()}

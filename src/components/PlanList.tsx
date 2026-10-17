@@ -58,7 +58,7 @@ export function PlanList({ plans, loading, limit = 3, onUse, onManage, emptyActi
           const detail = p.items.map((it) => `${it.quantity}×${it.name}`).join('、');
           return (
             <li key={p.id} className="group flex items-center gap-3.5 py-3.5">
-              <span className="tnum grid h-6 w-6 shrink-0 place-items-center rounded-full bg-[#f6f1ec] font-mono text-[9px] leading-none text-ink-faint" aria-hidden="true">
+              <span className="tnum grid h-6 w-6 shrink-0 place-items-center rounded-full bg-[#f6f1ec] text-[9px] leading-none text-ink-faint" aria-hidden="true">
                 {String(i + 1).padStart(2, '0')}
               </span>
               <div className="min-w-0 flex-1">
@@ -66,7 +66,7 @@ export function PlanList({ plans, loading, limit = 3, onUse, onManage, emptyActi
                   <span className="truncate text-[13px] text-ink" title={p.name}>
                     {p.name}
                   </span>
-                  {p.tag ? <span className="shrink-0 font-mono text-[9px] tracking-[0.08em] text-ink-faint">{p.tag}</span> : null}
+                  {p.tag ? <span className="shrink-0 text-[9px] tracking-[0.08em] text-ink-faint">{p.tag}</span> : null}
                 </div>
                 <p className="mt-1 truncate text-[11px] text-ink-faint" title={`${detail} · ${p.storeName || p.storeCode}`}>
                   <span className="tnum">{pieces} 件</span>

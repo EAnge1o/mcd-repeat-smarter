@@ -128,7 +128,7 @@ function Compare({ matched, candidate }: { matched: MatchedView[]; candidate: Ca
       <div className="rounded-2xl bg-[#f6f1ec] p-4">
         <div className="flex items-baseline justify-between">
           <span className="eyebrow">原方案</span>
-          <span className="tnum font-mono text-[9.5px] text-ink-faint">共 {matched.reduce((n, m) => n + m.quantity, 0)} 件</span>
+          <span className="tnum text-[9.5px] text-ink-faint">共 {matched.reduce((n, m) => n + m.quantity, 0)} 件</span>
         </div>
         <div className="mt-3 space-y-1.5">
           {matched.map((m, i) => {
@@ -136,7 +136,7 @@ function Compare({ matched, candidate }: { matched: MatchedView[]; candidate: Ca
             return (
               <div key={i}>
                 <div className="flex items-baseline gap-2">
-                  <span className="tnum w-5 shrink-0 text-right font-mono text-[9.5px] text-ink-faint">{m.quantity}×</span>
+                  <span className="tnum w-5 shrink-0 text-right text-[9.5px] text-ink-faint">{m.quantity}×</span>
                   <span className={cx('truncate text-[12px]', gone ? 'text-ink-faint line-through' : 'text-ink-soft')} title={m.name}>
                     {m.name}
                   </span>
@@ -154,10 +154,10 @@ function Compare({ matched, candidate }: { matched: MatchedView[]; candidate: Ca
         </span>
       </div>
 
-      <div className="rounded-2xl bg-blush p-4 ring-1 ring-inset ring-[#f6dcd6]">
+      <div className="rounded-2xl bg-wash p-4 ring-1 ring-inset ring-line">
         <div className="flex items-baseline justify-between">
           <span className="eyebrow text-brand-700">调整后</span>
-          <span className="tnum font-mono text-[9.5px] text-ink-faint">共 {count(candidate.items)} 件</span>
+          <span className="tnum text-[9.5px] text-ink-faint">共 {count(candidate.items)} 件</span>
         </div>
         <div className="mt-3 space-y-1.5">
           {candidate.items.length === 0 ? (
@@ -166,7 +166,7 @@ function Compare({ matched, candidate }: { matched: MatchedView[]; candidate: Ca
             candidate.items.map((item, i) => (
               <div key={`${item.productCode}-${i}`}>
                 <div className="flex items-baseline gap-2">
-                  <span className="tnum w-5 shrink-0 text-right font-mono text-[9.5px] text-ink-faint">{item.quantity}×</span>
+                  <span className="tnum w-5 shrink-0 text-right text-[9.5px] text-ink-faint">{item.quantity}×</span>
                   <span
                     className={cx('truncate text-[12px]', added.has(item.name) ? 'font-medium text-brand-700' : 'text-ink')}
                     title={item.name}
@@ -238,7 +238,7 @@ function CandidateCard({ candidate, active, onSelect }: { candidate: CandidatePl
                 {yuan(price.priceCents)}
               </div>
               {price.originalPriceCents > price.priceCents ? (
-                <div className="tnum mt-1 font-mono text-[9.5px] text-ink-faint line-through">¥{yuan(price.originalPriceCents)}</div>
+                <div className="tnum mt-1 text-[11px] text-ink-faint line-through">¥{yuan(price.originalPriceCents)}</div>
               ) : null}
             </>
           ) : (
@@ -251,7 +251,7 @@ function CandidateCard({ candidate, active, onSelect }: { candidate: CandidatePl
         {candidate.items.map((item, i) => (
           <div key={`${item.productCode}-${i}`}>
             <div className="flex items-baseline gap-2">
-              <span className="tnum w-4 shrink-0 text-right font-mono text-[9.5px] text-ink-faint">{item.quantity}</span>
+              <span className="tnum w-4 shrink-0 text-right text-[9.5px] text-ink-faint">{item.quantity}</span>
               <span className="truncate text-[12px] text-ink-soft">{item.name}</span>
             </div>
             {item.children.length > 0 ? (
@@ -302,7 +302,7 @@ function CandidateCard({ candidate, active, onSelect }: { candidate: CandidatePl
             <IconReceipt size={10} />
             官方核价 · 共 {price.lines.reduce((n, l) => n + l.quantity, 0)} 件
           </span>
-          {price.traceId ? <span className="tnum font-mono">trace {price.traceId.slice(0, 8)}</span> : null}
+          {price.traceId ? <span className="code text-[10.5px]">trace {price.traceId.slice(0, 8)}</span> : null}
         </div>
       ) : null}
     </div>
@@ -330,7 +330,7 @@ export function AdjustResultView({
   return (
     <div className="space-y-5">
       {/* 用户原话 + 解析出的修改点：先让用户确认「我理解对了没有」 */}
-      <div className="rounded-2xl bg-cream px-5 py-4">
+      <div className="rounded-2xl bg-wash px-5 py-4">
         <p className="eyebrow">你刚才说</p>
         <p className="display mt-2 text-[16px] leading-[1.6] text-ink md:text-[17px]">「{result.intent.raw}」</p>
         <ChangeTags result={result} />
@@ -361,7 +361,7 @@ export function AdjustResultView({
       <section>
         <div className="mb-3 flex items-baseline justify-between gap-3">
           <h3 className="display text-[17px] text-ink">候选方案</h3>
-          <span className="tnum font-mono text-[9.5px] text-ink-faint">{result.candidates.length} 个</span>
+          <span className="tnum text-[9.5px] text-ink-faint">{result.candidates.length} 个</span>
         </div>
         <div className="space-y-2.5" role="radiogroup" aria-label="候选方案">
           {result.candidates.map((c) => (

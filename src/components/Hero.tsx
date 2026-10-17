@@ -41,20 +41,20 @@ export function Hero({ lastOrder, loading, quickPrompts, prefill, demoReason, on
 
       <h1
         id="hero-title"
-        className="display mx-auto mt-5 text-[clamp(34px,5.2vw,62px)] leading-[1.12] tracking-[-0.04em] text-ink"
+        className="display mx-auto mt-5 text-[clamp(32px,4.4vw,50px)] leading-[1.18] tracking-[-0.03em] text-ink"
       >
         {/* 全角逗号自带一个字宽的空白，不收一下会在 62px 下断成「两个空格」。写成一行，避免 JSX 换行变成行内空格 */}
         今天<span className="mr-[-0.14em]">，</span>还是<span className="whitespace-nowrap text-brand-600">老样子</span>吗？
       </h1>
 
-      <p className="mx-auto mt-6 max-w-[30rem] text-pretty text-[12.5px] font-light leading-[1.95] text-ink-mute md:text-[13px]">
+      <p className="mx-auto mt-5 max-w-[30rem] text-pretty text-[13px] leading-[1.9] text-ink-mute md:text-[13.5px]">
         {/* 断行写死：让「20 元以内」不被拆开，破折号落在行首 */}
         整单照旧、去掉一样、换个饮料，或者压到 20 元以内
         <br />
         —— 说一句就行，其余交给它。
       </p>
 
-      <div className="mt-8 text-left">
+      <div className="mt-7 text-left">
         <Composer onSubmit={onSubmit} quickPrompts={quickPrompts} initialValue={prefill} />
       </div>
 
@@ -73,16 +73,16 @@ export function Hero({ lastOrder, loading, quickPrompts, prefill, demoReason, on
           <button
             type="button"
             onClick={onUseLatest}
-            className="group inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 font-medium text-brand-600 transition-colors duration-200 hover:bg-brand-50"
+            className="group inline-flex shrink-0 items-center gap-1 rounded px-1.5 py-0.5 font-medium text-brand-600 transition-colors duration-150 hover:bg-brand-50"
           >
             照这份再来
-            <IconArrow size={10} className="transition-transform duration-200 group-hover:translate-x-0.5" />
+            <IconArrow size={10} className="transition-transform duration-150 group-hover:translate-x-0.5" />
           </button>
         </div>
       ) : null}
 
       {demoReason ? (
-        <p className="mx-auto mt-5 flex max-w-[34rem] items-start justify-center gap-1.5 text-[10.5px] leading-relaxed text-[#7a5a1c]">
+        <p className="mx-auto mt-5 flex max-w-[34rem] items-start justify-center gap-1.5 text-[11px] leading-relaxed text-[#77571d]">
           <span className="mt-[3px] shrink-0">
             <IconAlert size={11} />
           </span>

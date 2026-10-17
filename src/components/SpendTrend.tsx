@@ -259,7 +259,7 @@ export function SpendTrend({ points, skipped, selectedId, onPick, height = 176 }
                 style={{ left: `${(hot.x / w) * 100}%`, top: `${(hot.y / H) * 100}%`, marginTop: -56 }}
               >
                 <p className="tnum display text-[14px] leading-none text-ink">¥{yuan(hot.cents)}</p>
-                <p className="mt-1 whitespace-nowrap font-mono text-[9px] tracking-[0.04em] text-ink-faint">{fmtDateTime(hot.time)}</p>
+                <p className="mt-1 whitespace-nowrap text-[9px] tracking-[0.04em] text-ink-faint">{fmtDateTime(hot.time)}</p>
               </div>
             ) : null}
           </div>

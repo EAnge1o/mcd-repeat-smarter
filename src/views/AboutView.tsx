@@ -64,7 +64,7 @@ export function AboutView({
             {FLOW.map((f, i) => (
               <li key={f.step} className={i === 0 ? 'pb-5' : 'border-t border-hair py-5'}>
                 <div className="flex gap-4">
-                  <span className="tnum shrink-0 pt-0.5 font-mono text-[9.5px] tracking-[0.1em] text-brand-600">{f.step}</span>
+                  <span className="tnum shrink-0 pt-0.5 text-[9.5px] tracking-[0.1em] text-brand-600">{f.step}</span>
                   <div className="min-w-0">
                     <p className="text-[13.5px] text-ink">{f.title}</p>
                     <p className="mt-1.5 text-[11.5px] leading-[1.85] text-ink-mute">{f.body}</p>
@@ -82,7 +82,7 @@ export function AboutView({
             {SOURCES.map(([k, v], i) => (
               <div key={k} className={i === 0 ? 'py-2.5' : 'border-t border-hair py-2.5'}>
                 <dt className="text-[11px] text-ink-mute">{k}</dt>
-                <dd className="mt-0.5 font-mono text-[10.5px] leading-relaxed text-ink-soft">{v}</dd>
+                <dd className="mt-0.5 text-[10.5px] leading-relaxed text-ink-soft">{v}</dd>
               </div>
             ))}
           </dl>
@@ -105,7 +105,7 @@ export function AboutView({
           </div>
           <div className="flex shrink-0 flex-col items-start gap-3">
             <Badge tone={mode === 'live' ? 'ok' : 'warn'}>{mode === 'live' ? '已连接真实 MCP' : '演示数据'}</Badge>
-            <Button variant="primary" arrow onClick={() => onNavigate('order')}>
+            <Button variant="primary" onClick={() => onNavigate('order')}>
               <IconSparkle size={13} />
               去试一单
             </Button>

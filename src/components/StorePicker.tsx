@@ -103,7 +103,7 @@ export function StoreSearch({ defaultCity, beType, currentStoreCode, onPick }: S
                   className={cx(
                     'flex w-full items-center gap-3 rounded-2xl px-3 py-2.5 text-left transition-[background-color,box-shadow] duration-200 ease-out',
                     active
-                      ? 'bg-blush ring-1 ring-inset ring-brand-200'
+                      ? 'bg-wash ring-1 ring-inset ring-brand-200'
                       : 'bg-[#fbf7f3] ring-1 ring-inset ring-transparent hover:bg-[#f8f2ec]',
                   )}
                 >
@@ -118,19 +118,19 @@ export function StoreSearch({ defaultCity, beType, currentStoreCode, onPick }: S
                       否则用户只能靠「下单失败」反推自己选了一家休息的店 */}
                   <span className="shrink-0 text-right">
                     {s.businessStatus ? (
-                      <span className="block font-mono text-[9px] leading-[1.5] tracking-[0.08em] text-[#3f6b52]">
+                      <span className="block text-[9px] leading-[1.5] tracking-[0.08em] text-[#3f6b52]">
                         营业中
                         {s.businessEndTime ? <span className="block text-ink-faint">至 {s.businessEndTime}</span> : null}
                       </span>
                     ) : (
-                      <span className="block font-mono text-[9px] leading-[1.5] tracking-[0.08em] text-ink-faint">
+                      <span className="block text-[9px] leading-[1.5] tracking-[0.08em] text-ink-faint">
                         休息中
                         {s.businessStartTime ? <span className="block text-ink-faint">{s.businessStartTime} 起</span> : null}
                       </span>
                     )}
                   </span>
                   {s.distance !== undefined ? (
-                    <span className="tnum shrink-0 font-mono text-[9.5px] text-ink-faint">{s.distance}m</span>
+                    <span className="tnum shrink-0 text-[9.5px] text-ink-faint">{s.distance}m</span>
                   ) : null}
                   <IconArrow size={11} className="shrink-0 text-ink-faint" />
                 </button>
@@ -179,7 +179,7 @@ export function StorePicker({
         role="dialog"
         aria-modal="true"
         aria-label="选择门店"
-        className="animate-fade-up flex max-h-[88vh] w-full max-w-[580px] flex-col overflow-hidden rounded-t-[28px] bg-white shadow-float sm:rounded-[28px]"
+        className="animate-fade-up flex max-h-[88vh] w-full max-w-[580px] flex-col overflow-hidden rounded-t-2xl bg-white shadow-float sm:rounded-2xl"
       >
         <div className="flex shrink-0 items-start gap-3 border-b border-hair px-6 py-5">
           <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-brand-50 text-brand-600" aria-hidden="true">

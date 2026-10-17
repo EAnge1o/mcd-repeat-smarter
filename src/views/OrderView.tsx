@@ -143,7 +143,7 @@ export function OrderView({
                 title="先给它一句话"
                 desc="说「还是老样子」直接复购；说「不要薯条」「饮料换无糖」「不超过 20 元」就在原方案上改。改完会按当前门店的真实菜单重新核价，再让你确认。"
                 action={
-                  <Button variant="primary" arrow onClick={() => onSubmit('还是老样子')}>
+                  <Button variant="primary" onClick={() => onSubmit('还是老样子')}>
                     <IconSparkle size={13} />
                     还是老样子
                   </Button>

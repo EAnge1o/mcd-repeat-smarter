@@ -273,21 +273,19 @@ export default function App() {
         onUsePlan={handleUsePlan}
       />
 
-      <div className="lg:pl-[248px]">
+      <div className="lg:pl-[228px]">
         <Topbar
-          view={view}
           plans={plans}
           orders={orders}
           storeName={store?.storeName || (store ? `门店 ${store.storeCode}` : '')}
           mode={mode}
           lastSync={lastSync}
-          dateLabel={todayLabel()}
           onNavigate={setView}
           onOpenMobile={() => setMobileNav(true)}
           onPickStore={() => setStorePickerOpen(true)}
         />
 
-        <main className="px-4 pb-32 pt-7 md:px-8 md:pt-10">
+        <main className="px-4 pb-28 pt-8 md:px-8 md:pt-12">
           <div className="mx-auto max-w-[1180px]">
             {view === 'overview' ? (
               <Overview
@@ -385,7 +383,7 @@ export default function App() {
       {view === 'order' && result && selectedCandidate ? (
         <div
           data-region="actionbar"
-          className="fixed bottom-0 left-0 right-0 z-30 border-t border-hair bg-[#faf8f6]/80 backdrop-blur-xl lg:left-[248px]"
+          className="fixed bottom-0 left-0 right-0 z-30 border-t border-hair bg-[#faf8f6]/80 backdrop-blur-xl lg:left-[228px]"
         >
           <div className="mx-auto flex max-w-[1180px] items-center justify-between gap-4 px-4 py-3 md:px-8">
             <div className="min-w-0">
@@ -400,7 +398,6 @@ export default function App() {
             <Button
               variant="primary"
               size="lg"
-              arrow
               onClick={() => setSheetOpen(true)}
               disabled={!selectedCandidate.price || selectedCandidate.price.priceCents === 0}
             >
@@ -450,7 +447,7 @@ export default function App() {
             role="dialog"
             aria-modal="true"
             aria-label="存成常用方案"
-            className="animate-fade-up w-full max-w-md overflow-hidden rounded-t-[28px] bg-white shadow-float sm:rounded-[28px]"
+            className="animate-fade-up w-full max-w-md overflow-hidden rounded-t-2xl bg-white shadow-float sm:rounded-2xl"
           >
             <div className="flex items-start gap-3 border-b border-hair px-6 py-5">
               <div className="min-w-0 flex-1">
@@ -508,7 +505,7 @@ export default function App() {
                 <ul className="divide-y divide-hair overflow-hidden rounded-2xl bg-[#fbf7f3]">
                   {selectedCandidate.items.map((it, i) => (
                     <li key={i} className="flex items-baseline gap-2.5 px-3.5 py-2">
-                      <span className="tnum shrink-0 font-mono text-[10px] text-ink-faint">{it.quantity}×</span>
+                      <span className="tnum shrink-0 text-[10px] text-ink-faint">{it.quantity}×</span>
                       <span className="min-w-0 flex-1 truncate text-[12px] text-ink">{it.name}</span>
                       {it.children.length > 0 ? (
                         <span className="shrink-0 truncate text-[10px] text-ink-faint">{it.children.map((c) => c.name).join(' / ')}</span>
@@ -520,7 +517,7 @@ export default function App() {
             </div>
 
             <div className="border-t border-hair px-6 py-4">
-              <Button variant="primary" size="lg" arrow className="w-full" onClick={() => void handleSavePlan()} disabled={saving}>
+              <Button variant="primary" size="lg" className="w-full" onClick={() => void handleSavePlan()} disabled={saving}>
                 {saving ? <span className="h-3.5 w-3.5 animate-spin-slow rounded-full border-2 border-white/30 border-t-white" /> : '保存'}
               </Button>
             </div>

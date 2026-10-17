@@ -1,13 +1,13 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
 import type { HistoryOrder, Plan } from '../../server/domain/types';
-import { Button, Panel, SectionHead, Stat } from '../components/ui';
+import { Button, MetricLead, MetricPair, Panel, SectionHead } from '../components/ui';
 import { Hero } from '../components/Hero';
 import { MemoryRail } from '../components/MemoryRail';
 import { PlanList } from '../components/PlanList';
 import { SpendTrend } from '../components/SpendTrend';
 import { OrderFeed } from '../components/OrderFeed';
 import { IconSparkle } from '../components/Icons';
-import { bucketOf, type Bucket, type Choice, type Kpi, type SpendPoint } from '../lib/metrics';
+import { bucketOf, paidCents, type Bucket, type Choice, type Kpi, type SpendPoint, yuan } from '../lib/metrics';
 import type { ViewKey } from '../components/Sidebar';
 
 interface TopItem {
@@ -83,12 +83,14 @@ export function Overview(props: OverviewProps) {
 
   const kpiOf = useCallback((key: string) => kpis.find((k) => k.key === key), [kpis]);
   const avg = kpiOf('avg');
-  const total = kpiOf('orders');
-  const topKpi = kpiOf('top');
-  const plansKpi = kpiOf('plans');
 
   const top = tops[0] ?? null;
   const topShare = top && orders.length > 0 ? Math.round((top.count / orders.length) * 100) : 0;
+
+  /* 累计实付：从真实订单算，且只累加接口确实返回了金额的那些 */
+  const pricedCents = useMemo(() => orders.map(paidCents).filter((c): c is number => c !== null && c > 0), [orders]);
+  const spendTotal = pricedCents.reduce((a, b) => a + b, 0);
+  const pricedCount = pricedCents.length;
 
   const activeBucket = buckets.find((b) => b.key === bucket) ?? null;
 
@@ -144,57 +146,43 @@ export function Overview(props: OverviewProps) {
         onUseLatest={onUseLatest}
       />
 
-      {/* 统计条带：四个衬线数字，发丝线切分，不装卡片 */}
-      <section aria-label="消费概况" className="mt-14 border-y border-hair md:mt-16">
-        <dl className="grid grid-cols-2 md:grid-cols-4">
-          <div className="py-6 md:py-7 md:pl-0 md:pr-7">
-            {ordersLoading ? (
-              <div className="space-y-3">
-                <div className="skeleton h-2.5 w-14" />
-                <div className="skeleton h-7 w-20" />
-              </div>
-            ) : (
-              <Stat label="累计下单" value={total?.value ?? '0'} unit={total?.unit} hint={total?.hint} />
-            )}
-          </div>
-          <div className="border-l border-hair px-4 py-6 md:px-7 md:py-7">
-            {ordersLoading ? (
-              <div className="space-y-3">
-                <div className="skeleton h-2.5 w-16" />
-                <div className="skeleton h-7 w-24" />
-              </div>
-            ) : (
-              <Stat label="平均客单价" value={avg?.value ?? '—'} hint={avg?.hint} tone="brand" />
-            )}
-          </div>
-          <div className="border-t border-hair py-6 md:border-l md:border-t-0 md:py-7 md:pl-7 md:pr-0">
-            {ordersLoading ? (
-              <div className="space-y-3">
-                <div className="skeleton h-2.5 w-14" />
-                <div className="skeleton h-7 w-16" />
-              </div>
-            ) : (
-              <Stat label="最常点" value={topKpi?.value ?? '—'} unit={topKpi?.unit} hint={topKpi?.hint} />
-            )}
-          </div>
-          <div className="border-l border-t border-hair px-4 py-6 md:border-t-0 md:py-7 md:pl-7 md:pr-0">
-            {ordersLoading ? (
-              <div className="space-y-3">
-                <div className="skeleton h-2.5 w-16" />
-                <div className="skeleton h-7 w-14" />
-              </div>
-            ) : (
-              <Stat label="常用方案" value={plansKpi?.value ?? String(plans.length)} unit="个" hint="存下来的整单，可一键复用" />
-            )}
-          </div>
-        </dl>
+      {/*
+        概况：一个主角 + 三个配角。
+        不做四个等宽格子 —— 同样大小等于宣称同样重要，结果是谁都不重要。
+        累计实付放大成唯一主角，其余退成一行次级数字。
+      */}
+      <section aria-label="消费概况" className="mt-14 md:mt-16">
+        <div className="flex flex-wrap items-end justify-between gap-x-12 gap-y-7">
+          <MetricLead
+            label="累计实付"
+            value={spendTotal > 0 ? `¥${yuan(spendTotal)}` : '—'}
+            note={
+              pricedCount > 0
+                ? `${pricedCount} 笔有金额 · ${orders.length - pricedCount} 笔接口未返回`
+                : '接口还没有返回过实付金额'
+            }
+            loading={ordersLoading}
+          />
+
+          <MetricPair
+            loading={ordersLoading}
+            items={[
+              { label: '累计下单', value: `${orders.length} 单` },
+              { label: '平均客单价', value: avg?.value ?? '—' },
+              { label: '最常点', value: top ? `${top.count} 次 · ${top.name}` : '—' },
+              { label: '常用方案', value: `${plans.length} 个` },
+            ]}
+          />
+        </div>
+
+        <div className="hair mt-8" aria-hidden="true" />
       </section>
 
       {/* 趋势 + 记忆 */}
       <div className="mt-12 grid grid-cols-1 items-start gap-5 md:mt-14 md:gap-6 xl:grid-cols-12">
         {ordersLoading || series.points.length > 0 ? (
           <Panel className="min-w-0 px-5 py-6 md:px-8 md:py-8 xl:col-span-8">
-            <SectionHead index="01 / 趋势" title="钱花在哪几单上" desc={trendNote} size="sm" />
+            <SectionHead title="钱花在哪几单上" desc={trendNote} size="sm" />
             <div className="mt-5">
               {ordersLoading ? (
                 <div className="skeleton h-[176px] w-full rounded-2xl" />
@@ -206,7 +194,7 @@ export function Overview(props: OverviewProps) {
         ) : null}
 
         <Panel className="min-w-0 px-5 py-6 md:px-7 md:py-8 xl:col-span-4">
-          <SectionHead index="02 / 记忆" title="我记住的" size="sm" />
+          <SectionHead title="我记住的" desc="全部由你的真实订单统计得出" size="sm" />
           <div className="mt-5">
             <MemoryRail
               top={top ? { name: top.name, count: top.count, share: topShare } : null}
@@ -224,7 +212,6 @@ export function Overview(props: OverviewProps) {
       {/* 常用方案 */}
       <Panel className="mt-5 px-5 py-6 md:mt-6 md:px-8 md:py-8">
         <SectionHead
-          index="03 / 方案"
           title="常用方案"
           desc="方案存的是商品编码，不是一句话。价格每次下单前都会按门店重新核。"
           size="sm"
@@ -241,7 +228,7 @@ export function Overview(props: OverviewProps) {
             onUse={onUsePlan}
             onManage={() => onNavigate('plans')}
             emptyAction={
-              <Button variant="primary" size="sm" arrow onClick={() => onNavigate('order')}>
+              <Button variant="primary" size="sm" onClick={() => onNavigate('order')}>
                 去调一单
               </Button>
             }
@@ -264,7 +251,7 @@ export function Overview(props: OverviewProps) {
             onViewAll={() => onNavigate('orders')}
             onClearFilter={() => pickBucket(null)}
             emptyAction={
-              <Button variant="primary" size="sm" arrow onClick={onUseLatest}>
+              <Button variant="primary" size="sm" onClick={onUseLatest}>
                 <IconSparkle size={12} />
                 还是老样子
               </Button>
