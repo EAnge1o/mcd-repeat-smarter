@@ -85,7 +85,7 @@ function MatchNotice({ matched, summary }: { matched: MatchedView[]; summary: Ad
               .filter((c) => c.status !== 'exact')
               .map((c, j) => (
                 <div key={j} className="mt-1">
-                  子项「{c.name}」{c.status === 'substituted' ? '已下架，替换为' : '编码变更，对应'}「{c.currentName}」
+                  子项「{c.name}」{c.status === 'substituted' ? '已下架，替换为' : '现对应'}「{c.currentName}」
                   {c.alternatives.length > 0 ? (
                     <span className="opacity-80">（也可选：{c.alternatives.map((a) => `${a.name} ${a.diffPrice ?? ''}`).join('、')}）</span>
                   ) : null}
@@ -318,7 +318,7 @@ function CandidateCard({ candidate, active, onSelect }: { candidate: CandidatePl
               )}
             >
               <IconAlert size={13} className="mt-0.5 shrink-0" />
-              <span>{candidate.budgetNote}。系统不会为了凑预算偷偷换掉你要的东西。</span>
+              <span>{candidate.budgetNote}</span>
             </p>
           ) : null}
           {(candidate.priceChecks ?? []).map((n, i) => (
@@ -392,7 +392,7 @@ export function AdjustResultView({
 
       {result.intent.unrecognized.length > 0 ? (
         <Alert kind="warn" title="有一部分没听懂">
-          「{result.intent.unrecognized.join('、')}」这部分没能转成具体修改。可以换个说法，例如「不要薯条」「薯条换成玉米杯」「不超过 20 元」。
+          「{result.intent.unrecognized.join('、')}」没能转成具体修改。换个说法试试。
         </Alert>
       ) : null}
 
@@ -400,7 +400,7 @@ export function AdjustResultView({
 
       {allOverBudget ? (
         <Alert kind="error" title={`没有方案能压到 ¥${(result.intent.budgetCents! / 100).toFixed(0)} 以内`}>
-          下面列出的是最接近的选项。你可以放宽预算，或告诉我可以减少哪一项。
+          下面是最接近的选项。可以放宽预算，或告诉我减少哪一项。
         </Alert>
       ) : null}
 
@@ -436,7 +436,7 @@ export function AdjustResultView({
           存成常用方案
           <IconArrow size={12} />
         </button>
-        <span className="text-[13px] text-ink-mute">下次说「还是老样子」就能调出来</span>
+        <span className="text-[13px] text-ink-mute">存下来就能一句话调出</span>
       </div>
     </div>
   );

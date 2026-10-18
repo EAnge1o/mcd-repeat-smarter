@@ -20,7 +20,7 @@ export function StoresView({
       <header className="max-w-[600px]">
         <h1 className="display display-36 text-ink md:display-48">选择门店</h1>
         <p className="mt-3 max-w-[36rem] text-pretty text-[14.5px] font-medium leading-[1.8] text-ink-mute">
-          门店决定菜单、价格与可选优惠。切换后方案与核价都会按新门店重算 —— 同一份餐在不同门店的价格本来就不一样。
+          同一份餐在不同门店价格不同，菜单与优惠也不同。
         </p>
       </header>
 
@@ -28,9 +28,6 @@ export function StoresView({
         <Panel className="px-5 py-6 md:px-7 md:py-7">
           <p className="eyebrow">搜索门店</p>
           <h2 className="display display-24 mt-2 text-ink">城市 + 关键词</h2>
-          <p className="mt-1.5 text-[11.5px] leading-relaxed text-ink-faint">
-            官方接口需要「城市 + 关键词」才会返回真实在售菜单，只给关键词可能查不到。
-          </p>
           <div className="mt-5">
             <StoreSearch defaultCity={defaultCity} beType={beType} currentStoreCode={currentStoreCode} onPick={onPick} />
           </div>
@@ -52,10 +49,6 @@ export function StoresView({
               </dd>
             </div>
           </dl>
-
-          <p className="mt-6 border-t border-hair pt-4 text-[13px] leading-relaxed text-ink-faint">
-            这一单会下到这家店。改店之后，之前核过的价格作废，需要重新核一次。
-          </p>
         </Panel>
       </div>
     </div>

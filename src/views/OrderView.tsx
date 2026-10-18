@@ -70,14 +70,12 @@ export function OrderView({
   return (
     <div>
       <header className="max-w-[640px]">
-        <p className="eyebrow">一句话调整 · 按门店实时核价</p>
+        <p className="eyebrow">一句话调整 · 门店实时核价</p>
         <h1 className="display display-24 mt-3 text-ink md:display-36">
           {result ? '还想再改点什么？' : '说清楚这次要什么'}
         </h1>
         <p className="mt-2.5 max-w-[34rem] text-pretty text-[13px] leading-[1.9] text-ink-mute">
-          {result
-            ? '在刚才的结果上接着说，每改一次都会重新核价，价格与优惠都取门店实时结果。'
-            : '可以整单照旧，也可以只改其中一两处。它会把这句话拆成结构化修改，而不是拿一句话去搜商品。'}
+          {result ? '在刚才的结果上接着说。' : '整单照旧，或者只改其中一两处。'}
         </p>
       </header>
 
@@ -118,7 +116,7 @@ export function OrderView({
             </Alert>
           ) : null}
 
-          {adjusting ? <Working title={result ? '正在按新的说法重新核价…' : '正在解析你的说法，并查询门店真实菜单…'} /> : null}
+          {adjusting ? <Working title={result ? '正在重新核价…' : '正在解析并查询门店菜单…'} /> : null}
 
           {result && !adjusting ? (
             <Panel className="px-5 py-6 md:px-7 md:py-8">
@@ -142,7 +140,7 @@ export function OrderView({
             <Panel className="flex min-h-[280px] items-center justify-center">
               <EmptyState
                 title="先给它一句话"
-                desc="说「还是老样子」直接复购；说「不要薯条」「饮料换无糖」「不超过 20 元」就在原方案上改。改完会按当前门店的真实菜单重新核价，再让你确认。"
+                desc="说「还是老样子」直接复购，说「不要薯条」「不超过 20 元」就在原方案上改。"
                 action={
                   <Button variant="primary" onClick={() => onSubmit('还是老样子')}>
                     <IconSparkle size={13} />
@@ -179,7 +177,7 @@ export function OrderView({
               </button>
             </div>
             {plans.length === 0 ? (
-              <p className="mt-3 text-[11.5px] leading-relaxed text-ink-faint">还没有常用方案。调好一单后可以存下来，下次一句话调出。</p>
+              <p className="mt-3 text-[11.5px] leading-relaxed text-ink-faint">还没有存过方案。</p>
             ) : (
               <ul className="mt-2 -mx-2">
                 {plans.slice(0, 3).map((p) => (

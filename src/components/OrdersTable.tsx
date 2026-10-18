@@ -36,7 +36,7 @@ function Amount({ order, size = 'md' }: { order: HistoryOrder; size?: 'md' | 'lg
   const c = paidCents(order);
   if (c === null) {
     return (
-      <span className="tnum text-ink-faint" title="接口未返回实付金额">
+      <span className="tnum text-ink-faint" title="未返回实付金额">
         —
       </span>
     );
@@ -55,7 +55,7 @@ function Amount({ order, size = 'md' }: { order: HistoryOrder; size?: 'md' | 'lg
       {c === 0 ? (
         <span
           className="rounded bg-gold-400 px-1 text-[10px] font-black leading-[1.5] text-ink"
-          title="这一单由券或积分全额抵扣，实付为 0"
+          title="券或积分全额抵扣"
         >
           券
         </span>
@@ -168,7 +168,7 @@ export function OrdersTable({
   }
 
   if (orders.length === 0) {
-    return <EmptyState title="还没有历史订单" desc="完成一单后，这里会显示门店、餐品与实付金额。" action={emptyAction} />;
+    return <EmptyState title="还没有历史订单" desc="完成一单后，这里会显示记录。" action={emptyAction} />;
   }
 
   return (
@@ -218,7 +218,7 @@ export function OrdersTable({
         <EmptyState
           compact
           title="没有匹配的订单"
-          desc={`「${q.trim()}」在 ${orders.length} 单里没有命中。换个关键词，或者清空搜索框。`}
+          desc={`「${q.trim()}」没有命中，${orders.length} 单里找不到。`}
           action={
             <button
               type="button"

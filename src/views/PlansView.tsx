@@ -31,7 +31,7 @@ export function PlansView({
         <div className="max-w-[560px]">
           <h1 className="display display-36 text-ink md:display-48">常用方案</h1>
           <p className="mt-3 max-w-[36rem] text-pretty text-[14.5px] font-medium leading-[1.8] text-ink-mute">
-            方案存的是商品编码，不是一句话。价格每次下单前都会按门店重新核，所以这里的数字只代表「当时那一单」。
+            说一句「还是老样子」就能整单调出来。
           </p>
         </div>
         <Button variant="primary" onClick={() => onNavigate('order')}>
@@ -42,13 +42,7 @@ export function PlansView({
 
       <section aria-label="方案概况" className="mt-9">
         <div className="flex flex-wrap items-end justify-between gap-x-12 gap-y-6">
-          <MetricLead
-            label="存下的方案"
-            value={`${plans.length}`}
-            unit="个"
-            note="每个方案存的是商品编码，不是一句话"
-            loading={loading}
-          />
+          <MetricLead label="存下的方案" value={`${plans.length}`} unit="个" loading={loading} />
           <MetricPair
             loading={loading}
             items={[
@@ -65,7 +59,7 @@ export function PlansView({
         <div className="flex flex-wrap items-baseline justify-between gap-3">
           <div>
             <p className="eyebrow">全部方案</p>
-            <h2 className="display display-24 mt-2 text-ink">点「用它」直接整单复用</h2>
+            <h2 className="display display-24 mt-2 text-ink">点「用它」整单复用</h2>
           </div>
           <p className="tnum text-[11.5px] text-ink-mute">{plans.length} 个</p>
         </div>
@@ -76,7 +70,7 @@ export function PlansView({
           ) : plans.length === 0 ? (
             <EmptyState
               title="还没有保存的常用方案"
-              desc="调好一单后点「存成常用方案」，它会出现在这里。下次说一句「还是老样子」，就能把它整单调出来。"
+              desc="调好一单后点「存成常用方案」。"
               action={
                 <Button variant="primary" size="sm" onClick={() => onNavigate('order')}>
                   去调一单

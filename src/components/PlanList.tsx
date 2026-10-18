@@ -41,7 +41,7 @@ export function PlanList({ plans, loading, limit = 3, onUse, onManage, emptyActi
       <EmptyState
         compact
         title="还没有保存的常用方案"
-        desc="调好一单后点「存成常用方案」，下次说一句「还是老样子」就能整单调出来。"
+        desc="调好一单后点「存成常用方案」。"
         action={emptyAction}
       />
     );

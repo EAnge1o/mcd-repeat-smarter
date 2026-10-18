@@ -44,7 +44,7 @@ export function PlansGrid({ plans, loading, onUse, onDuplicate, onRename, onDele
     return (
       <EmptyState
         title="还没有保存的常用方案"
-        desc="调好一单后点「存成常用方案」，下次说一句「还是老样子」就能整单调出来。"
+        desc="调好一单后点「存成常用方案」。"
         action={emptyAction}
       />
     );
@@ -142,7 +142,6 @@ export function PlansGrid({ plans, loading, onUse, onDuplicate, onRename, onDele
             <IconPlus size={11} />
             还能再存一个
           </span>
-          <span className="mt-1.5 text-[11.5px] leading-relaxed text-ink-faint">下次调好之后点「存成常用方案」</span>
         </div>
       ) : null}
     </div>

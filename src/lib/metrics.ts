@@ -132,7 +132,7 @@ export function computeKpis(orders: HistoryOrder[], plans: Plan[]): Kpi[] {
       key: 'avg',
       label: '平均客单价',
       value: avgAll > 0 ? `¥${yuan(avgAll)}` : '—',
-      hint: priced.length > 0 ? `基于 ${priced.length} 笔有金额的订单` : '接口未返回金额',
+      hint: priced.length > 0 ? `基于 ${priced.length} 笔有金额订单` : '暂无金额数据',
       trend:
         avgCur > 0 && avgPrev > 0
           ? deltaText(Math.round(avgCur), Math.round(avgPrev), '元')

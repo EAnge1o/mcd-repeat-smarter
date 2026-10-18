@@ -31,9 +31,7 @@ export function OrdersView({
         <div>
           <h1 className="display display-36 text-ink md:display-48">订单记录</h1>
           <p className="mt-3 max-w-[36rem] text-pretty text-[14.5px] font-medium leading-[1.8] text-ink-mute">
-            {mode === 'live'
-              ? '来自你的麦当劳账号，按下单时间倒序。金额取接口返回的实付值，接口没返回的显示为「—」，不按 0 算。'
-              : '当前为内置演示数据，不是真实账号。切到真实 MCP 后会读取你自己的历史订单。'}
+            {mode === 'live' ? '来自你的麦当劳账号，按下单时间倒序。' : '当前为内置演示数据，不是真实账号。'}
           </p>
         </div>
 
@@ -62,7 +60,7 @@ export function OrdersView({
             value={priced.length > 0 ? `¥${yuan(total)}` : '—'}
             note={
               priced.length > 0
-                ? `${priced.length} 笔有金额 · ${orders.length - priced.length} 笔接口未返回`
+                ? `${priced.length} 笔有金额${orders.length - priced.length > 0 ? ` · ${orders.length - priced.length} 笔未返回` : ''}`
                 : '接口还没有返回过实付金额'
             }
             loading={loading}

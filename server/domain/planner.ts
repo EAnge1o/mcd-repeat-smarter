@@ -179,7 +179,7 @@ export function applyIntent(req: PlanRequest, items: PlanItem[]): { items: PlanI
       changes.push({
         type: 'preference',
         target: change.preference ?? '',
-        detail: `注意到你要求「${change.preference}」，会在同轮次里优先挑符合的选项`,
+        detail: `按「${change.preference}」挑了同轮次里符合的选项`,
       });
       continue;
     }
@@ -216,7 +216,7 @@ export function applyIntent(req: PlanRequest, items: PlanItem[]): { items: PlanI
       changes.push({
         type: 'unavailable',
         target: change.target,
-        detail: `原方案里没找到「${change.target}」，这一项没有执行`,
+        detail: `原方案里没有「${change.target}」，未改动`,
       });
       continue;
     }
@@ -282,7 +282,7 @@ export function applyIntent(req: PlanRequest, items: PlanItem[]): { items: PlanI
         changes.push({
           type: 'unavailable',
           target: item.name,
-          detail: `没能确定「${change.replacement ?? '替代品'}」具体是哪件商品，需要你确认`,
+          detail: `没找到「${change.replacement ?? '替代品'}」，需要你确认`,
         });
       }
       continue;
@@ -420,7 +420,7 @@ function buildExplain(req: PlanRequest, changes: AppliedChange[], items: PlanIte
 
   const modified = changes.filter((c) => c.type !== 'kept');
   if (modified.length === 0) {
-    lines.push('没有检测到具体修改，按原方案准备');
+    lines.push(`没有具体改动，按原方案准备`);
   } else {
     for (const m of modified) {
       if (m.type === 'replaced' || m.type === 'removed' || m.type === 'added') lines.push(m.detail);
@@ -428,7 +428,7 @@ function buildExplain(req: PlanRequest, changes: AppliedChange[], items: PlanIte
   }
 
   if (req.intent.budgetCents) {
-    lines.push(`预算上限 ¥${(req.intent.budgetCents / 100).toFixed(2)}，最终金额以 MCP 核价为准`);
+    lines.push(`预算上限 ¥${(req.intent.budgetCents / 100).toFixed(2)}`);
   }
 
   const unavailable = changes.filter((c) => c.type === 'unavailable');

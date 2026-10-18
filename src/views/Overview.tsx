@@ -127,8 +127,7 @@ export function Overview(props: OverviewProps) {
     return list;
   }, [top]);
 
-  const trendNote =
-    series.points.length > 0 ? `近 ${series.points.length} 笔订单的实付金额 · 点一下定位到下面那一单` : '按时间正序';
+  const trendNote = series.points.length > 0 ? `近 ${series.points.length} 笔实付 · 点一下定位到那一单` : '按时间正序';
 
   return (
     <div>
@@ -158,7 +157,7 @@ export function Overview(props: OverviewProps) {
             value={spendTotal > 0 ? `¥${yuan(spendTotal)}` : '—'}
             note={
               pricedCount > 0
-                ? `${pricedCount} 笔有金额 · ${orders.length - pricedCount} 笔接口未返回`
+                ? `${pricedCount} 笔有金额${orders.length - pricedCount > 0 ? ` · ${orders.length - pricedCount} 笔未返回` : ''}`
                 : '接口还没有返回过实付金额'
             }
             loading={ordersLoading}
@@ -222,7 +221,7 @@ export function Overview(props: OverviewProps) {
       <Panel className="mt-5 px-5 py-6 shadow-panel md:mt-6 md:px-8 md:py-8">
         <SectionHead
           title="常用方案"
-          desc="方案存的是商品编码，不是一句话。价格每次下单前都会按门店重新核。"
+          desc="一句话整单复用"
           size="sm"
           action={
             <Button size="sm" onClick={() => onNavigate('plans')}>

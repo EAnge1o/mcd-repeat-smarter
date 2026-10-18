@@ -119,7 +119,7 @@ export function SpendTrend({ points, skipped, selectedId, onPick, height = 176 }
       <EmptyState
         compact
         title="还没有可画的消费数据"
-        desc="历史订单里没有返回金额。换到真实 MCP 模式，或者先完成一单，这里就会有趋势。"
+        desc="历史订单里没有金额数据。"
       />
     );
   }
@@ -266,8 +266,8 @@ export function SpendTrend({ points, skipped, selectedId, onPick, height = 176 }
 
           {skipped > 0 || zeroCount > 0 ? (
             <p className="mt-2 text-[11.5px] leading-relaxed text-ink-faint">
-              {skipped > 0 ? `另有 ${skipped} 笔订单接口未返回金额，未计入趋势线。` : ''}
-              {zeroCount > 0 ? `${skipped > 0 ? ' ' : ''}其中 ${zeroCount} 笔为券/积分全额抵扣，实付 ¥0。` : ''}
+              {skipped > 0 ? `另有 ${skipped} 笔无金额，未计入。` : ''}
+              {zeroCount > 0 ? `${skipped > 0 ? ' ' : ''}其中 ${zeroCount} 笔为券全额抵扣。` : ''}
             </p>
           ) : null}
         </>

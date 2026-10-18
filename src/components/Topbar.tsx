@@ -100,24 +100,24 @@ export function Topbar({
     {
       tone: mode === 'live' ? 'ok' : 'warn',
       title: mode === 'live' ? '已连接麦当劳 MCP' : '当前是演示数据',
-      body: mode === 'live' ? '门店、餐品与价格均来自官方接口实时返回。' : '门店、餐品与价格均为内置示例，不代表真实供应情况。',
+      body: mode === 'live' ? '门店、餐品与价格来自官方接口。' : '门店、餐品与价格均为内置示例。',
     },
     {
       tone: 'info',
       title: `取餐门店：${storeName || '未选择'}`,
-      body: '在左下角或这里切换门店，切换后方案与核价都会按新门店重算。',
+      body: '切换门店后，菜单与价格按新门店重算。',
     },
     {
       tone: 'info',
       title: lastSync ? `最近读取：${lastSync}` : '尚未读取过历史订单',
-      body: '订单记录只在你本机与服务端之间流转，Token 不会出现在浏览器。',
+      body: '订单只在本机与服务端之间流转。',
     },
   ];
 
   const results = (
     <>
       {hits.length === 0 ? (
-        <p className="px-4 py-5 text-[13px] leading-relaxed text-ink-mute">没有匹配的方案或订单。换个关键词，或者直接去「点单」说一句话。</p>
+        <p className="px-4 py-5 text-[13px] leading-relaxed text-ink-mute">没有匹配的结果。</p>
       ) : (
         <ul className="max-h-[60vh] overflow-y-auto p-2">
           {hits.map((h) => (
@@ -174,7 +174,7 @@ export function Topbar({
           {mode === 'live' ? '真实接口' : '演示数据'}
         </span>
         <span className="truncate text-[13px] text-ink-mute">
-          {mode === 'live' ? '门店与价格来自麦当劳接口实时返回' : '门店、餐品与价格均为内置示例'}
+          {mode === 'live' ? '门店与价格来自麦当劳接口' : '门店、餐品与价格为内置示例'}
           {lastSync ? <span className="tnum"> · 最近读取 {lastSync}</span> : null}
         </span>
       </div>

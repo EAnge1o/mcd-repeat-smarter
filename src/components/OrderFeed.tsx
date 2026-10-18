@@ -76,7 +76,7 @@ export function OrderFeed({
         <EmptyState
           compact
           title={filterLabel ? '这个时段没有订单' : '还没有历史订单'}
-          desc={filterLabel ? '换一个时段，或者清除筛选看全部。' : '完成一单后，这里会显示时间、门店、餐品与实付金额。'}
+          desc={filterLabel ? '换个时段，或清除筛选。' : '完成一单后，这里会显示记录。'}
           action={filterLabel ? undefined : emptyAction}
         />
       ) : (

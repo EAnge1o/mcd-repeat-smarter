@@ -175,7 +175,7 @@ function matchChild(child: PlanChild, index: number, combo: ComboDetail | undefi
           ...(bestChoice.name !== child.name ? { aliasNames: [child.name] } : {}),
         },
         alternatives: [],
-        reason: `「${child.name}」编码已变更，匹配到${bestChoice.roundName}的「${bestChoice.name}」`,
+        reason: `「${child.name}」现在是${bestChoice.roundName}的「${bestChoice.name}」`,
       };
     }
 
@@ -244,7 +244,7 @@ export function matchItem(item: PlanItem, ctx: MatchContext): MatchedItem {
   if (byName) {
     const combo = ctx.combos.get(byName.code);
     const children = item.children.map((c, i) => matchChild(c, i, combo));
-    const reason = `「${item.name}」编码已变更（${item.productCode} → ${byName.code}），按同名商品匹配`;
+    const reason = `「${item.name}」对应现在的「${byName.name}」`;
     return {
       original: item,
       status: 'renamed',
@@ -280,7 +280,7 @@ export function matchItem(item: PlanItem, ctx: MatchContext): MatchedItem {
         children: children.map((c) => c.current ?? c.original),
       },
       children,
-      notes: [`「${item.name}」按名称相似匹配到「${fuzzy.name}」，请确认是否接受`],
+      notes: [`「${item.name}」现在叫「${fuzzy.name}」`],
     };
   }
 
@@ -327,7 +327,7 @@ export function statusLabel(status: MatchStatus): string {
     case 'exact':
       return '仍可点';
     case 'renamed':
-      return '编码已更新';
+      return '已更名';
     case 'substituted':
       return '已替换';
     case 'unavailable':

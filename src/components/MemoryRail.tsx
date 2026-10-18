@@ -56,7 +56,7 @@ export function MemoryRail({ top, choices, buckets, activeBucket, loading, onPic
             </p>
             <p className="mt-2 flex flex-wrap items-baseline gap-x-2 gap-y-1 text-[13px] text-white/70">
               <span className="tnum font-bold text-white">{top.count} 次</span>
-              <span>出现在 {top.share}% 的订单里</span>
+              <span>占 {top.share}% 的订单</span>
             </p>
             <div className="mt-3 h-3 w-full overflow-hidden rounded-full bg-white/15" aria-hidden="true">
               <div className="h-full rounded-full bg-gold-400" style={{ width: `${Math.min(top.share, 100)}%` }} />
@@ -71,7 +71,7 @@ export function MemoryRail({ top, choices, buckets, activeBucket, loading, onPic
             </button>
           </>
         ) : (
-          <p className="mt-3 text-[13px] leading-relaxed text-white/55">还没有可统计的餐品，先完成一单。</p>
+          <p className="mt-3 text-[13px] leading-relaxed text-white/55">还没有可统计的餐品。</p>
         )}
       </div>
 
@@ -116,7 +116,7 @@ export function MemoryRail({ top, choices, buckets, activeBucket, loading, onPic
         </div>
 
         {nonZero.length === 0 ? (
-          <p className="mt-3 text-[13px] leading-relaxed text-white/55">历史订单里没有可解析的下单时间。</p>
+          <p className="mt-3 text-[13px] leading-relaxed text-white/55">没有可解析的下单时间。</p>
         ) : (
           <ul className="-mx-2 mt-2.5">
             {nonZero.map((b) => {
@@ -151,7 +151,7 @@ export function MemoryRail({ top, choices, buckets, activeBucket, loading, onPic
         )}
 
         {zeroCount > 0 && nonZero.length > 0 ? (
-          <p className="mt-2.5 text-[11.5px] text-white/40">另 {zeroCount} 个时段没有订单</p>
+          <p className="mt-2.5 text-[11.5px] text-white/40">另 {zeroCount} 个时段无订单</p>
         ) : null}
       </div>
     </div>

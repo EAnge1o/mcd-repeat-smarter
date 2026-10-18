@@ -144,7 +144,7 @@ export function StoreSearch({ defaultCity, beType, currentStoreCode, onPick }: S
         <EmptyState
           compact
           title="先搜索一家门店"
-          desc="MCP 的门店查询需要「城市 + 关键词」，这样才能拿到这家店真实的在售菜单和价格。"
+          desc="填城市 + 关键词才能查到。"
         />
       ) : null}
     </div>

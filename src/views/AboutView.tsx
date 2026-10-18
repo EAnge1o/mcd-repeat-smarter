@@ -3,10 +3,10 @@ import { IconArches, IconSparkle } from '../components/Icons';
 import type { ViewKey } from '../components/Sidebar';
 
 const FLOW = [
-  { step: '01', title: '读习惯', body: '从你的历史订单里算出常点的门店、餐品和时段，不用你填任何偏好表单。' },
-  { step: '02', title: '听懂改动', body: '「不要薯条」「饮料换无糖」「不超过 20 元」会被解析成结构化修改，不是猜一句话去搜商品。' },
-  { step: '03', title: '按门店核价', body: '每一次调整都调官方接口重新算钱，价格、优惠、库存状态都拿实时结果。' },
-  { step: '04', title: '你确认才下单', body: '弹层里核对门店、餐品、金额，勾选后才提交。系统不会在你确认前下单。' },
+  { step: '01', title: '读习惯', body: '从历史订单算出常点的门店、餐品和时段。' },
+  { step: '02', title: '听懂改动', body: '「不要薯条」「换无糖」「不超 20 元」拆成具体修改。' },
+  { step: '03', title: '按门店核价', body: '每次调整都重新调官方接口算价。' },
+  { step: '04', title: '你确认才下单', body: '核对门店、餐品、金额，勾选后才提交。' },
 ];
 
 const SOURCES = [
@@ -41,7 +41,7 @@ export function AboutView({
           听懂你这次改的
         </h1>
         <p className="mt-3 max-w-[34rem] text-pretty text-[13px] leading-[1.95] text-ink-mute">
-          基于麦当劳官方 MCP 的个性化点单助手。所有判断都落在「你的历史订单 + 门店实时菜单」这两件事实之上，不猜口味，也不编造优惠。
+          基于麦当劳官方 MCP 的个性化点单助手。所有判断都落在「你的历史订单 + 门店实时菜单」之上。
         </p>
       </header>
 
@@ -56,7 +56,7 @@ export function AboutView({
           <div className="flex items-baseline justify-between gap-3">
             <div>
               <p className="eyebrow">它到底做了什么</p>
-              <h2 className="display display-24 mt-2 text-ink">四步，每一步都可以被你打断</h2>
+              <h2 className="display display-24 mt-2 text-ink">四步，每步可打断</h2>
             </div>
           </div>
 
@@ -93,14 +93,13 @@ export function AboutView({
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="max-w-[42rem] text-pretty">
             <p className="eyebrow">关于这个作品</p>
-            <div className="mt-3 space-y-2.5 text-[13px] leading-[1.95] text-ink-soft">
+            <div className="mt-3 space-y-2 text-[13px] leading-[1.9] text-ink-soft">
               <p>
-                这是麦当劳中国程序员节开发者创新挑战赛的参赛作品，
+                麦当劳中国程序员节开发者创新挑战赛参赛作品，
                 <strong className="font-medium text-ink">非官方产品</strong>
-                ，与麦当劳中国没有隶属关系。界面中的金拱门标记仅用于标明所对接的服务，不代表官方授权。
+                。界面中的金拱门标记仅用于标明所对接的服务，不代表官方授权。
               </p>
-              <p>餐品、价格与优惠以麦当劳官方渠道实时结果为准；演示模式下页面内容为内置示例，不代表真实供应情况。</p>
-              <p>所有下单动作都需要你在确认弹层里主动勾选后才会提交，系统不会替你下单。</p>
+              <p>餐品、价格与优惠以官方渠道实时结果为准；所有下单都需要你在确认弹层里勾选后才会提交。</p>
             </div>
           </div>
           <div className="flex shrink-0 flex-col items-start gap-3">

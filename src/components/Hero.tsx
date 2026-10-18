@@ -74,8 +74,6 @@ export function Hero({ lastOrder, loading, quickPrompts, prefill, demoReason, on
 
       <p className="mx-auto mt-5 max-w-[34rem] text-pretty text-[15px] font-medium leading-[1.8] text-ink-soft">
         整单照旧、去掉一样、换个饮料，或者压到 20 元以内
-        <br />
-        —— 说一句就行，其余交给它。
       </p>
 
       <div className="mt-8 text-left">
@@ -109,7 +107,7 @@ export function Hero({ lastOrder, loading, quickPrompts, prefill, demoReason, on
           <span className="mt-[3px] shrink-0">
             <IconAlert size={12} />
           </span>
-          <span>当前展示内置示例数据，门店、餐品与价格不代表真实供应情况（{demoReason}）。</span>
+          <span>当前为内置示例数据，不代表真实供应情况（{demoReason}）。</span>
         </p>
       ) : null}
     </section>

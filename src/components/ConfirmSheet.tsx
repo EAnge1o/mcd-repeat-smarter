@@ -117,7 +117,7 @@ export function ConfirmSheet({
           <div className="min-w-0 flex-1">
             <p className="text-[12px] font-black uppercase tracking-[0.14em] text-white/75">最后一步</p>
             <h2 className="display display-24 mt-1 text-white">确认这一单</h2>
-            <p className="mt-1 text-[12.5px] font-medium text-white/80">提交前请核对门店、餐品与金额</p>
+            <p className="mt-1 text-[12.5px] font-medium text-white/80">核对门店、餐品与金额</p>
           </div>
           <button
             type="button"
@@ -302,7 +302,7 @@ export function ConfirmSheet({
             </div>
 
             <p className="mt-2.5 text-[12.5px] leading-relaxed text-ink-mute">
-              金额为官方接口实时核价，提交时可能因门店库存或活动变化产生微小差异，实际以门店出餐为准。
+              金额为官方接口实时核价，实际以门店出餐为准。
               {mode === 'demo' ? ' 当前为演示数据，不会产生真实订单。' : ''}
             </p>
 
@@ -313,10 +313,7 @@ export function ConfirmSheet({
                 onChange={(e) => setChecked(e.target.checked)}
                 className="mt-1 h-5 w-5 shrink-0 accent-brand-500"
               />
-              <span className="text-[13px] font-medium leading-relaxed text-ink-soft">
-                我已核对门店、餐品与金额，确认提交这一单。
-                <span className="text-ink-faint">（系统不会在你确认前下单）</span>
-              </span>
+              <span className="text-[13px] font-medium leading-relaxed text-ink-soft">我已核对门店、餐品与金额，确认提交这一单。</span>
             </label>
 
             <Button
