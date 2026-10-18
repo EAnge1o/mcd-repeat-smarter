@@ -24,7 +24,14 @@ interface OrdersTableProps {
   stickyMonths?: boolean;
 }
 
-/** 金额三态必须区分开：接口没返回（—）／券全额抵扣（¥0.00 降权显示）／正常金额。 */
+/**
+ * 金额三态必须区分开：接口没返回（—）／券全额抵扣／正常金额。
+ *
+ * `paidYuan === "0"` 是接口真实返回的值（券或积分全额抵扣的单就是这样），
+ * 不是数据缺失。所以不能画成「—」—— 那是撒谎说接口没给。
+ * 但也不能只靠灰色区分：这个账号的 10 单里有 6 单是 0 元，
+ * 只降权颜色的话，满屏灰 ¥0.00 看起来像页面坏了。加「券」字才说得清。
+ */
 function Amount({ order, size = 'md' }: { order: HistoryOrder; size?: 'md' | 'lg' }) {
   const c = paidCents(order);
   if (c === null) {
@@ -35,14 +42,24 @@ function Amount({ order, size = 'md' }: { order: HistoryOrder; size?: 'md' | 'lg
     );
   }
   return (
-    <span
-      className={cx(
-        'tnum font-black',
-        c === 0 ? 'text-ink-faint' : 'text-ink',
-        size === 'lg' ? 'text-[22px]' : 'text-[17px]',
-      )}
-    >
-      ¥{yuan(c)}
+    <span className="inline-flex items-baseline gap-1">
+      <span
+        className={cx(
+          'tnum font-black',
+          c === 0 ? 'text-ink-faint' : 'text-ink',
+          size === 'lg' ? 'text-[22px]' : 'text-[17px]',
+        )}
+      >
+        ¥{yuan(c)}
+      </span>
+      {c === 0 ? (
+        <span
+          className="rounded bg-gold-400 px-1 text-[10px] font-black leading-[1.5] text-ink"
+          title="这一单由券或积分全额抵扣，实付为 0"
+        >
+          券
+        </span>
+      ) : null}
     </span>
   );
 }
