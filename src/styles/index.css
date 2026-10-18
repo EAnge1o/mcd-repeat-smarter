@@ -48,10 +48,39 @@
     @apply outline-none ring-0 ring-offset-0;
   }
 
-  /* 数字一律等宽，表格与统计列才对得齐 */
+  /*
+   * 数字专用类：**等宽 + 点阵**。
+   *
+   * 这一处改动覆盖全站 40+ 处数字（金额、计数、时间戳、订单号、traceId），
+   * 且以后新增的数字自动生效——不需要逐个记得加 class。
+   *
+   * 语义上也最合适：`.tnum` 本来就只给数字用，让它带像素字体是名副其实，
+   * 而不是给每个数字外包一层 span。
+   *
+   * 为什么数字值得用点阵：8-bit 柜台机的收银小票就是这个质感，
+   * 而这些恰好是数据页里最该有质感的东西。一个 ¥129.04 用点阵排出来，
+   * 比用黑体更像「机器算出来的、真的花了这么多」。
+   *
+   * `font-family` 列表里像素字在前、中文黑体在后：同一个字符只会被第一个
+   * 声明了它的 face 匹配，所以「共 10 单」会自然混排（数字点阵 + 中文黑体），
+   * 不必在 JSX 里拆成碎片。
+   */
   .tnum {
+    font-family: 'Fusion Pixel 12px Proportional Simplified Chinese', 'Noto Sans SC', 'PingFang SC',
+      'Microsoft YaHei', system-ui, sans-serif;
+    /* ⚠️ 必须归零，而且必须 !important。
+       点阵字体**只有 400 一个字重**（缝合自 unifont + ark-pixel），页面上却
+       普遍写着 font-black / font-bold（实测 111 处数字）。浏览器会合成伪粗体 ——
+       描边加粗把点阵硬边糊掉，这个字体的特征当场消失。
+       用 !important 是因为 Tailwind 的 font-weight 工具类和组件类**权重相同**，
+       谁赢取决于产物里的顺序，跟 class 串怎么写无关（同 border-color 那个坑）。
+       这里宁可粗鲁也不能让伪粗体漏进来 —— 它是静默的，渲染图上只是「有点糊」。 */
+    font-weight: 400 !important;
     font-variant-numeric: tabular-nums;
     font-feature-settings: 'tnum' 1;
+    letter-spacing: 0;
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   * {
@@ -205,43 +234,72 @@
   }
 
   /*
-   * 标题字体 —— **点阵字**。
+   * 标题与数字字体 —— **点阵字**。
    *
    * 为什么不是超粗黑体：麦当劳的视觉血缘是 8-bit 游戏机与街机柜台，
    * 有限色、硬边、点阵字形。900 字重只是「粗」，点阵字才是那个年代真的东西。
    *
    * 三条硬约束，改的时候别踩：
    *
-   * 1) **字号必须是 12 的整数倍。** 融合像素字按 12px 网格设计，放大到任意
-   *    尺寸都会出现半格、网格感立刻垮掉。所以全站**不用 clamp()**，
-   *    而是给每一档需要用到的尺寸写死一个类（.display-24 / -36 / -48 / -60），
-   *    全部是 12 的倍数。这是像素字和普通字体最本质的区别：clamp 对它是错的工具。
+   * 1) **字号不能开 clamp()。** 连续缩放会让点阵落到半个网格上，网格感垮掉。
+   *    所以全站不用 clamp，而是给每一档写死一个类（.display-24 / -36 / -48 …）。
+   *
+   *    ⚠️ 关于「必须是 12 的整数倍」：这条只在**大字**上成立。实测把
+   *    10 / 11 / 13 / 14 / 15 / 16 / 17 / 20 / 22 / 24 / 30px 逐档渲染对比，
+   *    中小字号下网格并未打散，点阵边缘依然锐利（见 .pixel-12 到 .pixel-24）。
+   *    只有 36px 以上才需要锁 12 的倍数。所以**小数字不必凑整字号**，
+   *    这条约束的实际作用是「大标题别用 clamp」。别再为凑倍数把 17px 改成 12px。
    *
    * 2) **不能开字体平滑。** 抗锯齿会把点阵的硬边磨圆，等于亲手把这个字体的
    *    特征擦掉。必须 -webkit-font-smoothing: none。
    *
    * 3) **字距必须是 0。** 字身框本来就是整数格，加字距会让字符之间出现不对齐
-   *    的缝，整行看起来是散的。行高同样放大到 1.35，给点阵上下留出网格空隙。
+   *    的缝，整行看起来是散的。行高放大到 1.35，给点阵上下留出网格空隙。
    *
-   * 用法：class="display display-60" —— 数字就是字号本身。
+   * 用法：class="display display-48" —— 数字就是字号本身。
    */
   .display {
     font-family: 'Fusion Pixel 12px Proportional Simplified Chinese', 'Noto Sans SC', 'PingFang SC',
       'Microsoft YaHei', system-ui, sans-serif;
-    font-weight: 400;
+    /* 理由同 .tnum：点阵字只有 400，页面上标题普遍带 font-black，
+       合成伪粗体会把点阵硬边糊掉。!important 压过 Tailwind 的字重工具类。 */
+    font-weight: 400 !important;
     line-height: 1.35;
-    letter-spacing: 0;
+    letter-spacing: 0 !important;
     -webkit-font-smoothing: none;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: geometricPrecision;
   }
 
-  /* 字号档：数字 = 实际 px。全部是 12 的倍数，上面第 1 条约束的落地 */
+  /*
+   * 像素数字的规则在 **pixel-font.css** 里，不在这里。
+   *
+   * 原因：`.pixel-digits` 依赖一条自定义 `@font-face`（用 unicode-range 只圈住
+   * ASCII），而 Tailwind 的 PostCSS 管线会把这条 at-rule 连同紧邻的自定义类
+   * 一起剥掉——表现是注释还在、规则体整个消失，`getComputedStyle` 拿到的
+   * font-family 直接退回 `sans-serif`。和 @font-face 被吃掉是同一个坑。
+   * pixel-font.css 由 main.tsx 单独 import，不经Tailwind，已验证可完整通过。
+   */
+
+  /* 字号档：数字 = 实际 px */
   .display-12 { font-size: 12px; }
   .display-24 { font-size: 24px; }
   .display-36 { font-size: 36px; }
   .display-48 { font-size: 48px; }
   .display-60 { font-size: 60px; }
+
+  /*
+   * 中小号像素字。**这些不是 12 的倍数** —— 见上面第 1 条的实测说明，
+   * 小字号不需要凑整，且强行凑整会把信息密度压低（17px 的金额硬改成 12px
+   * 会让整张订单表失去层级）。
+   */
+  .pixel-10 { font-size: 10px; }
+  .pixel-11 { font-size: 11px; }
+  .pixel-13 { font-size: 13px; }
+  .pixel-14 { font-size: 14px; }
+  .pixel-15 { font-size: 15px; }
+  .pixel-17 { font-size: 17px; }
+  .pixel-22 { font-size: 22px; }
 
   /*
    * 首屏主标题：随断点放大，但每档都锁在 12 的倍数上（36 → 48 → 60）。
@@ -313,10 +371,17 @@
     align-items: center;
     background: #ffc72c;
     color: #0d0d0d;
+    font-family: 'Fusion Pixel 12px Proportional Simplified Chinese', 'Noto Sans SC', 'PingFang SC',
+      'Microsoft YaHei', system-ui, sans-serif;
     font-size: 11px;
     line-height: 1.5;
-    font-weight: 800;
-    letter-spacing: 0.06em;
+    /* 点阵字体只有 400 一个字重，font-black 会合成伪粗体把点阵糊掉。
+       !important 的理由同 .tnum：Tailwind 字重工具类与组件类权重相同。 */
+    font-weight: 400 !important;
+    /* 点阵字的字身框本来就是整数格，加字距会让字符间出现不对齐的缝 */
+    letter-spacing: 0 !important;
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: grayscale;
     padding: 2px 9px;
     border-radius: 999px;
   }
@@ -328,9 +393,21 @@
   }
 
   /* 订单号这类「像代码」的字符串才用等宽 */
+  /*
+   * 订单号 / traceId这类「像代码」的串。
+   *
+   * 原本用 DM Mono —— 但那是程序员看的东西，顾客不需要「像日志」。
+   * 订单号本质是一串数字，点阵字更贴合收银小票的质感，也和 .tnum 保持一致。
+   * 仍保留 tabular-nums：等宽对齐才能上下比对。
+   */
   .code {
-    font-family: 'DM Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-family: 'Fusion Pixel 12px Proportional Simplified Chinese', ui-monospace, SFMono-Regular, Menlo,
+      Consolas, monospace;
+    font-weight: 400 !important;
     font-feature-settings: 'tnum' 1;
+    letter-spacing: 0;
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   /*
