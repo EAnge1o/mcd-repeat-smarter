@@ -141,18 +141,19 @@ POST /api/adjust
 
 ## 真实 MCP 验证
 
-`npm run mcp:probe` 的真实输出（2026-10-18）：
+`npm run mcp:probe` 的真实输出（2026-10-18 实测；门店与在售商品数随官方数据变化，Tool 总数与核价能力稳定）：
 
 ```
 端点：https://mcp.mcd.cn
-门店：1450713 ｜ 取餐方式 beType=1
+门店：1450543 ｜ 取餐方式 beType=1
+Token：已读取（长度 32，不在任何输出中显示）
 
 1. 服务端实际暴露的 Tool（tools/list）      共 35 个
-2. 门店菜单（query-meals）                 在售商品 102 个
+2. 门店菜单（query-meals）                 在售商品 109 个
 3. 历史订单（order-list）                  可读取订单 10 单
 4. 官方核价（query-meal-detail + calculate-price）
    合计 33.50 元（原价 33.50，优惠 0.00）
-   source=mcp ｜ traceId=6e49dc0cdae58e8876891077361f39a1
+   source=mcp ｜ traceId=8bbdfa2de78b7898aeb6be815f1d6a75
 ```
 
 本项目实际使用 **7 个 Tool**：`query-nearby-stores`、`query-meals`、`query-meal-detail`、`order-list`、`calculate-price`、`query-my-coupons`、`create-order`。
