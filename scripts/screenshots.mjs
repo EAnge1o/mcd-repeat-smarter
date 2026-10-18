@@ -107,6 +107,79 @@ async function flattenActionBar(page) {
   await sleep(200);
 }
 
+/**
+ * 按语义区块分段截图，而不是 fullPage 截成一整张。
+ *
+ * 为什么：概览页整页高达 3147 CSS px（@2x = 6294px / 608 KB），
+ * 是其他桌面图的 3 倍多。它又排在 README 第一张，首屏就要拉，
+ * 实测单张冷请求耗时 110 秒、传输中途被掐断（只收到 5%），
+ * 表现为「打开仓库时第一张图总是转圈」。
+ *
+ * 这里改为按「Hero 输入区 / 消费概况 / 常用方案 / 最近订单」分别截图，
+ * 每张都保持 @2x 清晰度，但体积回到 200 KB 量级。
+ *
+ * 锚点优先用 aria-label（结构稳定），只有 aria-label 找不到时才回退到
+ * 标题文本 —— 文本回退会误命中侧栏导航按钮（它和区块标题文字相同），
+ * 导致切分线落在页面顶部、切出半截标题，这是实际踩过的坑。
+ */
+async function captureSections(page, prefix, sections) {
+  const geom = await page.evaluate((defs) => {
+    const docH = document.documentElement.scrollHeight;
+    const vh = window.innerHeight;
+    const anchors = defs.map((d) => {
+      let el = null;
+      if (d.aria) el = document.querySelector(`[aria-label="${d.aria}"]`);
+      if (!el && d.text) {
+        const all = [...document.querySelectorAll('h1,h2,h3,span,p,div')];
+        const hit = all.filter((e) => e.children.length === 0 && (e.textContent ?? '').trim() === d.text);
+        // 排除侧栏/导航里的同名元素：只要正文主区域内的那个
+        el = hit.find((e) => e.closest('main')) || hit[hit.length - 1] || null;
+      }
+      if (!el) return { y: null, why: 'anchor not found' };
+      // 用最近的分块容器（section / panel）作为切分单位
+      const sec = el.closest('section') || el.closest('.rounded-2xl') || el.parentElement;
+      const r = sec.getBoundingClientRect();
+      return { y: Math.round(r.top + window.scrollY), why: 'ok' };
+    });
+    return { docH, vh, anchors };
+  }, sections.map((s) => ({ aria: s.aria ?? '', text: s.text ?? '' })));
+
+  for (const [i, a] of geom.anchors.entries()) {
+    const def = sections[i];
+    if (def.top !== undefined) continue; // 起点固定，无需锚点
+    if (a.why !== 'ok') console.warn(`  ! 锚点未命中: ${def.aria || def.text}`);
+  }
+
+  const out = [];
+  // bound[i] = 第 i 张图的底边 = sections[i+1] 的顶边。
+  // 用「严格取下一段自己的锚点」，不能从 i 开始找 —— 否则第 i 和第 i+1 段
+  // 会取到同一个锚点，中间那段就被压成 120px（实际踩过）。
+  const ys = geom.anchors.map((a) => a.y);
+  const isY = (v) => v !== null && v !== undefined;
+  for (let i = 0; i < sections.length; i++) {
+    // 本段起点：首段为 0，其余为下一段锚点。
+    // 往上多让 56px：区块锚点取的是 Panel 顶边，而标题文字在 Panel 内侧，
+    // 贴着 0 切会让标题被上一段内容/吸顶栏压住（实际拍出来过）。
+    const top = i === 0 ? 0 : Math.max(0, (isY(ys[i]) ? ys[i] : geom.docH) - 76);
+    // 本段终点：下一段的锚点；末段为文档底
+    const nxt = i + 1 < ys.length ? ys[i + 1] : geom.docH;
+    const bottom = isY(nxt) ? Math.max(top + 120, nxt - 20) : geom.docH;
+    if (bottom - top < 120) continue; // 区块太矮不单独出图
+    const file = `${prefix}-${sections[i].file}.png`;
+    await page.evaluate((y) => window.scrollTo(0, y), top);
+    await sleep(260);
+    await page.screenshot({
+      path: shotPath(file),
+      clip: { x: 0, y: top, width: page.viewport().width, height: bottom - top },
+      captureBeyondViewport: true,
+    });
+    out.push({ file, from: top, to: bottom, h: bottom - top });
+    console.log(`✓ ${file}  ${top}→${bottom} (${bottom - top}px)`);
+  }
+  await page.evaluate(() => window.scrollTo(0, 0));
+  return out;
+}
+
 /** 切换门店：输入关键词 → 搜索 → 选第一家 */
 async function switchStore(page, keyword) {
   await goTo(page, '门店');
@@ -156,8 +229,13 @@ try {
 
   await goTo(desktop, '概览');
   await sleep(600);
-  await desktop.screenshot({ path: shotPath('dashboard-desktop.png'), fullPage: true });
-  console.log('✓ dashboard-desktop');
+  // 概览页整页 6294px 太大（README 第一张图拉不动），按区块分四张
+  await captureSections(desktop, 'dashboard', [
+    { file: 'hero', top: 0 },
+    { file: 'spending', aria: '消费概况' },
+    { file: 'plans', text: '常用方案' },
+    { file: 'orders', text: '最近订单' },
+  ]);
 
   await goTo(desktop, '订单记录');
   await desktop.screenshot({ path: shotPath('orders-desktop.png'), fullPage: true });
@@ -209,8 +287,13 @@ try {
 
   await goTo(mobile, '概览');
   await sleep(600);
-  await mobile.screenshot({ path: shotPath('dashboard-mobile.png'), fullPage: true });
-  console.log('✓ dashboard-mobile');
+  // 移动端整页更夸张（@2x 高 7748px），同样分段
+  await captureSections(mobile, 'dashboard-mobile', [
+    { file: 'hero', top: 0 },
+    { file: 'spending', aria: '消费概况' },
+    { file: 'plans', text: '常用方案' },
+    { file: 'orders', text: '最近订单' },
+  ]);
 
   // 抽屉导航
   await mobile.evaluate(() => document.querySelector('header button[aria-label="打开导航"]')?.click());

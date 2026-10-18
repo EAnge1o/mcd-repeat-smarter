@@ -4,7 +4,7 @@
 
 你昨天、上周、过去十次点的都是同一份。今天只想改一点点 —— 怎么说清楚，并且真的点出去。
 
-![概览](docs/screenshots/dashboard-desktop.png)
+![概览 · 一句话下单](docs/screenshots/dashboard-hero.png)
 
 <div align="center">
 
@@ -164,6 +164,14 @@ Token：已读取（长度 32，不在任何输出中显示）
 
 ## 界面
 
+**概览**分四段看：先是一句话输入区，再是钱花在哪几单上，然后是常用方案，最后是最近订单。
+
+![消费概况](docs/screenshots/dashboard-spending.png)
+
+![常用方案](docs/screenshots/dashboard-plans.png)
+
+![最近订单](docs/screenshots/dashboard-orders.png)
+
 **点单**：说一句话 → 右边给出「原方案 → 调整后」的前后对照和候选方案，每个金额带官方 `traceId`。候选选中态用黑底反白——因为卡里同时有白字正文、金色金额和黄底徽章三种对比，黑底是唯一能同时容纳三者的底色。
 
 ![点单结果](docs/screenshots/order-desktop.png)
@@ -172,7 +180,7 @@ Token：已读取（长度 32，不在任何输出中显示）
 
 ![确认下单](docs/screenshots/confirm-checked.png)
 
-**订单记录 / 常用方案**：
+**订单记录**（可搜索、可排序、可展开看套餐子项）：
 
 ![订单记录](docs/screenshots/orders-desktop.png)
 
