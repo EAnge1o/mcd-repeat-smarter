@@ -55,7 +55,7 @@ export function SectionHead({
         <h2
           className={cx(
             'display text-ink',
-            size === 'sm' ? 'text-[22px] md:text-[25px]' : 'text-[27px] md:text-[32px]',
+            size === 'sm' ? 'display-24' : 'display-24 md:display-36',
           )}
         >
           {title}
@@ -211,7 +211,7 @@ export function EmptyState({
           />
         </svg>
       </span>
-      <p className="display text-[19px] text-ink">{title}</p>
+      <p className="display display-24 text-ink">{title}</p>
       {desc ? <p className="mt-2 max-w-[26rem] text-pretty text-[13.5px] leading-[1.8] text-ink-mute">{desc}</p> : null}
       {action ? <div className="mt-5">{action}</div> : null}
     </div>
@@ -250,7 +250,7 @@ export function MetricLead({
     <div>
       <p className="eyebrow">{label}</p>
       <p className="mt-2.5 flex items-baseline gap-2">
-        <span className="tnum display text-[40px] leading-none text-brand-600 md:text-[52px]">{value}</span>
+        <span className="tnum display display-48 text-brand-600">{value}</span>
         {unit ? <span className="text-[13px] font-bold text-ink-mute">{unit}</span> : null}
       </p>
       {note ? <p className="mt-3 text-[13px] leading-relaxed text-ink-mute">{note}</p> : null}

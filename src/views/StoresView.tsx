@@ -18,7 +18,7 @@ export function StoresView({
   return (
     <div>
       <header className="max-w-[600px]">
-        <h1 className="display text-[34px] leading-[1.05] text-ink md:text-[46px]">选择门店</h1>
+        <h1 className="display display-36 text-ink md:display-48">选择门店</h1>
         <p className="mt-3 max-w-[36rem] text-pretty text-[14.5px] font-medium leading-[1.8] text-ink-mute">
           门店决定菜单、价格与可选优惠。切换后方案与核价都会按新门店重算 —— 同一份餐在不同门店的价格本来就不一样。
         </p>
@@ -27,7 +27,7 @@ export function StoresView({
       <div className="mt-9 grid grid-cols-1 items-start gap-5 xl:grid-cols-[minmax(0,1fr)_288px]">
         <Panel className="px-5 py-6 md:px-7 md:py-7">
           <p className="eyebrow">搜索门店</p>
-          <h2 className="display mt-2 text-[20px] text-ink">城市 + 关键词</h2>
+          <h2 className="display display-24 mt-2 text-ink">城市 + 关键词</h2>
           <p className="mt-1.5 text-[11.5px] leading-relaxed text-ink-faint">
             官方接口需要「城市 + 关键词」才会返回真实在售菜单，只给关键词可能查不到。
           </p>

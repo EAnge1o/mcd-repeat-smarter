@@ -35,7 +35,7 @@ export function AboutView({
           </span>
           <p className="eyebrow">参赛作品 · 非官方产品</p>
         </div>
-        <h1 className="display mt-4 text-[27px] leading-[1.15] text-ink md:text-[36px]">
+        <h1 className="display display-24 mt-4 text-ink md:display-36">
           记住你常点的，
           <br />
           听懂你这次改的
@@ -56,7 +56,7 @@ export function AboutView({
           <div className="flex items-baseline justify-between gap-3">
             <div>
               <p className="eyebrow">它到底做了什么</p>
-              <h2 className="display mt-2 text-[20px] text-ink md:text-[23px]">四步，每一步都可以被你打断</h2>
+              <h2 className="display display-24 mt-2 text-ink">四步，每一步都可以被你打断</h2>
             </div>
           </div>
 
@@ -77,7 +77,7 @@ export function AboutView({
 
         <Panel className="px-5 py-6 md:px-7">
           <p className="eyebrow">数据从哪里来</p>
-          <h2 className="display mt-2 text-[20px] text-ink">每个数字都能追到源头</h2>
+          <h2 className="display display-24 mt-2 text-ink">每个数字都能追到源头</h2>
           <dl className="mt-5">
             {SOURCES.map(([k, v], i) => (
               <div key={k} className={i === 0 ? 'py-2.5' : 'border-t border-hair py-2.5'}>

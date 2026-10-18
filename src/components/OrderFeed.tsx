@@ -43,7 +43,7 @@ export function OrderFeed({
     <section aria-labelledby="feed-title">
       <div className="flex flex-wrap items-end justify-between gap-x-5 gap-y-3">
         <div className="flex flex-wrap items-baseline gap-x-3 gap-y-2">
-          <h2 id="feed-title" className="display text-[26px] leading-none text-ink md:text-[30px]">
+          <h2 id="feed-title" className="display display-24 text-ink md:display-36">
             最近订单
           </h2>
           {filterLabel ? (

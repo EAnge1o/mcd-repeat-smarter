@@ -386,7 +386,7 @@ export function AdjustResultView({
       {/* 用户原话 + 解析出的修改点：先让用户确认「我理解对了没有」 */}
       <div className="rounded-2xl bg-wash px-5 py-4">
         <p className="eyebrow">你刚才说</p>
-        <p className="display mt-2 text-[16px] leading-[1.6] text-ink md:text-[17px]">「{result.intent.raw}」</p>
+        <p className="display display-12 mt-2 text-ink">「{result.intent.raw}」</p>
         <ChangeTags result={result} />
       </div>
 
@@ -406,7 +406,7 @@ export function AdjustResultView({
 
       <section>
         <div className="mb-3 flex items-center justify-between gap-3">
-          <h3 className="display text-[21px] text-ink">改了什么</h3>
+          <h3 className="display display-24 text-ink">改了什么</h3>
           <span className="eyebrow bg-ink text-white">前后对照</span>
         </div>
         <Compare matched={result.matched} candidate={selected} />
@@ -414,7 +414,7 @@ export function AdjustResultView({
 
       <section>
         <div className="mb-3 flex items-center justify-between gap-3">
-          <h3 className="display text-[21px] text-ink">候选方案</h3>
+          <h3 className="display display-24 text-ink">候选方案</h3>
           <span className="tnum rounded-full bg-ink/8 px-3 py-1 text-[12px] font-black text-ink-mute">
             {result.candidates.length} 个
           </span>

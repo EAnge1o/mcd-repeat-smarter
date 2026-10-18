@@ -116,7 +116,7 @@ export function ConfirmSheet({
           </span>
           <div className="min-w-0 flex-1">
             <p className="text-[12px] font-black uppercase tracking-[0.14em] text-white/75">最后一步</p>
-            <h2 className="display mt-1 text-[26px] text-white">确认这一单</h2>
+            <h2 className="display display-24 mt-1 text-white">确认这一单</h2>
             <p className="mt-1 text-[12.5px] font-medium text-white/80">提交前请核对门店、餐品与金额</p>
           </div>
           <button
@@ -200,7 +200,7 @@ export function ConfirmSheet({
                             </span>
                           ) : null}
                         </span>
-                        <span className="tnum display shrink-0 text-[11.5px] text-ink-soft">{line ? `¥${yuan(line.subtotalCents)}` : ''}</span>
+                        <span className="tnum display display-12 shrink-0 text-ink-soft">{line ? `¥${yuan(line.subtotalCents)}` : ''}</span>
                       </li>
                     );
                   })}

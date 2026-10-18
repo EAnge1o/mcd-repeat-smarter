@@ -55,12 +55,21 @@ export function Hero({ lastOrder, loading, quickPrompts, prefill, demoReason, on
 
       <p className="eyebrow mt-6">记住你常点的 · 听懂你这次改的</p>
 
-      <h1
-        id="hero-title"
-        className="display mx-auto mt-5 text-[clamp(38px,6.4vw,68px)] leading-[1.04] text-ink"
-      >
-        {/* 全角逗号自带一个字宽的空白，收一下避免在大字下断成「两个空格」。写成一行，避免 JSX 换行变成行内空格 */}
-        今天<span className="mr-[-0.14em]">，</span>还是<span className="whitespace-nowrap text-brand-600">老样子</span>吗？
+      {/*
+       * 主标题用点阵字。字号由 .display-hero 按断点给 36 / 48 / 60，
+       * 三档都是 12 的整数倍 —— 点阵字放到非整数倍尺寸上，网格会被打散，
+       * 特征就没了。字距必须 0、不能开 font-smoothing，都写在 .display 里。
+       *
+       *「老样子」用品牌红而不是金色：#ffc72c 在奶油底上只有 1.45:1，
+       * 字身会糊成一片；点阵字的金必须放在深色底上才立得住。
+       */}
+      <h1 id="hero-title" className="display display-hero pixel-title--drop mx-auto mt-6 text-ink">
+        {/* 点阵字的字身框是整格，不能像黑体那样收逗号字距；空隙靠断行处理 */}
+        <span className="block">今天，还是</span>
+        <span className="mt-2 block">
+          <span className="text-brand-600">老样子</span>
+          吗？
+        </span>
       </h1>
 
       <p className="mx-auto mt-5 max-w-[34rem] text-pretty text-[15px] font-medium leading-[1.8] text-ink-soft">

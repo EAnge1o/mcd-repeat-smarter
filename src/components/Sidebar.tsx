@@ -92,7 +92,7 @@ export function Sidebar({
             <IconArches size={26} />
           </span>
           <span className="min-w-0 flex-1">
-            <span className="display block truncate text-[16px] leading-tight text-white">麦麦老样子</span>
+            <span className="display display-24 block truncate text-white">麦麦老样子</span>
           </span>
           <button
             type="button"

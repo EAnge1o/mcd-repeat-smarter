@@ -51,7 +51,7 @@ export function MemoryRail({ top, choices, buckets, activeBucket, loading, onPic
         <p className="eyebrow">最常点</p>
         {top ? (
           <>
-            <p className="display mt-3 text-[22px] leading-snug text-gold-400" title={top.name}>
+            <p className="display display-24 mt-3 text-gold-400" title={top.name}>
               {top.name}
             </p>
             <p className="mt-2 flex flex-wrap items-baseline gap-x-2 gap-y-1 text-[13px] text-white/70">

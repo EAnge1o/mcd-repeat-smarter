@@ -71,7 +71,7 @@ export function OrderView({
     <div>
       <header className="max-w-[640px]">
         <p className="eyebrow">一句话调整 · 按门店实时核价</p>
-        <h1 className="display mt-3 text-[27px] leading-[1.15] text-ink md:text-[34px]">
+        <h1 className="display display-24 mt-3 text-ink md:display-36">
           {result ? '还想再改点什么？' : '说清楚这次要什么'}
         </h1>
         <p className="mt-2.5 max-w-[34rem] text-pretty text-[13px] leading-[1.9] text-ink-mute">
@@ -89,7 +89,7 @@ export function OrderView({
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div className="min-w-0">
                 <p className="eyebrow">{result ? '接着说' : '开始'}</p>
-                <h2 className="display mt-2 text-[18px] text-ink md:text-[20px]">
+                <h2 className="display display-12 mt-2 text-ink md:display-24">
                   {result ? '在这份结果上继续' : '用一句话说清'}
                 </h2>
               </div>
@@ -125,7 +125,7 @@ export function OrderView({
               <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2">
                 <div className="min-w-0">
                   <p className="eyebrow">调整结果</p>
-                  <h2 className="display mt-2 text-[20px] text-ink md:text-[23px]">这就是我要的那一份</h2>
+                  <h2 className="display display-24 mt-2 text-ink">这就是我要的那一份</h2>
                 </div>
                 <p className="max-w-[26rem] text-pretty text-[13px] leading-relaxed text-ink-faint">
                   {result.store.storeName || result.store.storeCode} · 基于

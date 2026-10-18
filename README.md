@@ -85,7 +85,7 @@
 
 | 维度 | 具体做法 |
 | --- | --- |
-| **字重与墨色是地基** | 全站零衬线。`Noto Sans SC` 900 字重 + `letter-spacing -0.045em`；墨色是**纯黑 `#0d0d0d`** 而非暖黑。麦当劳没有一个衬线字，字重和反差全靠这个纯黑撑 |
+| **点阵字是地基** | 全站标题用 **12px 网格设计的点阵字体**（融合像素字），字号锁在 12 的整数倍、字距 0、不开字体平滑；墨色是**纯黑 `#0d0d0d`** 而非暖黑。麦当劳的视觉血缘是 8-bit 游戏机与街机柜台 —— 有限色、硬边、点阵字形 |
 | **主色是大色块** | 品牌红 `#d62315` 铺满侧栏选中态、点单主按钮、发送键、标题里的「老样子」，不是点缀 |
 | **必须有第二品牌色** | 金拱黄 `#ffc72c`。只有红 + 中性灰 = 通用红色 App；有黄才是麦当劳。用在栏目标签、拱门图形、价格高亮 |
 | **形状资产要稀有** | 金拱门只出现在三处：侧栏品牌区、首屏开场、空状态。形状资产之所以有力是因为不滥用 |
@@ -136,15 +136,35 @@
 
 所以 `.composer` / `.composer__send` / `.composer__chip` / `.composer__label` 四组状态的 `:hover` / `:active` / `:focus-within` / `:disabled` 全部写在 `src/styles/index.css` 里——这些伪类权重天然更高，不依赖产物顺序。`Composer.tsx` 里只剩尺寸和排版类。
 
-### 字体：两套，各管一段
+### 字体：点阵字 + 黑体，各管一段
 
 | 用途 | 字族 | 设置 |
 | --- | --- | --- |
-| 标题与大数字 | `Noto Sans SC` | `.display`：`font-weight 900`、`letter-spacing -0.045em`、`line-height 1.05` |
+| 标题与大数字 | `Fusion Pixel 12px Proportional Simplified Chinese` | `.display`：字号锁在 **12 的整数倍**、`letter-spacing: 0`、`-webkit-font-smoothing: none`、`line-height 1.35` |
 | 正文 | `Noto Sans SC` | 400/500，`font-size 14.5px`，`line-height 1.75` |
 | 订单号这类「像代码」的串 | `DM Mono` | 只给 `.code`：订单号、`traceId`。**不给标签和时间戳** —— 中文小字配等宽像在看日志 |
 
-字号只有四档：`micro 11 / tiny 12 / small 13.5 / body 14.5`。所有数字加 `.tnum`（`tabular-nums`），统计列和金额才对得齐。
+**为什么标题用点阵字而不是超粗黑体。** 麦当劳的视觉血缘是 8-bit 游戏机与街机柜台 —— 有限色、硬边、点阵字形。900 字重只是「粗」，点阵字才是那个年代真的东西。
+
+### 点阵字的三条硬约束
+
+这三条是这个字体的全部脾气，违反任何一条网格就会垮：
+
+| 约束 | 说明 |
+| --- | --- |
+| **字号必须是 12 的整数倍** | 融合像素字按 12px 网格设计。放大到任意尺寸都会出现半格、网格感立刻垮掉。所以全站**不用 `clamp()`**，而是给每一档写死一个类：`display-12 / 24 / 36 / 48 / 60`，主标题用 `.display-hero` 在 `480px` / `768px` 两个断点跳档（36 → 48 → 60）。**`clamp` 对点阵字是错的工具** —— 连续缩放等于回到非整数倍 |
+| **不能开字体平滑** | `-webkit-font-smoothing: none`。抗锯齿会把点阵的硬边磨圆，等于亲手把这个字体的特征擦掉 |
+| **字距必须是 0** | 点阵字的字身框本来就是整数格，加字距会让字符之间出现不对齐的缝，整行看起来是散的。行高同时放大到 `1.35`，给上下留出网格空隙 |
+
+阴影也必须是**实心偏移**而不是模糊投影：点阵字的轮廓是台阶状的，模糊阴影会沿着台阶糊成一圈灰边，看起来像渲染坏了。`.pixel-title--drop` 用 `--pixel-drop` 变量让偏移随字号走（12px 用 2px，60px 用 5px）——用变量而不是堆组合选择器，因为主标题在断点间会落到不同字号。
+
+### 字体分片：548 KB / 21 片，不是完整字库
+
+上游按 Unicode 区间把字库切成**78 片**，每片 25–30KB。本项目只收录标题层实际出现的字符命中的 **21 片**。
+
+分片集合由 `scripts/build-pixel-font.py` 从上游 CSS 的 `unicode-range` **反推**得出，不是手写清单——文案改了字，重跑一次脚本就能得到正确集合，不会出现「某个字悄悄回退成黑体」。正文不换字，所以不为用不到的字形付费，也没有 404 请求。
+
+**一个必须知道的坑**：`@font-face` **不能进 Tailwind 的构建管线**。放进 `index.css` 用 `@import` 引入时，Tailwind 的 PostCSS 插件会把 `@font-face` 这个 at-rule 整行剥掉，只留下裸露的声明块，浏览器直接忽略——现象是「CSS 里明明有字体声明，但字体永远不加载」。所以 `pixel-font.css` 由 `src/main.tsx` 单独 `import`。
 
 ### 配色与 token
 
@@ -427,10 +447,14 @@ mcd-repeat-smarter/
 │   │                 业务流程：Composer（点餐卡）/ AdjustResultView / ConfirmSheet / StorePicker
 │   │                 原子组件：ui.tsx（Panel / SectionHead / Button / Badge / Alert / Skeleton / EmptyState / MetricLead / MetricPair / TrendPill / Toasts）
 │   ├── lib/metrics.ts  KPI、趋势、时段、常点与套餐子项的全部派生逻辑（纯函数，任何数字都从真实订单算出来）
-│   └── styles/index.css  Tailwind 入口 + 页面底色 + .composer/.float/.panel 三类容器 + .display/.eyebrow/.hair/.code + 骨架扫光
+│   ├── styles/pixel-font.css  融合像素字体（Fusion Pixel Font）的 @font-face。21 片 / 548KB，只含标题层出现的字符。
+│   │                           **必须由 main.tsx 单独 import** —— 走 Tailwind 管线会被 PostCSS 剥掉 @font-face
+│   └── styles/index.css  Tailwind 入口 + 页面底色 + .composer/.float/.panel 三类容器 + .display(含 12 倍数字号档)/
+│                          .pixel-title--drop/.pixel-title--outline/.eyebrow/.hair/.code + 骨架扫光
 ├── tailwind.config.js   品牌色阶（brand-50…950、gold-100…800）、ink 四级文字、canvas / raised / line / hair / wash、圆角 / 阴影 / 动效 token
 ├── tests/            79 个测试（全部在后端领域层与 API 层，前端改动不影响）
-├── scripts/          probe-mcp.ts（MCP 自检）、screenshots.mjs（UI 截图）
+├── public/fonts/      21 个 woff2 分片（由 build-pixel-font.py 生成，约 548 KB）
+├── scripts/          probe-mcp.ts（MCP 自检）、screenshots.mjs（UI 截图）、build-pixel-font.py（重建字体分片）
 └── docs/             竞品检查、开发总结、截图
 ```
 
@@ -496,7 +520,7 @@ npm run typecheck # tsc --noEmit
 npm run build     # tsc --noEmit && vite build
 ```
 
-当前状态：**79 passed / typecheck 无错误 / build 成功（JS gzip 102.1 KB + CSS gzip 7.8 KB）**。
+当前状态：**79 passed / typecheck 无错误 / build 成功（JS gzip 102.1 KB + CSS gzip 16.8 KB + 字体 21 片 548 KB，按需加载）**。
 
 覆盖范围：
 
@@ -557,6 +581,7 @@ npm run build     # tsc --noEmit && vite build
 | `tests/` | 79 个测试 |
 | `scripts/probe-mcp.ts` | MCP 能力自检（只读） |
 | `scripts/screenshots.mjs` | UI 截图脚本（会走完流程但不提交订单） |
+| `scripts/build-pixel-font.py` | 重建字体分片：从上游 CSS 的 `unicode-range` 反推标题用到的字命中哪些片 |
 | `docs/COMPETITIVE_CHECK.md` | 竞品检查记录 |
 | `docs/DEVELOPMENT_SUMMARY.md` | 开发过程整理稿（比对话记录更适合快速了解全貌） |
 

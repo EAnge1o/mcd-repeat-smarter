@@ -248,7 +248,7 @@ export default function App() {
       <div className="grid min-h-screen place-items-center px-5">
         <div className="w-full max-w-md">
           <p className="eyebrow mb-4 text-center">REPEAT SMARTER</p>
-          <h1 className="display mb-5 text-center text-[28px] text-ink">服务没有起来</h1>
+          <h1 className="display display-24 mb-5 text-center text-ink">服务没有起来</h1>
           <Alert kind="error" title="连不上本地服务" hint="请确认已执行 npm run dev，并且前端与 API 两个进程都正常启动。">
             {healthError}
           </Alert>
@@ -452,7 +452,7 @@ export default function App() {
             <div className="flex items-start gap-3 border-b border-hair px-6 py-5">
               <div className="min-w-0 flex-1">
                 <p className="eyebrow">保存方案</p>
-                <h2 className="display mt-2 text-[20px] text-ink">存成常用方案</h2>
+                <h2 className="display display-24 mt-2 text-ink">存成常用方案</h2>
                 <p className="mt-1 text-[11.5px] text-ink-mute">下次说「还是老样子」就能整单调出来</p>
               </div>
               <button

@@ -202,7 +202,7 @@ export function Overview(props: OverviewProps) {
           {/* 深色区块里的栏目头：标签换成红底，标题改反白 */}
           <div>
             <span className="eyebrow mb-2.5 bg-brand-500 text-white">我记住的</span>
-            <h2 className="display text-[25px] text-white">全部来自你的真实订单</h2>
+            <h2 className="display display-24 text-white">全部来自你的真实订单</h2>
           </div>
           <div className="mt-5">
             <MemoryRail

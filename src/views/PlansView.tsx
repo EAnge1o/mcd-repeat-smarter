@@ -29,7 +29,7 @@ export function PlansView({
     <div>
       <header className="flex flex-wrap items-end justify-between gap-x-6 gap-y-4">
         <div className="max-w-[560px]">
-          <h1 className="display text-[34px] leading-[1.05] text-ink md:text-[46px]">常用方案</h1>
+          <h1 className="display display-36 text-ink md:display-48">常用方案</h1>
           <p className="mt-3 max-w-[36rem] text-pretty text-[14.5px] font-medium leading-[1.8] text-ink-mute">
             方案存的是商品编码，不是一句话。价格每次下单前都会按门店重新核，所以这里的数字只代表「当时那一单」。
           </p>
@@ -65,7 +65,7 @@ export function PlansView({
         <div className="flex flex-wrap items-baseline justify-between gap-3">
           <div>
             <p className="eyebrow">全部方案</p>
-            <h2 className="display mt-2 text-[20px] text-ink md:text-[23px]">点「用它」直接整单复用</h2>
+            <h2 className="display display-24 mt-2 text-ink">点「用它」直接整单复用</h2>
           </div>
           <p className="tnum text-[11.5px] text-ink-mute">{plans.length} 个</p>
         </div>

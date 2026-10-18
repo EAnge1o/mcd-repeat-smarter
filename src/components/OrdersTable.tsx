@@ -221,7 +221,7 @@ export function OrdersTable({
             <section key={g.key} className="mb-7 last:mb-0">
               <h3
                 className={cx(
-                  'display -mx-1 mb-3 mt-2 inline-block rounded-full bg-ink px-4 py-1.5 text-[14px] text-gold-400',
+                  'display display-12 -mx-1 mb-3 mt-2 inline-block rounded-full bg-ink px-4 py-1.5 text-gold-400',
                   stickyMonths && 'sticky top-16 z-10',
                 )}
               >

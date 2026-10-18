@@ -187,7 +187,7 @@ export function StorePicker({
           </span>
           <div className="min-w-0 flex-1">
             <p className="eyebrow">切换门店</p>
-            <h2 className="display mt-1.5 text-[19px] text-ink">在哪家店取</h2>
+            <h2 className="display display-24 mt-1.5 text-ink">在哪家店取</h2>
             <p className="mt-0.5 text-[11.5px] text-ink-mute">门店会决定菜单、价格和可选优惠</p>
           </div>
           <button

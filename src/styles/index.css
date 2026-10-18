@@ -205,14 +205,103 @@
   }
 
   /*
-   * 标题字体。**麦当劳没有一个衬线字**。
-   * 900 字重 + 收紧字距 + 行高压到 1 上下，中文才有那种「印刷招贴」的冲劲。
+   * 标题字体 —— **点阵字**。
+   *
+   * 为什么不是超粗黑体：麦当劳的视觉血缘是 8-bit 游戏机与街机柜台，
+   * 有限色、硬边、点阵字形。900 字重只是「粗」，点阵字才是那个年代真的东西。
+   *
+   * 三条硬约束，改的时候别踩：
+   *
+   * 1) **字号必须是 12 的整数倍。** 融合像素字按 12px 网格设计，放大到任意
+   *    尺寸都会出现半格、网格感立刻垮掉。所以全站**不用 clamp()**，
+   *    而是给每一档需要用到的尺寸写死一个类（.display-24 / -36 / -48 / -60），
+   *    全部是 12 的倍数。这是像素字和普通字体最本质的区别：clamp 对它是错的工具。
+   *
+   * 2) **不能开字体平滑。** 抗锯齿会把点阵的硬边磨圆，等于亲手把这个字体的
+   *    特征擦掉。必须 -webkit-font-smoothing: none。
+   *
+   * 3) **字距必须是 0。** 字身框本来就是整数格，加字距会让字符之间出现不对齐
+   *    的缝，整行看起来是散的。行高同样放大到 1.35，给点阵上下留出网格空隙。
+   *
+   * 用法：class="display display-60" —— 数字就是字号本身。
    */
   .display {
-    font-family: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;
-    font-weight: 900;
-    letter-spacing: -0.045em;
-    line-height: 1.05;
+    font-family: 'Fusion Pixel 12px Proportional Simplified Chinese', 'Noto Sans SC', 'PingFang SC',
+      'Microsoft YaHei', system-ui, sans-serif;
+    font-weight: 400;
+    line-height: 1.35;
+    letter-spacing: 0;
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: geometricPrecision;
+  }
+
+  /* 字号档：数字 = 实际 px。全部是 12 的倍数，上面第 1 条约束的落地 */
+  .display-12 { font-size: 12px; }
+  .display-24 { font-size: 24px; }
+  .display-36 { font-size: 36px; }
+  .display-48 { font-size: 48px; }
+  .display-60 { font-size: 60px; }
+
+  /*
+   * 首屏主标题：随断点放大，但每档都锁在 12 的倍数上（36 → 48 → 60）。
+   * 是跳档而不是连续缩放 —— 连续缩放等于回到非整数倍，网格就没了。
+   */
+  .display-hero {
+    font-size: 36px;
+  }
+  @media (min-width: 480px) {
+    .display-hero {
+      font-size: 48px;
+    }
+  }
+  @media (min-width: 768px) {
+    .display-hero {
+      font-size: 60px;
+    }
+  }
+
+  /*
+   * 点阵字的落位阴影：右下实心硬偏移，像素游戏里文字压在背景上的那层硬边。
+   *
+   * 为什么是实心偏移而不是模糊投影：点阵字的轮廓是台阶状的，模糊阴影会沿着
+   * 台阶糊成一圈灰边，看起来像渲染坏了。硬偏移的每一格都对齐字形网格。
+   *
+   * 偏移量必须随字号走：12px 的字配 4px，影子会把字身整个吃掉；60px 的字配 4px
+   * 又几乎看不见。用 CSS 变量而不是堆 `.display-xx.pixel-title--drop` 组合选择器——
+   * 主标题随断点落到不同字号，组合选择器在某些断点上会对不上。
+   * 变量只在**同时带 .pixel-title--drop 的元素上**才声明，避免污染无关标题。
+   */
+  .pixel-title--drop {
+    --pixel-drop: 4px;
+    text-shadow: var(--pixel-drop) var(--pixel-drop) 0 var(--pixel-shadow-color, #ffc72c);
+  }
+  .display-12.pixel-title--drop { --pixel-drop: 2px; }
+  .display-24.pixel-title--drop { --pixel-drop: 3px; }
+  .display-36.pixel-title--drop { --pixel-drop: 3px; }
+  .display-48.pixel-title--drop { --pixel-drop: 4px; }
+  .display-hero.pixel-title--drop { --pixel-drop: 4px; }
+
+  @media (min-width: 480px) {
+    .display-hero.pixel-title--drop { --pixel-drop: 4px; }
+  }
+  @media (min-width: 768px) {
+    .display-hero.pixel-title--drop { --pixel-drop: 5px; }
+  }
+
+  /*
+   * 点阵字专属的描边层。用 text-shadow 叠四向硬偏移造出 1 格的描边，颜色
+   * 需显式指定（不能是 currentColor —— 那等于同色，等于没描）。
+   *
+   * 用途限定在**深色底**上：金色在深底上只有 1.45:1，靠描边分离才立得住；
+   * 但在奶油白底上金色本体只有 1.45:1，加描边也救不回来，别用。
+   */
+  .pixel-title--outline {
+    text-shadow:
+      -2px 0 0 var(--pixel-outline-color, #0d0d0d),
+      2px 0 0 var(--pixel-outline-color, #0d0d0d),
+      0 -2px 0 var(--pixel-outline-color, #0d0d0d),
+      0 2px 0 var(--pixel-outline-color, #0d0d0d);
   }
 
   /*
